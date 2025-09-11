@@ -136,7 +136,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       }
 
       // Add floor plans data
-      const floorPlansMapping = {
+      const floorPlansMapping: { [key: string]: Array<{ name: string; beds: number; baths: number; sqft: number; price: number; available: string }> } = {
         'Idyl Fenway': [
           { name: 'Studio', beds: 0, baths: 1, sqft: 450, price: 2800, available: 'Available Now' },
           { name: '1 Bedroom', beds: 1, baths: 1, sqft: 650, price: 3500, available: 'Available Now' },
