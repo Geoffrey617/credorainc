@@ -166,7 +166,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ 
       suggestions: [],
       fallback: true,
-      error: error.message
+      error: error instanceof Error ? error.message : 'Unknown error'
     });
   }
 }
