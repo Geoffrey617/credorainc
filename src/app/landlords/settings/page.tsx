@@ -767,6 +767,7 @@ export default function LandlordSettings() {
                           e.target.value = cleaned;
                         }
                       }}
+                    />
                   </div>
                 </div>
 
