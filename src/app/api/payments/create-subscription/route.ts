@@ -88,8 +88,8 @@ export async function POST(request: NextRequest) {
       clientSecret: (subscription.latest_invoice as any)?.payment_intent?.client_secret,
       status: subscription.status,
       customerId: customer.id,
-      currentPeriodStart: subscription.current_period_start,
-      currentPeriodEnd: subscription.current_period_end,
+      currentPeriodStart: (subscription as any).current_period_start,
+      currentPeriodEnd: (subscription as any).current_period_end,
     });
 
   } catch (error: any) {
