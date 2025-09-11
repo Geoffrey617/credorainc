@@ -233,7 +233,7 @@ export default function SubmitPage() {
       localStorage.setItem('credora_application_payment', JSON.stringify(paymentInfo));
       
       // Show success message and redirect to dashboard
-      alert(`✅ Application submitted successfully! Payment ID: ${paymentResult.paymentIntentId.substring(0, 10)}...`);
+      alert(`✅ Application submitted successfully! Payment ID: ${paymentResult.paymentIntentId?.substring(0, 10) || 'N/A'}...`);
       
       // Redirect to dashboard to view application status
       router.push('/dashboard');
