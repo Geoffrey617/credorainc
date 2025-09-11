@@ -75,7 +75,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       };
 
       // Map to proper image sets based on apartment title
-      const imageMapping = {
+      const imageMapping: { [key: string]: { imageUrl: string; images: string[] } } = {
         'Idyl Fenway': {
           imageUrl: '/images/apartments/idyl-boston/WhatsApp Image 2025-08-31 at 11.23.26.jpeg',
           images: [
