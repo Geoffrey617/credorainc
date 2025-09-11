@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Card Detection Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-md mx-auto bg-white rounded-lg shadow-lg p-6">
+        <h1 class="text-2xl font-bold mb-6 text-center">Card Provider Logo Test</h1>
+        
+        <div class="space-y-4">
+            <div>
+                <div class="flex justify-between items-center mb-2">
+                    <label class="block text-sm font-medium text-gray-700">
+                        Card Number
+                    </label>
+                    <!-- Accepted Cards Display -->
+                    <div class="flex space-x-1.5">
+                        <img src="/assets/logos/visa.png" alt="Visa" class="h-5 w-auto object-contain opacity-90 hover:opacity-100 transition-opacity" onerror="this.style.display='none'" />
+                        <img src="/assets/logos/mastercard.png" alt="Mastercard" class="h-5 w-auto object-contain opacity-90 hover:opacity-100 transition-opacity" onerror="this.style.display='none'" />
+                        <img src="/assets/logos/amex.png" alt="American Express" class="h-5 w-auto object-contain opacity-90 hover:opacity-100 transition-opacity" onerror="this.style.display='none'" />
+                        <img src="/assets/logos/discover.png" alt="Discover" class="h-5 w-auto object-contain opacity-90 hover:opacity-100 transition-opacity" onerror="this.style.display='none'" />
+                    </div>
+                </div>
+                <div class="relative">
+                    <input
+                        type="text"
+                        id="cardNumber"
+                        placeholder="Enter card number..."
+                        class="w-full px-4 py-3 pr-16 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                    <div id="cardLogo" class="absolute right-3 top-1/2 transform -translate-y-1/2 hidden">
+                        <img id="logoImg" src="" alt="" class="h-5 w-auto object-contain" />
+                    </div>
+                </div>
+            </div>
+            
+            <div id="cardInfo" class="text-sm text-gray-600 hidden">
+                <p><strong>Detected Type:</strong> <span id="cardType"></span></p>
+                <p><strong>Formatted:</strong> <span id="cardFormatted"></span></p>
+                <p><strong>Logo Path:</strong> <span id="logoPath"></span></p>
+            </div>
+        </div>
+        
+        <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+            <h3 class="font-semibold text-gray-800 mb-2">Test These Card Numbers:</h3>
+            <ul class="text-sm text-gray-600 space-y-1">
+                <li><strong>Visa:</strong> 4242424242424242</li>
+                <li><strong>Mastercard:</strong> 5555555555554444</li>
+                <li><strong>Amex:</strong> 378282246310005</li>
+                <li><strong>Discover:</strong> 6011111111111117</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Card detection logic (simplified version)
+        function detectCardType(cardNumber) {
+            const cleanNumber = cardNumber.replace(/\D/g, '');
+            
+            if (cleanNumber.length < 1) {
+                return { type: null, logoPath: null };
+            }
+
+            const patterns = {
+                visa: /^4/,
+                mastercard: /^5[1-5]|^2[2-7]/,
+                amex: /^3[47]/,
+                discover: /^6(?:011|5)/,
+            };
+
+            for (const [cardType, pattern] of Object.entries(patterns)) {
+                if (pattern.test(cleanNumber)) {
+                    return {
+                        type: cardType,
+                        logoPath: `/assets/logos/${cardType}.png`
+                    };
+                }
+            }
+
+            return { type: null, logoPath: null };
+        }
+
+        function formatCardNumber(cardNumber) {
+            const cleanNumber = cardNumber.replace(/\D/g, '');
+            
+            // American Express: XXXX XXXXXX XXXXX
+            if (cleanNumber.match(/^3[47]/)) {
+                return cleanNumber.replace(/(\d{4})(\d{6})(\d{5})/, '$1 $2 $3');
+            }
+            
+            // Other cards: XXXX XXXX XXXX XXXX
+            return cleanNumber.replace(/(\d{4})/g, '$1 ').trim();
+        }
+
+        // Event listener
+        document.getElementById('cardNumber').addEventListener('input', function(e) {
+            const cardNumber = e.target.value;
+            const detection = detectCardType(cardNumber);
+            const formatted = formatCardNumber(cardNumber);
+            
+            // Update input with formatted number
+            e.target.value = formatted;
+            
+            // Update UI
+            const cardLogo = document.getElementById('cardLogo');
+            const logoImg = document.getElementById('logoImg');
+            const cardInfo = document.getElementById('cardInfo');
+            
+            if (detection.logoPath) {
+                logoImg.src = detection.logoPath;
+                logoImg.alt = `${detection.type} logo`;
+                cardLogo.classList.remove('hidden');
+                
+                // Update info
+                document.getElementById('cardType').textContent = detection.type;
+                document.getElementById('cardFormatted').textContent = formatted;
+                document.getElementById('logoPath').textContent = detection.logoPath;
+                cardInfo.classList.remove('hidden');
+            } else {
+                cardLogo.classList.add('hidden');
+                cardInfo.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>

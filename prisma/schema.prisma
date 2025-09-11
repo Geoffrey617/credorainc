@@ -1,0 +1,273 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model for general users (renters/applicants)
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  firstName     String?
+  lastName      String?
+  name          String?
+  phone         String?
+  address       String?
+  city          String?
+  state         String?
+  zipCode       String?
+  emailVerified Boolean   @default(false)
+  signedInAt    DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  applications        Application[]
+  apartmentRequests   ApartmentFinderRequest[]
+  payments           Payment[]
+
+  @@map("users")
+}
+
+// Landlord model for property owners
+model Landlord {
+  id                String    @id @default(cuid())
+  email             String    @unique
+  firstName         String?
+  lastName          String?
+  name              String?
+  phone             String?
+  company           String?
+  address           String?
+  city              String?
+  state             String?
+  zipCode           String?
+  emailVerified     Boolean   @default(false)
+  idVerified        Boolean   @default(false)
+  subscriptionPlan  String?   // 'Basic' | 'Premium'
+  subscriptionStatus String?  // 'active' | 'cancelled' | 'past_due'
+  signedInAt        DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  // Relations
+  properties Property[]
+  payments   Payment[]
+
+  @@map("landlords")
+}
+
+// Application model for lease guarantor applications
+model Application {
+  id                String    @id @default(cuid())
+  userId            String
+  firstName         String
+  lastName          String
+  email             String
+  phone             String?
+  employmentStatus  String?
+  income            Float?
+  creditScore       Int?
+  rentalAddress     String?
+  rentalCity        String?
+  rentalState       String?
+  rentalZipCode     String?
+  monthlyRent       Float?
+  leaseLength       String?
+  moveInDate        DateTime?
+  status            String    @default("draft") // 'draft' | 'submitted' | 'under_review' | 'approved' | 'rejected'
+  paymentStatus     String    @default("pending") // 'pending' | 'paid' | 'refunded'
+  paymentIntentId   String?
+  applicationFee    Float?
+  submittedAt       DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("applications")
+}
+
+// Apartment Finder Request model
+model ApartmentFinderRequest {
+  id                    String    @id @default(cuid())
+  userId                String
+  userEmail             String
+  userName              String
+  budgetMin             Float
+  budgetMax             Float
+  preferredLocations    String[]  // Array of location strings
+  moveInDate            DateTime
+  leaseLength           String
+  contactPreference     String    // 'email' | 'phone' | 'both'
+  phoneNumber           String?
+  additionalNotes       String?
+  
+  // Dealbreakers
+  noPets                Boolean   @default(false)
+  petFriendlyRequired   Boolean   @default(false)
+  noStudents            Boolean   @default(false)
+  studentFriendlyRequired Boolean @default(false)
+  minimumCreditScore    Int?
+  requiredAmenities     String[]  // Array of required amenity strings
+  avoidAmenities        String[]  // Array of amenities to avoid
+  
+  status                String    @default("submitted") // 'submitted' | 'in_review' | 'recommendations_sent' | 'closed'
+  paymentStatus         String    @default("pending") // 'pending' | 'paid' | 'refunded'
+  paymentIntentId       String?
+  notes                 String?
+  submittedAt           DateTime
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("apartment_finder_requests")
+}
+
+// Property model for landlord-submitted properties
+model Property {
+  id                String    @id @default(cuid())
+  landlordId        String
+  title             String
+  description       String?
+  address           String
+  city              String
+  state             String
+  zipCode           String
+  propertyType      String    // 'apartment' | 'house' | 'condo' | 'townhouse'
+  totalUnits        Int       @default(1)
+  images            String[]  // Array of image URLs
+  amenities         String[]  // Array of amenity strings
+  petPolicy         Json?     // JSON object for pet policies
+  parkingAvailable  Boolean   @default(false)
+  laundryType       String?   // 'in_unit' | 'on_site' | 'none'
+  contactPhone      String?
+  contactEmail      String?
+  website           String?
+  verified          Boolean   @default(false)
+  status            String    @default("active") // 'active' | 'inactive' | 'pending_review'
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  // Relations
+  landlord Landlord @relation(fields: [landlordId], references: [id], onDelete: Cascade)
+  units    Unit[]
+
+  @@map("properties")
+}
+
+// Unit model for individual apartment units
+model Unit {
+  id              String    @id @default(cuid())
+  propertyId      String
+  unitNumber      String?
+  bedrooms        Int
+  bathrooms       Float
+  squareFeet      Int?
+  monthlyRent     Float
+  securityDeposit Float?
+  availableDate   DateTime?
+  leaseLength     String?   // '6_months' | '12_months' | 'month_to_month'
+  furnished       Boolean   @default(false)
+  utilities       Json?     // JSON object for utilities included
+  floorPlan       String?   // Floor plan type/name
+  images          String[]  // Array of unit-specific image URLs
+  status          String    @default("available") // 'available' | 'occupied' | 'maintenance'
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // Relations
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@map("units")
+}
+
+// Payment model for tracking all payments
+model Payment {
+  id                String    @id @default(cuid())
+  userId            String?   // For user payments
+  landlordId        String?   // For landlord payments
+  type              String    // 'application_fee' | 'apartment_finder_fee' | 'landlord_subscription'
+  amount            Float
+  currency          String    @default("usd")
+  status            String    // 'pending' | 'succeeded' | 'failed' | 'cancelled' | 'refunded'
+  paymentIntentId   String    @unique
+  stripeCustomerId  String?
+  description       String?
+  metadata          Json?     // Additional payment metadata
+  paidAt            DateTime?
+  refundedAt        DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  // Relations
+  user     User?     @relation(fields: [userId], references: [id])
+  landlord Landlord? @relation(fields: [landlordId], references: [id])
+
+  @@map("payments")
+}
+
+// Apartment model for manually added apartment listings
+model Apartment {
+  id              String    @id @default(cuid())
+  title           String
+  address         String
+  city            String
+  state           String
+  zipCode         String
+  description     String?
+  price           Float
+  bedrooms        Int
+  bathrooms       Float
+  squareFeet      Int?
+  images          String[]  // Array of image URLs
+  amenities       String[]  // Array of amenity strings
+  petFriendly     Boolean   @default(false)
+  parking         Boolean   @default(false)
+  laundry         Boolean   @default(false)
+  gym             Boolean   @default(false)
+  pool            Boolean   @default(false)
+  balcony         Boolean   @default(false)
+  dishwasher      Boolean   @default(false)
+  airConditioning Boolean   @default(false)
+  heating         Boolean   @default(false)
+  hardwoodFloors  Boolean   @default(false)
+  
+  // Contact and application info
+  contactPhone    String?
+  contactEmail    String?
+  website         String?
+  applyUrl        String?   // Official application URL
+  
+  // Metadata
+  neighborhood    String?
+  walkScore       Int?
+  transitScore    Int?
+  bikeScore       Int?
+  schools         Json?     // JSON array of nearby schools
+  restaurants     Json?     // JSON array of nearby restaurants
+  shopping        Json?     // JSON array of nearby shopping
+  
+  // Reviews and ratings
+  overallRating   Float?
+  reviews         Json?     // JSON array of reviews
+  
+  // Administrative
+  verified        Boolean   @default(false)
+  landlordSubmitted Boolean @default(false)
+  landlordId      String?
+  status          String    @default("active") // 'active' | 'inactive' | 'pending_review'
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@map("apartments")
+}

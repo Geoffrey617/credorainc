@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Landlord Storage</title>
+</head>
+<body>
+    <h1>Debug Landlord Storage</h1>
+    <div id="output"></div>
+    
+    <script>
+        function debugStorage() {
+            const output = document.getElementById('output');
+            let html = '<h2>LocalStorage Debug</h2>';
+            
+            // Check for unverified landlord
+            const unverified = localStorage.getItem('credora_unverified_landlord');
+            html += '<h3>Unverified Landlord:</h3>';
+            if (unverified) {
+                try {
+                    const data = JSON.parse(unverified);
+                    html += '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                } catch (e) {
+                    html += '<p style="color: red;">Error parsing: ' + e.message + '</p>';
+                    html += '<p>Raw data: ' + unverified + '</p>';
+                }
+            } else {
+                html += '<p style="color: orange;">No unverified landlord data found</p>';
+            }
+            
+            // Check for verified landlord
+            const verified = localStorage.getItem('credora_verified_landlord');
+            html += '<h3>Verified Landlord:</h3>';
+            if (verified) {
+                try {
+                    const data = JSON.parse(verified);
+                    html += '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                } catch (e) {
+                    html += '<p style="color: red;">Error parsing: ' + e.message + '</p>';
+                }
+            } else {
+                html += '<p style="color: orange;">No verified landlord data found</p>';
+            }
+            
+            // Check for landlord user
+            const user = localStorage.getItem('credora_landlord_user');
+            html += '<h3>Landlord User:</h3>';
+            if (user) {
+                try {
+                    const data = JSON.parse(user);
+                    html += '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                } catch (e) {
+                    html += '<p style="color: red;">Error parsing: ' + e.message + '</p>';
+                }
+            } else {
+                html += '<p style="color: orange;">No landlord user data found</p>';
+            }
+            
+            // Show all localStorage keys
+            html += '<h3>All LocalStorage Keys:</h3>';
+            const keys = Object.keys(localStorage);
+            if (keys.length > 0) {
+                html += '<ul>';
+                keys.forEach(key => {
+                    html += '<li><strong>' + key + '</strong>: ' + localStorage.getItem(key).substring(0, 100) + (localStorage.getItem(key).length > 100 ? '...' : '') + '</li>';
+                });
+                html += '</ul>';
+            } else {
+                html += '<p>No localStorage keys found</p>';
+            }
+            
+            output.innerHTML = html;
+        }
+        
+        // Run debug on load
+        debugStorage();
+        
+        // Add refresh button
+        document.body.innerHTML += '<br><button onclick="debugStorage()">Refresh Debug</button>';
+    </script>
+</body>
+</html>

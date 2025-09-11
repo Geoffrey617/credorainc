@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -22,5 +23,77 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: Georgia, "Times New Roman", Times, serif;
 }
+
+/* 3D Transform Utilities */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.rotate-y-12 {
+  transform: rotateY(12deg);
+}
+
+.translate-z-2 {
+  transform: translateZ(8px);
+}
+
+.translate-z-4 {
+  transform: translateZ(16px);
+}
+
+/* Additional 3D Effects for Testimonials */
+.shadow-3xl {
+  box-shadow: 0 35px 60px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+.translate-z-\[-20px\] {
+  transform: translateZ(-20px);
+}
+
+/* Backdrop blur utilities */
+.backdrop-blur-sm {
+  backdrop-filter: blur(4px);
+}
+
+/* Custom animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Continuous Sliding Animations */
+@keyframes slide-left {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes slide-right {
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(0); }
+}
+
+.animate-slide-left {
+  animation: slide-left 60s linear infinite;
+}
+
+.animate-slide-right {
+  animation: slide-right 60s linear infinite;
+}
+
+/* Pause animation on hover */
+.animate-slide-left:hover,
+.animate-slide-right:hover {
+  animation-play-state: paused;
+}
+
+
