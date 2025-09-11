@@ -125,7 +125,7 @@ export default function ApartmentDetailPage() {
   };
 
   const getOfficialWebsite = (apartmentTitle: string) => {
-    const websiteMapping = {
+    const websiteMapping: { [key: string]: string } = {
       'Idyl Fenway': 'https://www.idylfenway.com',
       'The Q Topanga': 'https://www.theqtopanga.com',
       'Heritage House': 'https://www.heritagehousechicago.com',
