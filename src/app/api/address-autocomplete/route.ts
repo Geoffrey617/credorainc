@@ -71,7 +71,7 @@ export async function GET(request: NextRequest) {
       let state = '';
       if (addr.state) {
         // Convert full state names to abbreviations for common ones
-        const stateAbbreviations = {
+        const stateAbbreviations: { [key: string]: string } = {
           'Illinois': 'IL',
           'New York': 'NY',
           'California': 'CA',
