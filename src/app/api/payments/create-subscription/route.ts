@@ -129,9 +129,9 @@ export async function GET(request: NextRequest) {
         id: subscription.id,
         status: subscription.status,
         customerId: subscription.customer,
-        currentPeriodStart: subscription.current_period_start,
-        currentPeriodEnd: subscription.current_period_end,
-        cancelAtPeriodEnd: subscription.cancel_at_period_end,
+        currentPeriodStart: (subscription as any).current_period_start,
+        currentPeriodEnd: (subscription as any).current_period_end,
+        cancelAtPeriodEnd: (subscription as any).cancel_at_period_end,
         items: subscription.items.data.map(item => ({
           id: item.id,
           priceId: item.price.id,
