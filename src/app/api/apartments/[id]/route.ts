@@ -33,7 +33,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     
     // Get the apartment mapping with proper images and details
     const getApartmentDetails = (apt: any) => {
-      const baseDetails = {
+      const baseDetails: any = {
         id: apt.id.toString(),
         title: apt.title,
         buildingName: apt.building_name || apt.title,
