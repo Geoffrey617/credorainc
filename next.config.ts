@@ -10,9 +10,12 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       },
     ],
+    unoptimized: true, // Required for static export
   },
   
-  // Configure for Netlify deployment with server-side features
+  // Configure for Netlify deployment
+  output: 'export',
+  trailingSlash: true,
   serverExternalPackages: ['resend'],
 };
 
