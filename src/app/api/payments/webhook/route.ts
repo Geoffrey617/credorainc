@@ -179,8 +179,8 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
 async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
   console.log(`💰 Invoice payment succeeded: ${invoice.id}`);
   
-  if (invoice.subscription) {
-    console.log(`🔄 Subscription payment successful: ${invoice.subscription}`);
+  if ((invoice as any).subscription) {
+    console.log(`🔄 Subscription payment successful: ${(invoice as any).subscription}`);
     
     // Extend subscription period
     // Send payment receipt
