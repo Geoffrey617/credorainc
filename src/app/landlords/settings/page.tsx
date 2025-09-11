@@ -240,7 +240,7 @@ export default function LandlordSettings() {
       setShowPaymentModal(false);
       
       // Show success message
-      alert(`✅ Successfully subscribed to ${selectedPlan} plan! Payment ID: ${paymentResult.paymentIntentId.substring(0, 10)}...`);
+      alert(`✅ Successfully subscribed to ${selectedPlan} plan! Payment ID: ${paymentResult.paymentIntentId?.substring(0, 10) || 'N/A'}...`);
       
     } catch (error: any) {
       console.error('Subscription payment failed:', error);
