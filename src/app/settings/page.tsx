@@ -298,7 +298,7 @@ export default function SettingsPage() {
             <div>
               <h3 className="text-sm font-medium text-slate-700 mb-2">Last Updated</h3>
               <p className="text-sm text-slate-600">
-                {user.updatedAt ? new Date(user.updatedAt).toLocaleDateString() : 'Never'}
+                {(user as any).updatedAt ? new Date((user as any).updatedAt).toLocaleDateString() : 'Never'}
               </p>
             </div>
           </div>
