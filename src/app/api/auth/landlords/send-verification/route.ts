@@ -254,10 +254,10 @@ Email is not a secure method of communication because it may be intercepted by t
       text: textContent,
     });
 
-    console.log('✅ Landlord verification email sent:', { email, resendId: data.id });
+    console.log('✅ Landlord verification email sent:', { email, resendId: data?.data?.id });
 
     return NextResponse.json(
-      { message: 'Verification email sent successfully', emailId: data.id },
+      { message: 'Verification email sent successfully', emailId: data?.data?.id },
       { status: 200 }
     );
   } catch (error) {
