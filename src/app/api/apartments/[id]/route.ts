@@ -32,7 +32,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     }
     
     // Get the apartment mapping with proper images and details
-    const getApartmentDetails = (apt) => {
+    const getApartmentDetails = (apt: any) => {
       const baseDetails = {
         id: apt.id.toString(),
         title: apt.title,
