@@ -191,8 +191,8 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
 async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
   console.log(`💔 Invoice payment failed: ${invoice.id}`);
   
-  if (invoice.subscription) {
-    console.log(`⚠️ Subscription payment failed: ${invoice.subscription}`);
+  if ((invoice as any).subscription) {
+    console.log(`⚠️ Subscription payment failed: ${(invoice as any).subscription}`);
     
     // Send payment failure notification
     // Provide retry options
