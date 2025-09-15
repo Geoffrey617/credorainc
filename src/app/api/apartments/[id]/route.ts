@@ -2,7 +2,7 @@ import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 
 // Configure for static export compatibility
-export const dynamic = 'force-dynamic'
+export const dynamic = 'force-static'
 export const runtime = 'nodejs'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
