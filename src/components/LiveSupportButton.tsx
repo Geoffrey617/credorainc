@@ -76,12 +76,6 @@ export default function LiveSupportButton({ className = '' }: LiveSupportButtonP
 // Extend the Window interface for TypeScript
 declare global {
   interface Window {
-    Tawk_API?: {
-      maximize?: () => void;
-      minimize?: () => void;
-      toggle?: () => void;
-      showWidget?: () => void;
-      hideWidget?: () => void;
-    };
+    Tawk_API?: any;
   }
 }
