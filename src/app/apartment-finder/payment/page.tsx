@@ -557,7 +557,7 @@ export default function ApartmentFinderPaymentPage() {
             expiryDate: cardDetails.expiryDate,
             cvv: cardDetails.cvv,
             cardholderName: cardDetails.cardholderName,
-            zipCode: cardDetails.zipCode
+            zipCode: billingAddress.zipCode
           },
           billingAddress
         })
