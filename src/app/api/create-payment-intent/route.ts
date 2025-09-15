@@ -10,32 +10,83 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 export async function POST(request: NextRequest) {
   try {
-    const { amount, currency = 'usd', customerEmail, customerName, service, description } = await request.json();
+    const { amount, currency = 'usd', customerEmail, customerName, service, description, cardDetails, billingAddress } = await request.json();
 
-    // Create payment intent
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(amount * 100), // Convert to cents
-      currency,
-      automatic_payment_methods: {
-        enabled: true,
-      },
-      metadata: {
-        customerEmail,
-        customerName,
-        service: service || 'Cosigner Application Fee'
-      },
-      description: description || `Credora Cosigner Application Fee - ${customerEmail}`,
-    });
+    // If card details are provided, process payment server-side
+    if (cardDetails) {
+      console.log('💳 Processing server-side payment with card details');
 
-    return NextResponse.json({
-      clientSecret: paymentIntent.client_secret,
-      paymentIntentId: paymentIntent.id,
-    });
+      // Create payment method from card details
+      const paymentMethod = await stripe.paymentMethods.create({
+        type: 'card',
+        card: {
+          number: cardDetails.cardNumber,
+          exp_month: parseInt(cardDetails.expiryDate.split('/')[0]),
+          exp_year: parseInt('20' + cardDetails.expiryDate.split('/')[1]),
+          cvc: cardDetails.cvv,
+        },
+        billing_details: {
+          name: cardDetails.cardholderName,
+          address: {
+            line1: billingAddress?.street,
+            city: billingAddress?.city,
+            state: billingAddress?.state,
+            postal_code: cardDetails.zipCode,
+            country: 'US',
+          },
+        },
+      });
+
+      // Create and confirm payment intent
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: Math.round(amount * 100), // Convert to cents
+        currency,
+        payment_method: paymentMethod.id,
+        confirm: true,
+        metadata: {
+          customerEmail,
+          customerName,
+          service: service || 'Cosigner Application Fee'
+        },
+        description: description || `Credora ${service} - ${customerEmail}`,
+      });
+
+      return NextResponse.json({
+        success: true,
+        paymentIntent: {
+          id: paymentIntent.id,
+          status: paymentIntent.status,
+          amount: paymentIntent.amount,
+          currency: paymentIntent.currency,
+        },
+      });
+    } else {
+      // Create payment intent for client-side processing (original behavior)
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: Math.round(amount * 100), // Convert to cents
+        currency,
+        automatic_payment_methods: {
+          enabled: true,
+        },
+        metadata: {
+          customerEmail,
+          customerName,
+          service: service || 'Cosigner Application Fee'
+        },
+        description: description || `Credora Cosigner Application Fee - ${customerEmail}`,
+      });
+
+      return NextResponse.json({
+        success: true,
+        clientSecret: paymentIntent.client_secret,
+        paymentIntentId: paymentIntent.id,
+      });
+    }
 
   } catch (error: any) {
-    console.error('Error creating payment intent:', error);
+    console.error('Error processing payment:', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to create payment intent' },
+      { error: error.message || 'Failed to process payment' },
       { status: 500 }
     );
   }

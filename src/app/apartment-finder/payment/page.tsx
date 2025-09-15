@@ -539,40 +539,42 @@ export default function ApartmentFinderPaymentPage() {
         throw new Error('Failed to load Stripe');
       }
 
-      // Confirm payment with card details
-      // Create payment method first, then confirm payment
-      const { error: pmError, paymentMethod } = await stripe.createPaymentMethod({
-        type: 'card',
-        card: {
-          number: cardDetails.cardNumber.replace(/\s/g, ''),
-          exp_month: parseInt(cardDetails.expiryDate.split('/')[0]),
-          exp_year: parseInt('20' + cardDetails.expiryDate.split('/')[1]),
-          cvc: cardDetails.cvv,
+      // Use server-side payment processing for custom form
+      const paymentResponse = await fetch('/api/create-payment-intent', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-        billing_details: {
-          name: cardDetails.cardholderName,
-          address: {
-            line1: billingAddress.street,
-            city: billingAddress.city,
-            state: billingAddress.state,
-            postal_code: billingAddress.zipCode,
-            country: 'US',
+        body: JSON.stringify({
+          amount: 55, // Apartment finder fee
+          currency: 'usd',
+          customerEmail: formData.email,
+          customerName: formData.fullName,
+          service: 'Apartment Finder Service',
+          description: 'Apartment Finder Service Payment',
+          cardDetails: {
+            cardNumber: cardDetails.cardNumber.replace(/\s/g, ''),
+            expiryDate: cardDetails.expiryDate,
+            cvv: cardDetails.cvv,
+            cardholderName: cardDetails.cardholderName,
+            zipCode: cardDetails.zipCode
           },
-        },
+          billingAddress
+        })
       });
 
-      if (pmError) {
-        throw new Error(pmError.message || 'Failed to create payment method');
+      if (!paymentResponse.ok) {
+        const errorData = await paymentResponse.json();
+        throw new Error(errorData.error || 'Payment failed');
       }
 
-      // Confirm payment with the payment method
-      const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
-        payment_method: paymentMethod.id,
-      });
-
-      if (error) {
-        throw new Error(error.message || 'Payment failed');
+      const paymentResult = await paymentResponse.json();
+      
+      if (!paymentResult.success) {
+        throw new Error(paymentResult.error || 'Payment failed');
       }
+
+      const paymentIntent = paymentResult.paymentIntent;
 
       if (paymentIntent.status !== 'succeeded') {
         throw new Error('Payment was not completed successfully');
