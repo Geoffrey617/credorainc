@@ -20,9 +20,12 @@ export function useAuth() {
 
   useEffect(() => {
     // Check for existing session
-    const currentUser = auth.getCurrentUser()
-    setUser(currentUser)
-    setLoading(false)
+    const loadUser = async () => {
+      const currentUser = await auth.getCurrentUser()
+      setUser(currentUser)
+      setLoading(false)
+    }
+    loadUser()
   }, [])
 
   const signOut = async () => {
