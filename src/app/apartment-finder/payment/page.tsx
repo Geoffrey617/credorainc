@@ -548,8 +548,8 @@ export default function ApartmentFinderPaymentPage() {
         body: JSON.stringify({
           amount: 55, // Apartment finder fee
           currency: 'usd',
-          customerEmail: formData.email,
-          customerName: formData.fullName,
+          customerEmail: draftRequest?.userEmail || '',
+          customerName: draftRequest?.userName || '',
           service: 'Apartment Finder Service',
           description: 'Apartment Finder Service Payment',
           cardDetails: {
