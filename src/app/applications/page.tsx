@@ -9,6 +9,7 @@ interface Application {
   id: number;
   status: 'draft' | 'submitted' | 'under_review' | 'approved' | 'denied';
   created_at: string;
+  updated_at?: string;
   user_id: number;
   email: string;
   first_name: string;
@@ -236,7 +237,7 @@ export default function ApplicationsPage() {
                         Submitted: {new Date(application.created_at).toLocaleDateString()}
                       </div>
                       <div className="text-sm text-slate-500">
-                        Updated: {new Date(application.updated_at).toLocaleDateString()}
+                        Updated: {application.updated_at ? new Date(application.updated_at).toLocaleDateString() : 'Not updated'}
                       </div>
                       <button className="bg-slate-100 text-slate-700 px-4 py-2 rounded-lg hover:bg-slate-200 transition-colors font-medium">
                         View Details
