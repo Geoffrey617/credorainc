@@ -71,7 +71,7 @@ export default function SettingsPage() {
         firstName: authUser?.firstName || authUser?.first_name || '',
         lastName: authUser?.lastName || authUser?.last_name || '',
         email: authUser?.email || '',
-        phone: authUser?.phone || ''
+        phone: (authUser as any)?.phone || ''
       });
     }
   };
