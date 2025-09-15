@@ -49,23 +49,6 @@ export const auth = {
     }
   },
 
-  // Sign out
-  async signOut() {
-    try {
-      // Clear local storage
-      localStorage.removeItem('credora_session')
-      localStorage.removeItem('credora_user')
-      
-      // Sign out from Supabase (for OAuth users)
-      await supabase.auth.signOut()
-      
-      return { success: true }
-    } catch (error) {
-      console.error('Sign-out error:', error)
-      throw error
-    }
-  },
-
   // Get current user
   // Get current user from Supabase session
   async getCurrentUser() {
