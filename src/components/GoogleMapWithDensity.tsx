@@ -214,7 +214,7 @@ const GoogleMapWithDensity: React.FC<GoogleMapWithDensityProps> = ({
   onMarkerClick
 }) => {
   const mapRef = useRef<HTMLDivElement>(null);
-  const [map, setMap] = useState<google.maps.Map | null>(null);
+  const [map, setMap] = useState<any>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [apiKeyMissing, setApiKeyMissing] = useState(false);
   const [densityData] = useState<ApartmentDensityMarker[]>(() => generateApartmentDensityData());
