@@ -308,7 +308,7 @@ const GoogleMapWithDensity: React.FC<GoogleMapWithDensityProps> = ({
               }
               
               // Show info window
-              const infoWindow = new google.maps.InfoWindow({
+              const infoWindow = new (window as any).google.maps.InfoWindow({
                 content: `
                   <div style="padding: 10px; min-width: 200px;">
                     <h3 style="margin: 0 0 8px 0; color: #475569; font-size: 16px; font-weight: bold;">${marker.city}, ${marker.state}</h3>
