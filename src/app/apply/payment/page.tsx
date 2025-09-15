@@ -115,8 +115,8 @@ export default function PaymentPage() {
       // Process payment with Stripe
       const paymentResult = await processStripePayment(
         {
-          amount: 55, // $55 guarantor service application fee
-          description: 'Credora Guarantor Service Application Fee - Background check and processing',
+          amount: 55, // $55 cosigner service application fee
+          description: 'Credora Cosigner Service Application Fee - Background check and processing',
           metadata: {
             type: 'application_fee',
             applicantId: 'current_user', // In production, use actual user ID
@@ -140,7 +140,7 @@ export default function PaymentPage() {
           amount: 55,
           status: 'paid',
           paidAt: new Date().toISOString(),
-          description: 'Guarantor Service Application Fee',
+          description: 'Cosigner Service Application Fee',
         };
         
         localStorage.setItem('credora_application_payment', JSON.stringify(paymentInfo));

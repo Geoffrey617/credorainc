@@ -1,36 +1,22 @@
-import type { Metadata } from "next";
-import { createMetadata, createBreadcrumbSchema } from '@/lib/seo-config';
-import ApplyPageClient from './ApplyPageClient';
+'use client';
 
-export const metadata: Metadata = createMetadata({
-  title: "Apply",
-  description: "Apply for Credora Inc apartment cosigner service. Get approved in 24-48 hours with professional cosigners. Simple application process for all 50 states.",
-  path: "/apply",
-  keywords: [
-    "apply cosigner service",
-    "apartment cosigner application",
-    "lease guarantor application",
-    "rental cosigner apply",
-    "apartment approval application",
-    "cosigner service application",
-    "lease guarantee application",
-    "rental approval apply"
-  ]
-});
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function ApplyPage() {
-  const breadcrumbSchema = createBreadcrumbSchema([
-    { name: "Home", path: "" },
-    { name: "Apply", path: "/apply" }
-  ]);
+  const router = useRouter();
+
+  useEffect(() => {
+    // Redirect to the first step of the application
+    router.push('/apply/personal');
+  }, [router]);
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
-      />
-      <ApplyPageClient />
-    </>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-white flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-slate-700 mx-auto mb-4"></div>
+        <p className="text-slate-600">Redirecting to application...</p>
+      </div>
+    </div>
   );
 }

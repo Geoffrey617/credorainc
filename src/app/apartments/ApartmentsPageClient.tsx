@@ -77,13 +77,19 @@ function ApartmentSearchContent() {
   const [propertyType, setPropertyType] = useState('');
   const [showFilters, setShowFilters] = useState(false);
 
-  // Get unique values for filters
-  const uniqueStates = [...new Set(apartments.map(apt => apt.state))].sort();
-  const uniqueCities = [...new Set(
-    apartments.filter(apt => !selectedState || apt.state === selectedState)
-             .map(apt => apt.city)
-  )].sort();
-  const uniquePropertyTypes = [...new Set(apartments.map(apt => apt.propertyType))].sort();
+  // Get unique values for filters (with safety check)
+  const uniqueStates = apartments && Array.isArray(apartments) 
+    ? [...new Set(apartments.map(apt => apt.state))].sort()
+    : [];
+  const uniqueCities = apartments && Array.isArray(apartments)
+    ? [...new Set(
+        apartments.filter(apt => !selectedState || apt.state === selectedState)
+                 .map(apt => apt.city)
+      )].sort()
+    : [];
+  const uniquePropertyTypes = apartments && Array.isArray(apartments)
+    ? [...new Set(apartments.map(apt => apt.propertyType))].sort()
+    : [];
 
   // Load apartments from API
   useEffect(() => {
@@ -137,6 +143,12 @@ function ApartmentSearchContent() {
 
   // Apply filters
   useEffect(() => {
+    // Safety check - ensure apartments is an array
+    if (!apartments || !Array.isArray(apartments)) {
+      setFilteredApartments([]);
+      return;
+    }
+
     let filtered = apartments;
 
     // Text search

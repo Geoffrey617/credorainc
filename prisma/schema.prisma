@@ -63,7 +63,7 @@ model Landlord {
   @@map("landlords")
 }
 
-// Application model for lease guarantor applications
+// Application model for lease cosigner applications
 model Application {
   id                String    @id @default(cuid())
   userId            String

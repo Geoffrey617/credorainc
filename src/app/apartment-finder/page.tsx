@@ -39,6 +39,19 @@ export default function ApartmentFinderPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+
+  const formatPhone = (value: string) => {
+    const numbers = value.replace(/\D/g, '');
+    if (numbers.length <= 3) return numbers;
+    if (numbers.length <= 6) return `(${numbers.slice(0, 3)}) ${numbers.slice(3)}`;
+    return `(${numbers.slice(0, 3)}) ${numbers.slice(3, 6)}-${numbers.slice(6, 10)}`;
+  };
+
+  const formatCurrency = (value: string) => {
+    const numbers = value.replace(/[^0-9]/g, '');
+    if (!numbers || numbers === '0') return '';
+    return new Intl.NumberFormat('en-US').format(parseInt(numbers));
+  };
   
   const [formData, setFormData] = useState<ApartmentFinderRequest>({
     budget: { min: 0, max: 0 },
@@ -238,36 +251,37 @@ export default function ApartmentFinderPage() {
             <h3 className="text-lg font-semibold text-slate-800 mb-4">Personal Information</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Full Name *</label>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Full Name <span className="text-red-500">*</span></label>
                 <input
                   type="text"
                   value={personalInfo.fullName}
                   onChange={(e) => setPersonalInfo({ ...personalInfo, fullName: e.target.value })}
                   placeholder="John Doe"
                   className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent text-slate-900 bg-white"
-                  // required
+                  required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Email Address *</label>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Email Address <span className="text-red-500">*</span></label>
                 <input
                   type="email"
                   value={personalInfo.email}
                   onChange={(e) => setPersonalInfo({ ...personalInfo, email: e.target.value })}
                   placeholder="john@example.com"
                   className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent text-slate-900 bg-white"
-                  // required
+                  required
                 />
               </div>
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-slate-700 mb-2">Phone Number *</label>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Phone Number <span className="text-red-500">*</span></label>
                 <input
                   type="tel"
-                  value={personalInfo.phoneNumber}
-                  onChange={(e) => setPersonalInfo({ ...personalInfo, phoneNumber: e.target.value })}
+                  value={formatPhone(personalInfo.phoneNumber)}
+                  onChange={(e) => setPersonalInfo({ ...personalInfo, phoneNumber: e.target.value.replace(/\D/g, '') })}
                   placeholder="(555) 123-4567"
                   className="w-full md:w-64 px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent text-slate-900 bg-white"
-                  // required
+                  maxLength={14}
+                  required
                 />
               </div>
             </div>
@@ -275,23 +289,22 @@ export default function ApartmentFinderPage() {
 
           {/* Budget */}
           <div className="mb-8">
-            <label className="block text-sm font-medium text-slate-700 mb-4">Budget Range (Monthly Rent)</label>
+            <label className="block text-sm font-medium text-slate-700 mb-4">Budget Range (Monthly Rent) <span className="text-red-500">*</span></label>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs text-slate-600 mb-1">Minimum</label>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500">$</span>
                   <input
-                    type="number"
-                    value={formData.budget.min || ''}
+                    type="text"
+                    value={formatCurrency(formData.budget.min.toString())}
                     onChange={(e) => setFormData({
                       ...formData,
-                      budget: { ...formData.budget, min: parseInt(e.target.value) || 0 }
+                      budget: { ...formData.budget, min: parseInt(e.target.value.replace(/[^0-9]/g, '')) || 0 }
                     })}
-                    placeholder="1000"
+                    placeholder="1,000"
                     className="w-full pl-8 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent text-slate-900 bg-white"
-                    min="0"
-                    // required (temporarily disabled)
+                    required
                   />
                 </div>
               </div>
@@ -300,16 +313,15 @@ export default function ApartmentFinderPage() {
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500">$</span>
                   <input
-                    type="number"
-                    value={formData.budget.max || ''}
+                    type="text"
+                    value={formatCurrency(formData.budget.max.toString())}
                     onChange={(e) => setFormData({
                       ...formData,
-                      budget: { ...formData.budget, max: parseInt(e.target.value) || 0 }
+                      budget: { ...formData.budget, max: parseInt(e.target.value.replace(/[^0-9]/g, '')) || 0 }
                     })}
-                    placeholder="2500"
+                    placeholder="2,500"
                     className="w-full pl-8 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent text-slate-900 bg-white"
-                    min="0"
-                    // required (temporarily disabled)
+                    required
                   />
                 </div>
               </div>
@@ -318,7 +330,7 @@ export default function ApartmentFinderPage() {
 
           {/* Preferred Locations */}
           <div className="mb-8">
-            <label className="block text-sm font-medium text-slate-700 mb-4">Preferred Locations</label>
+            <label className="block text-sm font-medium text-slate-700 mb-4">Preferred Locations <span className="text-red-500">*</span></label>
             <p className="text-xs text-slate-600 mb-4">Add cities, neighborhoods, or areas you'd like to live in</p>
             {formData.preferredLocations.map((location, index) => (
               <div key={index} className="flex items-center gap-2 mb-3">
@@ -328,7 +340,7 @@ export default function ApartmentFinderPage() {
                   onChange={(e) => handleLocationChange(index, e.target.value)}
                   placeholder="e.g., Boston, MA or Back Bay, Boston"
                   className="flex-1 px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent text-slate-900 bg-white"
-                  // required={index === 0}
+                  required={index === 0}
                 />
                 {index > 0 && (
                   <button
@@ -358,7 +370,7 @@ export default function ApartmentFinderPage() {
           {/* Move-in Date and Lease Length */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">Preferred Move-in Date</label>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Preferred Move-in Date <span className="text-red-500">*</span></label>
               <input
                 type="date"
                 value={formData.moveInDate}
@@ -368,7 +380,7 @@ export default function ApartmentFinderPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">Lease Length</label>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Lease Length <span className="text-red-500">*</span></label>
               <select
                 value={formData.leaseLength}
                 onChange={(e) => setFormData({ ...formData, leaseLength: e.target.value })}

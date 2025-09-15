@@ -1,35 +1,20 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import LiveSupport from '@/components/LiveSupport';
-import LiveSupportButton from '@/components/LiveSupportButton';
-import { getLiveSupportConfig } from '@/config/liveSupport';
-
-interface User {
-  email: string;
-  name: string;
-  firstName?: string;
-  lastName?: string;
-}
+import { useSimpleAuth } from '@/hooks/useSimpleAuth';
 
 export default function DashboardPage() {
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const liveSupportConfig = getLiveSupportConfig();
+  const { user, isAuthenticated, isLoading } = useSimpleAuth();
 
   useEffect(() => {
-    // Check if user is signed in
-    const userData = localStorage.getItem('credora_user');
-    if (userData) {
-      setUser(JSON.parse(userData));
-    } else {
+    if (!isLoading && !isAuthenticated) {
+      console.log('🚫 Not authenticated, redirecting to sign in');
       router.push('/auth/signin');
     }
-    setIsLoading(false);
-  }, [router]);
+  }, [isAuthenticated, isLoading, router]);
 
 
 
@@ -58,7 +43,7 @@ export default function DashboardPage() {
             Welcome back, {user.firstName || user.name?.split(' ')[0] || 'there'}!
           </h2>
           <p className="text-slate-200 text-lg">
-            Manage your applications and track your progress towards getting approved.
+            Manage applications and track your progress.
           </p>
         </div>
 
@@ -72,10 +57,10 @@ export default function DashboardPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.462-.881-6.065-2.328C5.556 11.731 5 10.5 5 9c0-4.418 3.582-8 8-8s8 3.582 8 8c0 1.5-.556 2.731-.935 3.672z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-slate-800 ml-4">Lease Guarantor</h3>
+              <h3 className="text-lg font-semibold text-slate-800 ml-4">Lease Cosigner</h3>
             </div>
             <p className="text-slate-600 mb-6 text-sm">
-              Begin your cosigning application process. Get approved in 24-48 hours.
+              Begin your cosigner request application. Get Approved in 24 - 48 hours.
             </p>
             <Link
               href="/apply"
@@ -130,27 +115,6 @@ export default function DashboardPage() {
             </Link>
           </div>
 
-          {/* Live Support */}
-          <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
-            <div className="flex items-center mb-4">
-              <div className="bg-green-100 p-3 rounded-lg">
-                <svg className="w-6 h-6 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                </svg>
-              </div>
-              <div className="ml-4">
-                <h3 className="text-lg font-semibold text-slate-800">Live Support</h3>
-                <div className="flex items-center mt-1">
-                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse mr-2"></div>
-                  <span className="text-xs text-green-600 font-medium">Online Now</span>
-                </div>
-              </div>
-            </div>
-            <p className="text-slate-600 mb-6 text-sm">
-              Get instant help from our support team. Chat with us live for real-time assistance.
-            </p>
-            <LiveSupportButton className="w-full text-sm" />
-          </div>
         </div>
 
         {/* Application Status */}
@@ -187,45 +151,78 @@ export default function DashboardPage() {
             <div className="text-2xl font-bold text-green-600">94.2%</div>
             <div className="text-sm text-slate-600">Success Rate</div>
           </div>
-          <div className="bg-white rounded-lg p-6 text-center">
-            <div className="text-2xl font-bold text-slate-700">$55</div>
-            <div className="text-sm text-slate-600">Application Fee</div>
-          </div>
         </div>
 
         {/* Resources */}
         <div className="mt-8 bg-white rounded-xl shadow-lg p-6">
           <h3 className="text-xl font-semibold text-slate-800 mb-4">Helpful Resources</h3>
-          <div className="grid md:grid-cols-3 gap-4">
-            <Link href="/faq" className="p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
-              <h4 className="font-semibold text-slate-800 mb-2">FAQ</h4>
-              <p className="text-sm text-slate-600">Get answers to common questions about our cosigning service.</p>
-            </Link>
-            <Link href="/for-renters" className="p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
-              <h4 className="font-semibold text-slate-800 mb-2">For Renters</h4>
-              <p className="text-sm text-slate-600">Learn more about our services and how we can help you.</p>
-            </Link>
-            <div className="p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer"
-                 onClick={() => {
-                   if (window.Tawk_API && window.Tawk_API.maximize) {
-                     window.Tawk_API.maximize();
-                   }
-                 }}>
-              <h4 className="font-semibold text-slate-800 mb-2">Live Chat Support</h4>
-              <p className="text-sm text-slate-600">Get instant help from our support team via live chat.</p>
+          <div className="grid md:grid-cols-2 gap-4">
+            
+            {/* FAQ Dropdown */}
+            <div className="relative group">
+              <button className="w-full p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors text-left">
+                <h4 className="font-semibold text-slate-800 mb-2 flex items-center justify-between">
+                  FAQ
+                  <svg className="w-4 h-4 text-slate-500 group-hover:text-slate-700 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </h4>
+                <p className="text-sm text-slate-600">Get answers to common questions about our cosigning service.</p>
+              </button>
+              
+              {/* FAQ Dropdown Content */}
+              <div className="absolute top-full left-0 mt-2 w-80 bg-white border border-slate-200 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-10">
+                <div className="p-4 space-y-4">
+                  <div>
+                    <h5 className="font-semibold text-slate-800 text-sm mb-1">How long does approval take?</h5>
+                    <p className="text-slate-600 text-xs">Most applications are approved within 24-48 hours after submission.</p>
+                  </div>
+                  <div>
+                    <h5 className="font-semibold text-slate-800 text-sm mb-1">What documents do I need?</h5>
+                    <p className="text-slate-600 text-xs">Government ID, income verification, and student ID (if applicable).</p>
+                  </div>
+                  <div>
+                    <h5 className="font-semibold text-slate-800 text-sm mb-1">How much does it cost?</h5>
+                    <p className="text-slate-600 text-xs">$55 application fee, then service fee based on your first month rent amount.</p>
+                  </div>
+                </div>
+              </div>
             </div>
+
+            {/* Live Support Dropdown */}
+            <div className="relative group">
+              <button className="w-full p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors text-left">
+                <h4 className="font-semibold text-slate-800 mb-2 flex items-center justify-between">
+                  Live Chat Support
+                  <svg className="w-4 h-4 text-slate-500 group-hover:text-slate-700 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </h4>
+                <p className="text-sm text-slate-600">Get instant help from our support team via live chat.</p>
+              </button>
+              
+              {/* Support Dropdown Content */}
+              <div className="absolute top-full left-0 mt-2 w-80 bg-white border border-slate-200 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-10">
+                <div className="p-4 space-y-4">
+                  <div>
+                    <h5 className="font-semibold text-slate-800 text-sm mb-1">Live Chat Available</h5>
+                    <p className="text-slate-600 text-xs">Monday - Friday, 9 AM - 6 PM EST. Get instant answers to your questions.</p>
+                  </div>
+                  <div>
+                    <h5 className="font-semibold text-slate-800 text-sm mb-1">Email Support</h5>
+                    <p className="text-slate-600 text-xs">Send us an email at support@credorainc.com for detailed assistance.</p>
+                  </div>
+                  <div>
+                    <h5 className="font-semibold text-slate-800 text-sm mb-1">Phone Support</h5>
+                    <p className="text-slate-600 text-xs">Call us at 1-800-CREDORA (1-800-273-3672) for urgent matters.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
-      
-      {/* Live Support Widget */}
-      {liveSupportConfig.enabled && (
-        <LiveSupport 
-          widgetId={liveSupportConfig.widgetId} 
-          propertyId={liveSupportConfig.propertyId} 
-          provider={liveSupportConfig.provider} 
-        />
-      )}
     </div>
   );
 }

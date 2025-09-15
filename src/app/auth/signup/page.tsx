@@ -2,9 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import AuthNavigation from '../../../components/AuthNavigation';
 import { useRouter } from 'next/navigation';
-import { signIn, getSession } from 'next-auth/react';
+import { firebaseAuth } from '@/lib/firebase-auth';
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -20,7 +19,6 @@ export default function SignUpPage() {
   const [showVerificationMessage, setShowVerificationMessage] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isAppleDevice, setIsAppleDevice] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState({
     minLength: false,
     hasUppercase: false,
@@ -29,13 +27,6 @@ export default function SignUpPage() {
     hasSpecialChar: false
   });
 
-  useEffect(() => {
-    // Detect if user is on Apple device
-    const userAgent = navigator.userAgent.toLowerCase();
-    setIsAppleDevice(
-      /iphone|ipad|ipod|macintosh|mac os x/.test(userAgent)
-    );
-  }, []);
 
   const checkPasswordStrength = (password: string) => {
     setPasswordStrength({
@@ -70,36 +61,29 @@ export default function SignUpPage() {
     }
   };
 
-  const handleSocialSignUp = async (provider: 'google' | 'azure-ad' | 'apple') => {
+  const handleSocialSignUp = async () => {
     setIsLoading(true);
     setError('');
     
     try {
-      const result = await signIn(provider, {
-        callbackUrl: '/dashboard',
-        redirect: false
-      });
-
-      if (result?.error) {
-        throw new Error(result.error);
-      }
-
-      if (result?.ok) {
-        const session = await getSession();
-        if (session) {
-          console.log(`✅ ${provider} sign-up successful:`, session.user?.email);
-          router.push('/dashboard');
-        } else {
-          throw new Error('Session creation failed');
-        }
-      }
+      const result = await firebaseAuth.signInWithGoogle();
+      
+      // Store user data in localStorage for consistency
+      localStorage.setItem('credora_user', JSON.stringify(result.user));
+      localStorage.setItem('credora_session', 'firebase_session');
+      
+      console.log('✅ Google sign-up successful:', result.user.email);
+      
+      // Redirect to dashboard
+      router.push('/dashboard');
     } catch (err) {
-      console.error(`❌ ${provider} sign-up error:`, err);
-      setError(`${provider.charAt(0).toUpperCase() + provider.slice(1)} sign-up failed. Please try again.`);
+      console.error('❌ Google sign-up error:', err);
+      setError('Google sign-up failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -161,10 +145,9 @@ export default function SignUpPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <AuthNavigation />
 
       {/* Sign Up Form */}
-      <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 pt-24">
+      <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 pt-8">
         <div className="max-w-md w-full space-y-8">
           <div className="text-center">
             <h2 className="text-2xl font-bold text-gray-900">Create your account</h2>
@@ -252,7 +235,7 @@ export default function SignUpPage() {
                 {/* Social Sign-Up Options */}
                 <div className="space-y-3 mb-6">
                   <button
-                    onClick={() => handleSocialSignUp('google')}
+                    onClick={handleSocialSignUp}
                     disabled={isLoading}
                     className="w-full flex items-center justify-center px-4 py-3 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
@@ -265,32 +248,6 @@ export default function SignUpPage() {
                     Continue with Google
                   </button>
                   
-                  <button
-                    onClick={() => handleSocialSignUp('azure-ad')}
-                    disabled={isLoading}
-                    className="w-full flex items-center justify-center px-4 py-3 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                  >
-                    <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24">
-                      <path fill="#f25022" d="M1 1h10v10H1z"/>
-                      <path fill="#00a4ef" d="M12 1h10v10H12z"/>
-                      <path fill="#7fba00" d="M1 12h10v10H1z"/>
-                      <path fill="#ffb900" d="M12 12h10v10H12z"/>
-                    </svg>
-Continue with Microsoft
-                  </button>
-
-                  {isAppleDevice && (
-                    <button
-                      onClick={() => handleSocialSignUp('apple')}
-                      disabled={isLoading}
-                      className="w-full flex items-center justify-center px-4 py-3 border border-gray-300 rounded-md shadow-sm bg-black text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    >
-                      <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
-                      </svg>
-                      Continue with Apple
-                    </button>
-                  )}
                 </div>
 
                 <div className="relative">

@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     "apartment cosigner cost", 
     "rental guarantee pricing",
     "student cosigner discount",
-    "lease guarantor rates",
+    "lease cosigner rates",
     "apartment approval cost",
     "cosigning service fees",
     "rental cosigner pricing"
@@ -74,7 +74,7 @@ export default function PricingPage() {
               Transparent Pricing
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Simple, upfront pricing for our lease guarantor service. No hidden fees, no surprises.
+              Simple, upfront pricing for our lease cosigner service. No hidden fees, no surprises.
             </p>
           </div>
         </div>
@@ -273,7 +273,7 @@ export default function PricingPage() {
         <section className="bg-gradient-to-r from-slate-700 to-slate-800 rounded-2xl p-12 text-center text-white">
           <h2 className="text-3xl font-bold mb-4">Ready to Get Approved?</h2>
           <p className="text-xl text-slate-200 mb-8">
-            Join thousands of renters who have secured their dream apartments with our lease guarantor service.
+            Join thousands of renters who have secured their dream apartments with our lease cosigner service.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/auth/signin" className="bg-white text-slate-700 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-100 transition-colors">

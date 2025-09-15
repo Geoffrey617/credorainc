@@ -10,12 +10,17 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       },
     ],
-    unoptimized: true, // Required for static export
+    // Only unoptimize images for static export in production
+    unoptimized: process.env.NODE_ENV === 'production',
   },
   
-  // Configure for Netlify deployment
-  output: 'export',
-  trailingSlash: true,
+  // Only use static export for production builds (Netlify deployment)
+  // In development, we need server-side functionality for NextAuth.js
+  ...(process.env.NODE_ENV === 'production' && {
+    output: 'export',
+    trailingSlash: true,
+  }),
+  
   serverExternalPackages: ['resend'],
 };
 

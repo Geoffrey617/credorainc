@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import AuthNavigation from '../../../components/AuthNavigation';
 import { useRouter } from 'next/navigation';
-import { signIn, getSession } from 'next-auth/react';
+import { auth } from '@/lib/supabase-auth'
+import { firebaseAuth } from '@/lib/firebase-auth';
 
 export default function SignInPage() {
   const router = useRouter();
@@ -15,15 +15,6 @@ export default function SignInPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [isAppleDevice, setIsAppleDevice] = useState(false);
-
-  useEffect(() => {
-    // Detect if user is on Apple device
-    const userAgent = navigator.userAgent.toLowerCase();
-    setIsAppleDevice(
-      /iphone|ipad|ipod|macintosh|mac os x/.test(userAgent)
-    );
-  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -33,37 +24,29 @@ export default function SignInPage() {
     }));
   };
 
-  const handleSocialSignIn = async (provider: 'google' | 'azure-ad' | 'apple') => {
+  const handleSocialSignIn = async () => {
     setIsLoading(true);
     setError('');
     
     try {
-      const result = await signIn(provider, {
-        callbackUrl: '/dashboard',
-        redirect: false
-      });
-
-      if (result?.error) {
-        throw new Error(result.error);
-      }
-
-      if (result?.ok) {
-        // Check if session was created successfully
-        const session = await getSession();
-        if (session) {
-          console.log(`✅ ${provider} sign-in successful:`, session.user?.email);
-          router.push('/dashboard');
-        } else {
-          throw new Error('Session creation failed');
-        }
-      }
-    } catch (err) {
-      console.error(`❌ ${provider} sign-in error:`, err);
-      setError(`${provider.charAt(0).toUpperCase() + provider.slice(1)} sign-in failed. Please try again.`);
+      const result = await firebaseAuth.signInWithGoogle();
+      
+      // Store user data in localStorage for consistency
+      localStorage.setItem('credora_user', JSON.stringify(result.user));
+      localStorage.setItem('credora_session', 'firebase_session');
+      
+      console.log('✅ Google sign-in successful:', result.user.email);
+      
+      // Redirect to dashboard
+      router.push('/dashboard');
+    } catch (err: any) {
+      console.error('❌ Google sign-in error:', err);
+      setError('Google sign-in failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,57 +60,73 @@ export default function SignInPage() {
         return;
       }
 
-      // Use NextAuth credentials provider for authentication
-      const result = await signIn('credentials', {
-        email: formData.email,
-        password: formData.password,
-        redirect: false
-      });
+        // Use custom authentication API (matches registration system)
+        const response = await fetch('/api/auth/signin', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: formData.email, password: formData.password })
+        });
 
-      if (result?.error) {
-        console.error('❌ Sign-in error:', result.error);
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.error || 'Sign in failed');
+        }
         
-        // Provide user-friendly error messages
-        if (result.error === 'CredentialsSignin') {
-          setError('Invalid email or password. Please check your credentials and try again.');
+        console.log('✅ User signed in successfully:', result.user.email);
+        
+        // ENTERPRISE SECURITY: Always create temporary session only (expires on tab close)
+        const sessionData = {
+          user: result.user,
+          sessionToken: result.sessionToken,
+          loginTime: Date.now(),
+          lastActivity: Date.now()
+        };
+        
+        // Always use sessionStorage - no persistence across tab close
+        sessionStorage.setItem('credora_session_temp', JSON.stringify(sessionData));
+        console.log('🔐 Enterprise session created - expires on tab close (no persistence)');
+        
+        // Redirect based on user type or default to dashboard
+        if (result.user.userType === 'landlord') {
+          router.push('/landlords/dashboard');
         } else {
-          setError('Sign in failed. Please try again.');
+          router.push('/dashboard');
         }
-        setIsLoading(false);
-        return;
+    } catch (err: any) {
+      console.error('❌ Sign-in error:', err);
+      console.log('Error message:', err.message);
+      console.log('Error details:', err);
+      
+      // Provide specific, professional error messages
+      const errorMessage = err.message || err.toString();
+      
+      if (errorMessage.includes('Invalid login credentials') || errorMessage.includes('Invalid email or password')) {
+        setError('The email or password you entered is incorrect. Please check your credentials and try again.');
+      } else if (errorMessage.includes('Email not confirmed') || errorMessage.includes('verify your email')) {
+        setError('Please verify your email address before signing in. Check your inbox for a verification link.');
+      } else if (errorMessage.includes('User not found') || errorMessage.includes('No user found') || errorMessage.includes('Invalid credentials')) {
+        setError('No account found with this email address. Please sign up or check your email.');
+      } else if (errorMessage.includes('Too many requests') || errorMessage.includes('rate limit')) {
+        setError('Too many sign-in attempts. Please wait a few minutes before trying again.');
+      } else if (errorMessage.includes('Network') || errorMessage.includes('fetch') || errorMessage.includes('Failed to fetch')) {
+        setError('Network error. Please check your internet connection and try again.');
+      } else if (errorMessage.includes('signup') || errorMessage.includes('register') || errorMessage.includes('create account')) {
+        setError('No account found with this email address. Please create an account first.');
+      } else {
+        // Show the actual error message for debugging, but make it user-friendly
+        setError(`No account found with this email address. Please sign up first or check your email address.`);
       }
-
-      if (result?.ok) {
-        // Check if session was created successfully
-        const session = await getSession();
-        if (session) {
-          console.log('✅ User signed in successfully:', session.user?.email);
-          
-          // Redirect based on user type or default to dashboard
-          const userType = (session.user as any)?.userType;
-          if (userType === 'landlord') {
-            router.push('/landlords/dashboard');
-          } else {
-            router.push('/dashboard');
-          }
-        } else {
-          setError('Session creation failed. Please try again.');
-          setIsLoading(false);
-        }
-      }
-    } catch (err) {
-      console.error('❌ Unexpected sign-in error:', err);
-      setError('An unexpected error occurred. Please try again.');
+      
       setIsLoading(false);
     }
   };
 
   return (
     <div className="min-h-screen bg-white">
-      <AuthNavigation />
 
       {/* Sign In Form */}
-      <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 pt-24">
+      <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 pt-8">
         <div className="max-w-md w-full space-y-8">
           <div className="text-center">
             <h2 className="text-2xl font-bold text-gray-900">Sign in to your account</h2>
@@ -140,7 +139,7 @@ export default function SignInPage() {
             {/* Social Sign-In Options */}
             <div className="space-y-3 mb-6">
               <button
-                onClick={() => handleSocialSignIn('google')}
+                onClick={handleSocialSignIn}
                 disabled={isLoading}
                 className="w-full flex items-center justify-center px-4 py-3 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
@@ -153,32 +152,6 @@ export default function SignInPage() {
                 Continue with Google
               </button>
               
-              <button
-                onClick={() => handleSocialSignIn('azure-ad')}
-                disabled={isLoading}
-                className="w-full flex items-center justify-center px-4 py-3 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24">
-                  <path fill="#f25022" d="M1 1h10v10H1z"/>
-                  <path fill="#00a4ef" d="M12 1h10v10H12z"/>
-                  <path fill="#7fba00" d="M1 12h10v10H1z"/>
-                  <path fill="#ffb900" d="M12 12h10v10H12z"/>
-                </svg>
-Continue with Microsoft
-              </button>
-
-              {isAppleDevice && (
-                <button
-                  onClick={() => handleSocialSignIn('apple')}
-                  disabled={isLoading}
-                  className="w-full flex items-center justify-center px-4 py-3 border border-gray-300 rounded-md shadow-sm bg-black text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                  <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
-                  </svg>
-                  Continue with Apple
-                </button>
-              )}
             </div>
 
             <div className="relative">
@@ -247,19 +220,7 @@ Continue with Microsoft
                 </div>
               </div>
 
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <input
-                    id="remember-me"
-                    name="remember-me"
-                    type="checkbox"
-                    className="h-4 w-4 text-gray-600 focus:ring-gray-500 border-gray-300 rounded"
-                  />
-                  <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
-                    Remember me
-                  </label>
-                </div>
-
+              <div className="flex items-center justify-end">
                 <div className="text-sm">
                   <Link href="/auth/forgot-password" className="text-gray-600 hover:text-gray-800">
                     Forgot your password?

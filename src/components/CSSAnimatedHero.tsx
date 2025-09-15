@@ -44,7 +44,7 @@ export default function CSSAnimatedHero({
             </span>
           </h1>
           <p className="text-lg md:text-xl lg:text-2xl text-gray-200 mb-8 leading-relaxed">
-            Professional lease guarantor services with 94.2% approval rate. 
+            Professional lease cosigner services with 94.2% approval rate. 
             Find your perfect apartment today.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

@@ -4,79 +4,48 @@ import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import Navigation from './Navigation';
 import AuthenticatedNavigation from './AuthenticatedNavigation';
+import { useSimpleAuth } from '@/hooks/useSimpleAuth';
 
 export default function ConditionalNavigation() {
   const pathname = usePathname();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userEmail, setUserEmail] = useState('');
+  const { isAuthenticated, user, isLoading } = useSimpleAuth();
+  const [hydrated, setHydrated] = useState(false);
   
-  // Check authentication status
+  // Ensure we're hydrated before rendering anything
   useEffect(() => {
-    const checkAuth = () => {
-      // Check if user is logged in via localStorage
-      const verifiedUser = localStorage.getItem('credora_verified_user');
-      const activeUser = localStorage.getItem('credora_user');
-      
-      console.log('🔍 ConditionalNavigation Auth Check:', {
-        verifiedUser: !!verifiedUser,
-        activeUser: !!activeUser,
-        pathname
-      });
-      
-      if (verifiedUser) {
-        const userData = JSON.parse(verifiedUser);
-        console.log('✅ Found verified user:', userData.email);
-        setIsAuthenticated(true);
-        setUserEmail(userData.email);
-      } else if (activeUser) {
-        const userData = JSON.parse(activeUser);
-        console.log('✅ Found active user:', userData.email);
-        setIsAuthenticated(true);
-        setUserEmail(userData.email);
-      } else {
-        console.log('❌ No authenticated user found');
-        setIsAuthenticated(false);
-        setUserEmail('');
-      }
-    };
-
-    // Check on mount
-    checkAuth();
-
-    // Listen for localStorage changes (when user logs in/out)
-    const handleStorageChange = () => checkAuth();
-    window.addEventListener('storage', handleStorageChange);
-    
-    // Also check periodically in case of same-tab changes
-    const interval = setInterval(checkAuth, 1000);
-
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      clearInterval(interval);
-    };
+    setHydrated(true);
   }, []);
   
-  // Don't show global navigation on auth pages
+  // Don't show global navigation on auth pages and application forms
   const isAuthPage = pathname?.startsWith('/auth/');
   const isLandlordPage = pathname?.startsWith('/landlords/dashboard') || pathname?.startsWith('/landlords/settings') || pathname?.startsWith('/landlords/add-property');
+  const isApplicationPage = pathname?.startsWith('/apply/personal') || pathname?.startsWith('/apply/employment') || pathname?.startsWith('/apply/rental') || pathname?.startsWith('/apply/documents') || pathname?.startsWith('/apply/review') || pathname?.startsWith('/apply/submit');
   
-  console.log('🧭 Navigation Decision:', {
+  // CRITICAL: Don't render anything until hydration is complete AND session status is confirmed
+  if (!hydrated || isLoading) {
+    // Invisible placeholder to prevent layout shift and flicker
+    return <div className="h-16 bg-white border-b border-gray-200 opacity-0"></div>;
+  }
+  
+  console.log('🧭 Navigation Decision (Post-Hydration):', {
     isAuthPage,
     isLandlordPage,
+    isApplicationPage,
     isAuthenticated,
-    userEmail,
-    pathname
+    userEmail: user?.email,
+    pathname,
+    hydrated
   });
   
-  if (isAuthPage || isLandlordPage) {
-    console.log('🚫 Hiding navigation (auth page or landlord page)');
+  if (isAuthPage || isLandlordPage || isApplicationPage) {
+    console.log('🚫 Hiding navigation (auth page, landlord page, or application form)');
     return null;
   }
   
   // Show authenticated navigation if user is logged in
-  if (isAuthenticated) {
-    console.log('🔐 Showing authenticated navigation for:', userEmail);
-    return <AuthenticatedNavigation userEmail={userEmail} />;
+  if (isAuthenticated && user) {
+    console.log('🔐 Showing authenticated navigation for:', user.email);
+    return <AuthenticatedNavigation userEmail={user.email} />;
   }
   
   // Show public navigation for non-authenticated users

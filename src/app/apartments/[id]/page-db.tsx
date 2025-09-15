@@ -108,9 +108,7 @@ export default function ApartmentDetailPage() {
   };
 
   const handleApply = () => {
-    if (apartment?.applyUrl) {
-      window.open(apartment.applyUrl, '_blank');
-    }
+    window.location.href = '/auth/signin';
   };
 
   if (loading) {

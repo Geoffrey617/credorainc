@@ -2,45 +2,91 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSimpleAuth } from '@/hooks/useSimpleAuth';
 
 interface User {
+  id?: string;
   email: string;
-  name: string;
-  firstName?: string;
-  lastName?: string;
-  signedInAt?: string;
-  emailVerified?: boolean;
+  first_name?: string;
+  last_name?: string;
+  phone?: string;
+  email_verified?: boolean;
+  created_at?: string;
+  provider?: string;
 }
 
 export default function SettingsPage() {
   const router = useRouter();
+  const { user: authUser, isAuthenticated, isLoading } = useSimpleAuth();
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [error, setError] = useState<string>('');
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
-    email: ''
+    email: '',
+    phone: ''
   });
 
-  useEffect(() => {
-    // Check if user is signed in
-    const userData = localStorage.getItem('credora_user');
-    if (userData) {
-      const parsedUser = JSON.parse(userData);
-      setUser(parsedUser);
-      setFormData({
-        firstName: parsedUser.firstName || '',
-        lastName: parsedUser.lastName || '',
-        email: parsedUser.email || ''
+  const loadUserProfile = async (userEmail: string) => {
+    try {
+      // Fetch real user data from database
+      const response = await fetch(`/api/user/profile?email=${encodeURIComponent(userEmail)}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
-    } else {
-      router.push('/auth/signin');
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log('✅ User profile loaded:', result.profile.email);
+        setUser(result.profile);
+        setFormData({
+          firstName: result.profile.first_name || '',
+          lastName: result.profile.last_name || '',
+          email: result.profile.email || '',
+          phone: result.profile.phone || ''
+        });
+      } else {
+        console.error('❌ Failed to load profile:', response.status);
+        setError('Failed to load your profile');
+        // Fallback to auth user data
+        setUser(authUser);
+        setFormData({
+          firstName: authUser?.firstName || authUser?.first_name || '',
+          lastName: authUser?.lastName || authUser?.last_name || '',
+          email: authUser?.email || '',
+          phone: authUser?.phone || ''
+        });
+      }
+    } catch (err) {
+      console.error('❌ Error loading profile:', err);
+      setError('Error loading your profile');
+      // Fallback to auth user data
+      setUser(authUser);
+      setFormData({
+        firstName: authUser?.firstName || authUser?.first_name || '',
+        lastName: authUser?.lastName || authUser?.last_name || '',
+        email: authUser?.email || '',
+        phone: authUser?.phone || ''
+      });
     }
-    setIsLoading(false);
-  }, [router]);
+  };
+
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      console.log('🚫 Not authenticated, redirecting to sign in');
+      router.push('/auth/signin');
+      return;
+    }
+    
+    if (isAuthenticated && authUser?.email) {
+      loadUserProfile(authUser.email);
+    }
+  }, [isAuthenticated, isLoading, authUser, router]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -53,28 +99,55 @@ export default function SettingsPage() {
   const handleSave = async () => {
     setSaving(true);
     setSaveStatus('idle');
+    setError('');
 
     try {
-      // Update user data in localStorage
-      const updatedUser = {
-        ...user,
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        name: `${formData.firstName} ${formData.lastName}`,
-        email: formData.email,
-        updatedAt: new Date().toISOString()
-      };
+      // Update user profile via API
+      const response = await fetch('/api/user/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: user?.email,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          phone: formData.phone
+        })
+      });
 
-      localStorage.setItem('credora_user', JSON.stringify(updatedUser));
-      setUser(updatedUser);
-      setIsEditing(false);
-      setSaveStatus('success');
+      const result = await response.json();
 
-      // Clear success message after 3 seconds
-      setTimeout(() => setSaveStatus('idle'), 3000);
+      if (response.ok) {
+        console.log('✅ Profile updated successfully');
+        setUser(result.profile);
+        setIsEditing(false);
+        setSaveStatus('success');
 
-    } catch (error) {
-      console.error('Error saving user data:', error);
+        // Update localStorage with new data
+        const updatedLocalUser = {
+          ...user,
+          firstName: result.profile.first_name,
+          lastName: result.profile.last_name,
+          first_name: result.profile.first_name,
+          last_name: result.profile.last_name,
+          phone: result.profile.phone,
+          name: `${result.profile.first_name} ${result.profile.last_name}`,
+          updatedAt: new Date().toISOString()
+        };
+        localStorage.setItem('credora_user', JSON.stringify(updatedLocalUser));
+
+        // Clear success message after 3 seconds
+        setTimeout(() => setSaveStatus('idle'), 3000);
+      } else {
+        console.error('❌ Failed to update profile:', result.error);
+        setError(result.error || 'Failed to update profile');
+        setSaveStatus('error');
+      }
+
+    } catch (err) {
+      console.error('❌ Error updating profile:', err);
+      setError('Error updating your profile. Please try again.');
       setSaveStatus('error');
     } finally {
       setSaving(false);
@@ -85,13 +158,15 @@ export default function SettingsPage() {
     // Reset form data to original values
     if (user) {
       setFormData({
-        firstName: user.firstName || '',
-        lastName: user.lastName || '',
-        email: user.email || ''
+        firstName: user.first_name || '',
+        lastName: user.last_name || '',
+        email: user.email || '',
+        phone: user.phone || ''
       });
     }
     setIsEditing(false);
     setSaveStatus('idle');
+    setError('');
   };
 
   if (isLoading) {
@@ -105,7 +180,7 @@ export default function SettingsPage() {
     );
   }
 
-  if (!user) {
+  if (!isAuthenticated || !user) {
     return null; // Will redirect to sign in
   }
 
@@ -122,7 +197,7 @@ export default function SettingsPage() {
               <p className="text-slate-600 mt-2">Manage your personal information and preferences</p>
             </div>
             <div className="w-16 h-16 bg-gradient-to-r from-slate-700 to-slate-800 rounded-full flex items-center justify-center text-white font-bold text-xl">
-              {(user.firstName || user.name || user.email).charAt(0).toUpperCase()}
+              {(user.first_name || user.email).charAt(0).toUpperCase()}
             </div>
           </div>
 
@@ -142,7 +217,7 @@ export default function SettingsPage() {
             </div>
           )}
 
-          {saveStatus === 'error' && (
+          {(saveStatus === 'error' || error) && (
             <div className="mb-6 bg-red-50 border border-red-200 rounded-md p-4">
               <div className="flex">
                 <svg className="w-5 h-5 text-red-400 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
@@ -150,7 +225,7 @@ export default function SettingsPage() {
                 </svg>
                 <div className="ml-3">
                   <p className="text-sm text-red-800">
-                    There was an error saving your settings. Please try again.
+                    {error || 'There was an error saving your settings. Please try again.'}
                   </p>
                 </div>
               </div>
@@ -200,7 +275,7 @@ export default function SettingsPage() {
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-2">
                 Email Address
-                {user.emailVerified && (
+                {user.email_verified && (
                   <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
                     <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
@@ -215,11 +290,28 @@ export default function SettingsPage() {
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
+                disabled={true} // Email should not be editable
+                className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 text-gray-900 bg-gray-50 cursor-not-allowed"
+                placeholder="Enter your email address"
+              />
+              <p className="text-xs text-slate-500 mt-1">Email address cannot be changed</p>
+            </div>
+
+            <div>
+              <label htmlFor="phone" className="block text-sm font-medium text-slate-700 mb-2">
+                Phone Number
+              </label>
+              <input
+                type="tel"
+                id="phone"
+                name="phone"
+                value={formData.phone}
+                onChange={handleInputChange}
                 disabled={!isEditing}
                 className={`w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 text-gray-900 ${
                   !isEditing ? 'bg-gray-50 cursor-not-allowed' : 'bg-white'
                 }`}
-                placeholder="Enter your email address"
+                placeholder="Enter your phone number"
               />
             </div>
 
@@ -270,14 +362,14 @@ export default function SettingsPage() {
             <div>
               <h3 className="text-sm font-medium text-slate-700 mb-2">Member Since</h3>
               <p className="text-sm text-slate-600">
-                {user.signedInAt ? new Date(user.signedInAt).toLocaleDateString() : 'N/A'}
+                {user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}
               </p>
             </div>
 
             <div>
               <h3 className="text-sm font-medium text-slate-700 mb-2">Email Verification</h3>
               <div className="flex items-center">
-                {user.emailVerified ? (
+                {user.email_verified ? (
                   <>
                     <svg className="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
@@ -296,9 +388,9 @@ export default function SettingsPage() {
             </div>
 
             <div>
-              <h3 className="text-sm font-medium text-slate-700 mb-2">Last Updated</h3>
+              <h3 className="text-sm font-medium text-slate-700 mb-2">Account Provider</h3>
               <p className="text-sm text-slate-600">
-                {(user as any).updatedAt ? new Date((user as any).updatedAt).toLocaleDateString() : 'Never'}
+                {user.provider === 'email' ? 'Email/Password' : user.provider || 'N/A'}
               </p>
             </div>
           </div>

@@ -24,7 +24,7 @@ const subscriptionPlans: SubscriptionPlan[] = [
   {
     id: 'basic',
     name: 'Basic',
-    price: 29,
+    price: 25,
     interval: 'monthly',
     propertyLimit: 5,
     description: 'Perfect for individual landlords getting started',
@@ -37,9 +37,9 @@ const subscriptionPlans: SubscriptionPlan[] = [
     ]
   },
   {
-    id: 'professional',
-    name: 'Professional',
-    price: 79,
+    id: 'premium',
+    name: 'Premium',
+    price: 75,
     interval: 'monthly',
     propertyLimit: 25,
     description: 'Ideal for growing property management businesses',
@@ -52,24 +52,6 @@ const subscriptionPlans: SubscriptionPlan[] = [
       'Analytics dashboard',
       'Bulk property management',
       'Custom application forms'
-    ]
-  },
-  {
-    id: 'enterprise',
-    name: 'Enterprise',
-    price: 199,
-    interval: 'monthly',
-    propertyLimit: -1, // Unlimited
-    description: 'For large property management companies',
-    features: [
-      'Unlimited property listings',
-      'Premium tenant screening',
-      'Dedicated account manager',
-      'Maximum listing visibility',
-      'Advanced analytics & reporting',
-      'API access',
-      'White-label options',
-      'Custom integrations'
     ]
   }
 ];
@@ -90,47 +72,15 @@ export default function SubscriptionPlans({
       price: billingInterval === 'yearly' ? Math.floor(plan.price * 10) : plan.price // 2 months free on yearly
     };
     
-    // For now, call the existing onPlanSelect
-    // In production, you would integrate with Stripe Checkout or Elements
-    onPlanSelect(adjustedPlan);
+    console.log('📋 Selected plan:', plan.name, 'Price:', adjustedPlan.price);
     
-    /* 
-    // Future Stripe integration would look like this:
-    try {
-      const { loadStripe } = await import('@stripe/stripe-js');
-      const stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
-      
-      const response = await fetch('/api/payments/create-checkout-session', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          priceId: getPriceId(plan.id, billingInterval),
-          successUrl: `${window.location.origin}/landlords/dashboard?subscription=success`,
-          cancelUrl: `${window.location.origin}/landlords/dashboard?subscription=cancelled`,
-        }),
-      });
-      
-      const { sessionId } = await response.json();
-      
-      const result = await stripe!.redirectToCheckout({
-        sessionId: sessionId,
-      });
-      
-      if (result.error) {
-        console.error('Stripe checkout error:', result.error);
-      }
-    } catch (error) {
-      console.error('Payment setup error:', error);
-      onPlanSelect(adjustedPlan); // Fallback to current method
-    }
-    */
+    // Call the parent component's onPlanSelect to trigger payment modal
+    onPlanSelect(adjustedPlan);
   };
 
   const getAdjustedPrice = (plan: SubscriptionPlan) => {
     if (billingInterval === 'yearly') {
-      return Math.floor(plan.price * 10); // 2 months free
+      return plan.price * 10; // 10 months price for 12 months (2 months free)
     }
     return plan.price;
   };
@@ -153,36 +103,39 @@ export default function SubscriptionPlans({
           Select the perfect plan to manage your properties and grow your rental business
         </p>
 
-        {/* Billing Toggle */}
+        {/* Monthly/Yearly Billing Toggle */}
         <div className="flex items-center justify-center mb-8">
-          <span className={`mr-3 ${billingInterval === 'monthly' ? 'text-gray-900 font-medium' : 'text-gray-500'}`}>
-            Monthly
-          </span>
-          <button
-            onClick={() => setBillingInterval(billingInterval === 'monthly' ? 'yearly' : 'monthly')}
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-              billingInterval === 'yearly' ? 'bg-blue-600' : 'bg-gray-200'
-            }`}
-          >
-            <span
-              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                billingInterval === 'yearly' ? 'translate-x-6' : 'translate-x-1'
+          <div className="bg-gray-100 p-1 rounded-lg flex items-center">
+            <button
+              onClick={() => setBillingInterval('monthly')}
+              className={`px-6 py-2 rounded-md font-medium transition-all duration-200 ${
+                billingInterval === 'monthly'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
               }`}
-            />
-          </button>
-          <span className={`ml-3 ${billingInterval === 'yearly' ? 'text-gray-900 font-medium' : 'text-gray-500'}`}>
-            Yearly
-          </span>
-          {billingInterval === 'yearly' && (
-            <span className="ml-2 bg-green-100 text-green-800 text-xs font-semibold px-2 py-1 rounded-full">
-              Save 17%
-            </span>
-          )}
+            >
+              Monthly
+            </button>
+            <button
+              onClick={() => setBillingInterval('yearly')}
+              className={`px-6 py-2 rounded-md font-medium transition-all duration-200 ${
+                billingInterval === 'yearly'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              Yearly
+              <span className="ml-2 text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
+                Save 17%
+              </span>
+            </button>
+          </div>
         </div>
+
       </div>
 
       {/* Plans Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8 mt-12">
         {subscriptionPlans.map((plan) => {
           const adjustedPrice = getAdjustedPrice(plan);
           const savings = getSavingsText(plan);
@@ -193,15 +146,15 @@ export default function SubscriptionPlans({
               key={plan.id}
               className={`relative bg-white rounded-lg shadow-sm border-2 transition-all duration-200 hover:shadow-md ${
                 plan.recommended 
-                  ? 'border-blue-500 ring-2 ring-blue-200' 
+                  ? 'border-gray-700 ring-2 ring-gray-200' 
                   : isSelected
-                  ? 'border-blue-400'
+                  ? 'border-gray-600'
                   : 'border-gray-200 hover:border-gray-300'
               }`}
             >
               {plan.recommended && (
-                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                  <span className="bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-semibold">
+                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
+                  <span className="bg-gray-700 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg whitespace-nowrap">
                     Most Popular
                   </span>
                 </div>
@@ -244,9 +197,9 @@ export default function SubscriptionPlans({
                   }}
                   className={`w-full py-3 px-4 rounded-md font-medium transition-colors ${
                     plan.recommended
-                      ? 'bg-blue-600 text-white hover:bg-blue-700'
+                      ? 'bg-gray-700 text-white hover:bg-gray-800'
                       : isSelected
-                      ? 'bg-blue-100 text-blue-700 border border-blue-300'
+                      ? 'bg-gray-100 text-gray-700 border border-gray-300'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >

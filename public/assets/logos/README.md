@@ -22,7 +22,7 @@ Please save the following logo files in PNG format:
 
 These logos are automatically displayed in the payment forms when users enter their card numbers:
 
-- `/apply/submit` - Guarantor application fee payment
+- `/apply/submit` - Cosigner application fee payment
 - `/apartment-finder/payment` - Apartment finder service payment  
 - `/landlords/settings` - Landlord subscription payment modal
 

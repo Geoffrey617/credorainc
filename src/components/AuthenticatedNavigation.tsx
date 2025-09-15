@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSimpleAuth } from '@/hooks/useSimpleAuth';
 
 interface AuthenticatedNavigationProps {
   userEmail: string;
@@ -12,15 +13,13 @@ export default function AuthenticatedNavigation({ userEmail }: AuthenticatedNavi
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const router = useRouter();
+  const { signOut, user } = useSimpleAuth();
 
   const handleLogout = () => {
-    // Clear all authentication data
-    localStorage.removeItem('credora_user');
-    localStorage.removeItem('credora_verified_user');
-    localStorage.removeItem('credora_unverified_user');
+    console.log('🚪 Logout button clicked');
     
-    // Redirect to home page
-    router.push('/');
+    // Use the proper signOut method from useSimpleAuth
+    signOut();
     
     // Close menus
     setIsUserMenuOpen(false);
@@ -29,17 +28,31 @@ export default function AuthenticatedNavigation({ userEmail }: AuthenticatedNavi
 
   // Get user's display name
   const getDisplayName = () => {
-    // Try to get user data from localStorage
-    const userData = localStorage.getItem('credora_user');
-    if (userData) {
-      const user = JSON.parse(userData);
-      if (user.firstName) {
-        return user.firstName;
+    // Use user data from the auth hook
+    if (user) {
+      if (user.firstName || user.first_name) {
+        return user.firstName || user.first_name;
       } else if (user.name) {
         return user.name.split(' ')[0]; // Get first name from full name
       }
     }
-    // Fallback to email-based name
+    
+    // Fallback: try localStorage for backwards compatibility
+    try {
+      const userData = localStorage.getItem('credora_user');
+      if (userData) {
+        const storedUser = JSON.parse(userData);
+        if (storedUser.firstName) {
+          return storedUser.firstName;
+        } else if (storedUser.name) {
+          return storedUser.name.split(' ')[0];
+        }
+      }
+    } catch (e) {
+      // Ignore localStorage errors
+    }
+    
+    // Final fallback to email-based name
     return userEmail.split('@')[0].charAt(0).toUpperCase() + userEmail.split('@')[0].slice(1);
   };
 
@@ -52,45 +65,6 @@ export default function AuthenticatedNavigation({ userEmail }: AuthenticatedNavi
             Credora
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center space-x-6">
-            <Link href="/dashboard" className="text-slate-700 hover:text-slate-900 transition-all duration-300 font-medium hover:scale-105">
-              Dashboard
-            </Link>
-            <Link href="/apartments" className="text-slate-700 hover:text-slate-900 transition-all duration-300 font-medium hover:scale-105">
-              Browse
-            </Link>
-            <div className="relative group">
-              <button className="text-slate-700 hover:text-slate-900 transition-all duration-300 font-medium hover:scale-105 flex items-center">
-                Services
-                <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-              <div className="absolute top-full left-0 mt-2 w-56 bg-white/90 backdrop-blur-lg border border-white/30 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
-                <div className="py-2">
-                  <Link href="/apply" className="block px-4 py-2 text-sm text-slate-700 hover:bg-white/20 hover:text-slate-900 transition-all">
-                    Lease Guarantor Service
-                  </Link>
-                  <Link href="/apartment-finder" className="block px-4 py-2 text-sm text-slate-700 hover:bg-white/20 hover:text-slate-900 transition-all">
-                    <div className="flex items-center justify-between">
-                      <span>Apartment Finder Service</span>
-                      <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full">NEW</span>
-                    </div>
-                  </Link>
-                </div>
-              </div>
-            </div>
-            <Link href="/pricing" className="text-slate-700 hover:text-slate-900 transition-all duration-300 font-medium hover:scale-105">
-              Pricing
-            </Link>
-            <Link href="/faq" className="text-slate-700 hover:text-slate-900 transition-all duration-300 font-medium hover:scale-105">
-              FAQ
-            </Link>
-            <Link href="/contact" className="text-slate-700 hover:text-slate-900 transition-all duration-300 font-medium hover:scale-105">
-              Contact
-            </Link>
-          </div>
 
           {/* User Menu */}
           <div className="hidden lg:flex items-center space-x-4">
@@ -143,14 +117,11 @@ export default function AuthenticatedNavigation({ userEmail }: AuthenticatedNavi
                       My Applications
                     </Link>
                     <Link 
-                      href="/apartment-finder/track" 
+                      href="/support" 
                       className="block px-4 py-2 text-sm text-slate-700 hover:bg-white/20 hover:text-slate-900 transition-all"
                       onClick={() => setIsUserMenuOpen(false)}
                     >
-                      <div className="flex items-center justify-between">
-                        <span>Apartment Finder</span>
-                        <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full">NEW</span>
-                      </div>
+                      Support
                     </Link>
                     <div className="border-t border-white/20 mt-2 pt-2">
                       <button 
@@ -204,49 +175,11 @@ export default function AuthenticatedNavigation({ userEmail }: AuthenticatedNavi
                 Dashboard
               </Link>
               <Link 
-                href="/apartments" 
+                href="/applications" 
                 className="text-slate-700 hover:text-slate-900 hover:bg-white/20 transition-all duration-300 py-3 px-4 rounded-xl font-medium"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                Browse Apartments
-              </Link>
-              <Link 
-                href="/apply" 
-                className="text-slate-700 hover:text-slate-900 hover:bg-white/20 transition-all duration-300 py-3 px-4 rounded-xl font-medium"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Lease Guarantor Service
-              </Link>
-              <Link 
-                href="/apartment-finder" 
-                className="text-slate-700 hover:text-slate-900 hover:bg-white/20 transition-all duration-300 py-3 px-4 rounded-xl font-medium"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                <div className="flex items-center justify-between">
-                  <span>Apartment Finder Service</span>
-                  <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full">NEW</span>
-                </div>
-              </Link>
-              <Link 
-                href="/pricing" 
-                className="text-slate-700 hover:text-slate-900 hover:bg-white/20 transition-all duration-300 py-3 px-4 rounded-xl font-medium"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Pricing
-              </Link>
-              <Link 
-                href="/faq" 
-                className="text-slate-700 hover:text-slate-900 hover:bg-white/20 transition-all duration-300 py-3 px-4 rounded-xl font-medium"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                FAQ
-              </Link>
-              <Link 
-                href="/contact" 
-                className="text-slate-700 hover:text-slate-900 hover:bg-white/20 transition-all duration-300 py-3 px-4 rounded-xl font-medium"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Contact
+                My Applications
               </Link>
               <Link 
                 href="/settings" 
@@ -256,21 +189,11 @@ export default function AuthenticatedNavigation({ userEmail }: AuthenticatedNavi
                 Account Settings
               </Link>
               <Link 
-                href="/applications" 
+                href="/support" 
                 className="text-slate-700 hover:text-slate-900 hover:bg-white/20 transition-all duration-300 py-3 px-4 rounded-xl font-medium"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                My Applications
-              </Link>
-              <Link 
-                href="/apartment-finder/track" 
-                className="text-slate-700 hover:text-slate-900 hover:bg-white/20 transition-all duration-300 py-3 px-4 rounded-xl font-medium"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                <div className="flex items-center justify-between">
-                  <span>Apartment Finder</span>
-                  <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full">NEW</span>
-                </div>
+                Support
               </Link>
               <button 
                 onClick={handleLogout}

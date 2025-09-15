@@ -108,7 +108,7 @@ export default function AnimatedHero({
             </span>
           </h1>
           <p className="text-lg md:text-xl lg:text-2xl text-gray-200 mb-8 leading-relaxed">
-            Discover thousands of apartments with our lease guarantor service. 
+            Discover thousands of apartments with our lease cosigner service. 
             Get approved in 24-48 hours with 94.2% success rate.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

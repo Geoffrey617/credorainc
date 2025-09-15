@@ -102,6 +102,26 @@ interface FormData {
   moveInDate: string;
   landlordName: string;
   landlordPhone: string;
+  propertyWebsite: string;
+  
+  // Employment - Additional fields
+  businessName: string;
+  businessType: string;
+  yearsInBusiness: string;
+  selfEmployedIncome: string;
+  retirementIncome: string;
+  pensionSource: string;
+  socialSecurityIncome: string;
+  disabilityDuration: string;
+  disabilityType: string;
+  disabilityBenefits: string;
+  
+  // Documents
+  documents?: {
+    governmentId: string;
+    incomeVerification: string;
+    studentId: string;
+  };
 }
 
 export default function ReviewPage() {
@@ -134,7 +154,20 @@ export default function ReviewPage() {
     monthlyRent: '',
     moveInDate: '',
     landlordName: '',
-    landlordPhone: ''
+    landlordPhone: '',
+    propertyWebsite: '',
+    
+    // Employment - Additional fields
+    businessName: '',
+    businessType: '',
+    yearsInBusiness: '',
+    selfEmployedIncome: '',
+    retirementIncome: '',
+    pensionSource: '',
+    socialSecurityIncome: '',
+    disabilityDuration: '',
+    disabilityType: '',
+    disabilityBenefits: ''
   });
   const [completedSteps] = useState<string[]>(['personal', 'employment', 'rental', 'documents']);
   const [showSSN, setShowSSN] = useState(false);
@@ -194,86 +227,37 @@ export default function ReviewPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto pt-24 pb-8 px-4 sm:px-6 lg:px-8">
-        {/* Modern Progress Header */}
-        <div className="mb-12">
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent mb-4">
-              Lease Guarantor Application
-            </h1>
-            <p className="text-lg text-gray-600 mb-6">
-              Step {getCurrentStepNumber()} of {getTotalSteps()} • {steps.find(s => s.name.toLowerCase().includes('review'))?.estimatedTime} remaining
-            </p>
-            
-            {/* Progress Bar */}
-            <div className="max-w-md mx-auto">
-              <div className="flex justify-between text-xs text-gray-500 mb-2">
-                <span>Progress</span>
-                <span>{Math.round(getProgressPercentage())}% complete</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-100 to-slate-200 pt-8">
+      {/* Progress Header */}
+      <div className="bg-white border-b border-slate-200 sticky top-0 z-10">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-slate-900">Review Application</h1>
+              <p className="text-slate-600 mt-1">Step {getCurrentStepNumber()} of {getTotalSteps()}</p>
+            </div>
+            <div className="text-right">
+              <div className="text-sm text-slate-500 mb-1">Progress</div>
+              <div className="w-32 bg-slate-200 rounded-full h-2">
                 <div 
-                  className="h-2 bg-gradient-to-r from-gray-600 to-gray-800 rounded-full transition-all duration-700 ease-out"
+                  className="bg-gradient-to-r from-slate-600 to-slate-700 h-2 rounded-full transition-all duration-300"
                   style={{ width: `${getProgressPercentage()}%` }}
-                />
+                ></div>
               </div>
             </div>
-          </div>
-          
-          {/* Step Indicators */}
-          <div className="flex justify-center items-center space-x-4 overflow-x-auto pb-4">
-            {steps.map((step, index) => {
-              const stepKey = ['personal', 'employment', 'rental', 'documents', 'review', 'submit'][index];
-              const isCompleted = completedSteps.includes(stepKey);
-              const isCurrent = stepKey === 'review';
-              const StepIcon = step.icon;
-              
-              return (
-                <div key={step.name} className="flex flex-col items-center min-w-0 flex-shrink-0">
-                  <div className={`
-                    relative w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 mb-2
-                    ${
-                      isCompleted 
-                        ? 'bg-gradient-to-r from-gray-600 to-gray-700 shadow-lg shadow-gray-200' 
-                        : isCurrent 
-                        ? 'bg-gradient-to-r from-gray-800 to-gray-900 shadow-lg shadow-gray-300 scale-110' 
-                        : 'bg-gray-100 border-2 border-gray-300'
-                    }
-                  `}>
-                    {isCompleted ? (
-                      <CheckCircleIcon className={`w-6 h-6 text-white`} />
-                    ) : (
-                      <StepIcon className={`w-6 h-6 ${
-                        isCurrent ? 'text-white' : 'text-gray-400'
-                      }`} />
-                    )}
-                  </div>
-                  <div className="text-center">
-                    <p className={`text-sm font-medium ${
-                      isCurrent ? 'text-gray-900' : isCompleted ? 'text-gray-700' : 'text-gray-500'
-                    }`}>
-                      {step.name}
-                    </p>
-                    <p className={`text-xs ${
-                      isCurrent ? 'text-gray-600' : 'text-gray-400'
-                    }`}>
-                      {step.estimatedTime}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
           </div>
         </div>
+      </div>
 
-        {/* Modern Application Form */}
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8 sm:p-12 transition-all duration-500">
+      {/* Main Content */}
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Form */}
+        <div className="bg-white rounded-xl shadow-lg p-8">
+          <div className="mb-8">
+            <h2 className="text-2xl font-semibold text-slate-800 mb-2">Review Your Application</h2>
+            <p className="text-slate-600">Please review all information before submitting.</p>
+          </div>
           <div className="space-y-6">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Review Your Application</h2>
-              <p className="text-gray-600">Please review all the information below before submitting your application. You can go back to make changes if needed.</p>
-            </div>
 
             <div className="space-y-8">
               {/* Personal Information */}
@@ -415,6 +399,10 @@ export default function ReviewPage() {
                     <label className="block text-sm font-semibold text-gray-700">Landlord Phone</label>
                     <p className="text-gray-900">{formatPhone(formData.landlordPhone)}</p>
                   </div>
+                  <div className="space-y-2">
+                    <label className="block text-sm font-semibold text-gray-700">Property Website</label>
+                    <p className="text-gray-900">{formData.propertyWebsite}</p>
+                  </div>
                 </div>
               </div>
 
@@ -422,26 +410,61 @@ export default function ReviewPage() {
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">Document Status</h3>
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between p-3 bg-green-50 rounded-xl border border-green-200">
-                    <span className="text-gray-700 font-medium">Government-Issued ID</span>
-                    <span className="flex items-center text-green-600">
+                  <div className={`flex items-center justify-between p-3 rounded-xl border ${
+                    formData.documents?.governmentId 
+                      ? 'bg-green-50 border-green-200' 
+                      : 'bg-red-50 border-red-200'
+                  }`}>
+                    <div>
+                      <span className="text-gray-700 font-medium">Government-Issued ID</span>
+                      {formData.documents?.governmentId && (
+                        <p className="text-sm text-gray-500">{formData.documents.governmentId}</p>
+                      )}
+                    </div>
+                    <span className={`flex items-center ${
+                      formData.documents?.governmentId ? 'text-green-600' : 'text-red-600'
+                    }`}>
                       <CheckCircleIcon className="w-5 h-5 mr-2" />
-                      Uploaded
+                      {formData.documents?.governmentId ? 'Uploaded' : 'Required'}
                     </span>
                   </div>
-                  <div className="flex items-center justify-between p-3 bg-green-50 rounded-xl border border-green-200">
-                    <span className="text-gray-700 font-medium">Proof of Income</span>
-                    <span className="flex items-center text-green-600">
+                  
+                  <div className={`flex items-center justify-between p-3 rounded-xl border ${
+                    formData.documents?.incomeVerification 
+                      ? 'bg-green-50 border-green-200' 
+                      : 'bg-red-50 border-red-200'
+                  }`}>
+                    <div>
+                      <span className="text-gray-700 font-medium">Proof of Income</span>
+                      {formData.documents?.incomeVerification && (
+                        <p className="text-sm text-gray-500">{formData.documents.incomeVerification}</p>
+                      )}
+                    </div>
+                    <span className={`flex items-center ${
+                      formData.documents?.incomeVerification ? 'text-green-600' : 'text-red-600'
+                    }`}>
                       <CheckCircleIcon className="w-5 h-5 mr-2" />
-                      Uploaded
+                      {formData.documents?.incomeVerification ? 'Uploaded' : 'Required'}
                     </span>
                   </div>
-                  {formData.employmentStatus === 'student' && (
-                    <div className="flex items-center justify-between p-3 bg-green-50 rounded-xl border border-green-200">
-                      <span className="text-gray-700 font-medium">Student ID</span>
-                      <span className="flex items-center text-green-600">
+                  
+                  {(formData.employmentStatus === 'student' || formData.citizenshipStatus === 'international_student') && (
+                    <div className={`flex items-center justify-between p-3 rounded-xl border ${
+                      formData.documents?.studentId 
+                        ? 'bg-green-50 border-green-200' 
+                        : 'bg-red-50 border-red-200'
+                    }`}>
+                      <div>
+                        <span className="text-gray-700 font-medium">Student ID</span>
+                        {formData.documents?.studentId && (
+                          <p className="text-sm text-gray-500">{formData.documents.studentId}</p>
+                        )}
+                      </div>
+                      <span className={`flex items-center ${
+                        formData.documents?.studentId ? 'text-green-600' : 'text-red-600'
+                      }`}>
                         <CheckCircleIcon className="w-5 h-5 mr-2" />
-                        Uploaded
+                        {formData.documents?.studentId ? 'Uploaded' : 'Required'}
                       </span>
                     </div>
                   )}
@@ -449,29 +472,25 @@ export default function ReviewPage() {
               </div>
             </div>
 
-            {/* Modern Navigation Controls */}
-            <div className="flex items-center justify-between pt-8 mt-8 border-t border-gray-100">
-              <div className="flex items-center space-x-4">
-                <button
-                  type="button"
-                  onClick={prevStep}
-                  className="flex items-center space-x-2 px-6 py-3 text-gray-600 hover:text-gray-800 font-medium transition-all duration-200"
-                >
-                  <ChevronLeftIcon className="w-5 h-5" />
-                  <span>Previous</span>
-                </button>
-              </div>
+            {/* Navigation Buttons */}
+            <div className="flex justify-between pt-8">
+              <button
+                type="button"
+                onClick={prevStep}
+                className="flex items-center px-6 py-3 text-slate-600 hover:text-slate-800 font-medium transition-colors"
+              >
+                <ChevronLeftIcon className="w-5 h-5 mr-2" />
+                Back to Documents
+              </button>
               
-              <div className="flex items-center space-x-4">
-                <button
-                  type="button"
-                  onClick={nextStep}
-                  className="flex items-center space-x-2 px-8 py-3 rounded-xl font-semibold text-white transition-all duration-200 transform hover:scale-105 bg-gradient-to-r from-gray-700 to-gray-800 shadow-lg shadow-gray-200 hover:shadow-gray-300"
-                >
-                  <span>Continue</span>
-                  <ChevronRightIcon className="w-5 h-5" />
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={nextStep}
+                className="flex items-center px-8 py-3 bg-gradient-to-r from-slate-600 to-slate-700 text-white rounded-lg hover:from-slate-700 hover:to-slate-800 transition-all transform hover:scale-105 shadow-lg hover:shadow-xl"
+              >
+                Next
+                <ChevronRightIcon className="w-5 h-5 ml-2" />
+              </button>
             </div>
           </div>
         </div>

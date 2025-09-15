@@ -1,6 +1,10 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 
+// Configure for static export compatibility
+export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
+
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
@@ -40,7 +44,6 @@ export async function POST(request: NextRequest) {
       apply_url: null, // Will be generated later
       verified: false, // Landlord properties need to be verified by admin
       landlord_submitted: true,
-      landlord_id: propertyData.landlordId,
       management_company: propertyData.landlordName,
       rating: null,
       review_count: 0,
@@ -82,11 +85,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Landlord ID required' }, { status: 400 })
     }
     
-    // Get all properties for this landlord
+    // Get all properties for this landlord (using contact_email since landlord_id doesn't exist)
     const { data: apartments, error } = await supabase
       .from('apartments')
       .select('*')
-      .eq('landlord_id', landlordId)
+      .eq('contact_email', landlordId)
       .eq('landlord_submitted', true)
       .order('created_at', { ascending: false })
     

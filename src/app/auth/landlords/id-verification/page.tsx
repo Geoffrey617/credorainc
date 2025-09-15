@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import AutomatedIDVerification, { AutomatedIDVerificationData } from '@/components/AutomatedIDVerification';
+import VeriffIDVerification, { VeriffVerificationData } from '@/components/VeriffIDVerification';
 import Link from 'next/link';
 
 export default function LandlordIDVerificationPage() {
@@ -10,6 +10,7 @@ export default function LandlordIDVerificationPage() {
   const [landlordData, setLandlordData] = useState<any>(null);
   const [verificationComplete, setVerificationComplete] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   useEffect(() => {
     // Check if landlord is signed in and needs ID verification
@@ -18,18 +19,20 @@ export default function LandlordIDVerificationPage() {
         const verifiedLandlord = localStorage.getItem('credora_verified_landlord');
         const unverifiedLandlord = localStorage.getItem('credora_unverified_landlord');
         
+        let landlordInfo = null;
+        
         if (verifiedLandlord) {
-          const data = JSON.parse(verifiedLandlord);
-          setLandlordData(data);
+          landlordInfo = JSON.parse(verifiedLandlord);
+          setLandlordData(landlordInfo);
           
           // Check if already ID verified
-          if (data.idVerificationStatus === 'approved') {
+          if (landlordInfo.idVerificationStatus === 'approved') {
             router.push('/landlords/dashboard');
             return;
           }
         } else if (unverifiedLandlord) {
-          const data = JSON.parse(unverifiedLandlord);
-          setLandlordData(data);
+          landlordInfo = JSON.parse(unverifiedLandlord);
+          setLandlordData(landlordInfo);
         } else {
           // No landlord data found
           router.push('/auth/landlords/signin');
@@ -37,6 +40,11 @@ export default function LandlordIDVerificationPage() {
         }
         
         setIsLoading(false);
+        
+        // Automatically start verification if landlord data is available
+        if (landlordInfo && landlordInfo.idVerificationStatus !== 'approved') {
+          startVerificationImmediately(landlordInfo);
+        }
       } catch (error) {
         console.error('Error checking landlord status:', error);
         router.push('/auth/landlords/signin');
@@ -46,7 +54,43 @@ export default function LandlordIDVerificationPage() {
     checkLandlordStatus();
   }, [router]);
 
-  const handleVerificationComplete = (verificationData: AutomatedIDVerificationData) => {
+  // Start verification immediately without showing intro page
+  const startVerificationImmediately = async (landlordInfo: any) => {
+    setIsRedirecting(true);
+    
+    try {
+      console.log('🚀 Starting immediate Veriff verification for:', landlordInfo.email);
+
+      const response = await fetch('/api/veriff/create-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          landlordId: landlordInfo.email,
+          callback: `${window.location.origin}/auth/landlords/verification-complete`
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to create verification session');
+      }
+
+      const { sessionUrl } = await response.json();
+      console.log('📋 Veriff session created, redirecting immediately...');
+
+      // Redirect directly to Veriff
+      window.location.href = sessionUrl;
+
+    } catch (error) {
+      console.error('❌ Error starting verification:', error);
+      setIsRedirecting(false);
+      // Fall back to showing the intro page if immediate redirect fails
+    }
+  };
+
+  const handleVerificationComplete = (verificationData: VeriffVerificationData) => {
     try {
       // Update landlord data with automated ID verification info
       const updatedLandlordData = {
@@ -103,12 +147,19 @@ export default function LandlordIDVerificationPage() {
     }
   };
 
-  if (isLoading) {
+  if (isLoading || isRedirecting) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
+          <p className="mt-4 text-gray-600">
+            {isRedirecting ? 'Redirecting to secure verification...' : 'Loading...'}
+          </p>
+          {isRedirecting && (
+            <p className="mt-2 text-sm text-gray-500">
+              You will be taken to Veriff's secure verification platform
+            </p>
+          )}
         </div>
       </div>
     );
@@ -196,8 +247,8 @@ export default function LandlordIDVerificationPage() {
           </div>
         </div>
 
-        {/* Automated ID Verification Component */}
-        <AutomatedIDVerification 
+        {/* Veriff ID Verification Component */}
+        <VeriffIDVerification 
           onVerificationComplete={handleVerificationComplete}
           onSkip={handleSkipVerification}
           showSkipOption={true}

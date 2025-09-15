@@ -3,9 +3,25 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import AnimatedHero from '@/components/AnimatedHero';
 
 export default function Home() {
+  const router = useRouter();
+
+  useEffect(() => {
+    // IMMEDIATE redirect for logged-in users - they should never see marketing pages
+    if (typeof window !== 'undefined') {
+      const tempSession = sessionStorage.getItem('credora_session_temp');
+      const persistentSession = localStorage.getItem('credora_persistent_session');
+      
+      if (tempSession || persistentSession) {
+        console.log('🔄 Logged-in user blocked from marketing page - redirecting to dashboard');
+        router.replace('/dashboard'); // Use replace to prevent back navigation
+        return;
+      }
+    }
+  }, [router]);
   // Mock statistics - in real app these would come from your API
   const stats = {
     totalApplications: 12547,
@@ -331,7 +347,7 @@ export default function Home() {
               </h1>
               
               <p className="text-lg text-slate-100 mb-8 leading-relaxed">
-                <span className="font-bold text-white text-xl tracking-wide">Apartment Finder and Lease Guarantor Service.</span> We understand how hard it is when your income looks great on paper but landlords still want a cosigner. Our lease guarantor service provides you with the professional cosigner you need to secure your dream apartment.
+                <span className="font-bold text-white text-xl tracking-wide">Apartment Finder and Lease Cosigner Service.</span> We understand how hard it is when your income looks great on paper but landlords still want a cosigner. Our lease cosigner service provides you with the professional cosigner you need to secure your dream apartment.
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4 mb-8">
@@ -1271,12 +1287,12 @@ export default function Home() {
               <div className="text-sm">
                 <p className="mb-2">&copy; 2025 Credora Inc. All rights reserved.</p>
                 <p className="mb-2">A Delaware Corporation | Licensed in all 50 states</p>
-                <p className="mb-2">Apartment Finder | lease guarantor service</p>
+                <p className="mb-2">Apartment Finder | lease cosigner service</p>
               </div>
               
               <div className="text-xs text-gray-500 max-w-4xl mx-auto">
                 <p className="mb-2">
-                  <strong>Legal Notice:</strong> Credora Inc is incorporated in the State of Delaware and operates as an apartment finder and lease guarantor service headquartered in San Francisco, California. 
+                  <strong>Legal Notice:</strong> Credora Inc is incorporated in the State of Delaware and operates as an apartment finder and lease cosigner service headquartered in San Francisco, California. 
                   Our services are subject to employment verification and rental history review processes. Fees are non-refundable except as outlined in our Terms of Service.
                 </p>
                 <p className="mb-2">

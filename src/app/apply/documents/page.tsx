@@ -87,24 +87,66 @@ export default function DocumentsPage() {
     studentIdFile: null,
     incomeVerificationFile: null,
   });
+  const [errors, setErrors] = useState<{[key: string]: string}>({});
+  const [uploading, setUploading] = useState<{[key: string]: boolean}>({});
   const [completedSteps] = useState<string[]>(['personal', 'employment', 'rental']);
   const [dragOver, setDragOver] = useState<string | null>(null);
 
-  // Load form data from localStorage
+  // Load form data from database and localStorage
   useEffect(() => {
-    const savedData = localStorage.getItem('credora_application_form');
-    if (savedData) {
-      const parsed = JSON.parse(savedData);
-      setFormData(prev => ({
-        ...prev,
-        employmentStatus: parsed.employmentStatus || '',
-        citizenshipStatus: parsed.citizenshipStatus || '',
-        internationalStudentType: parsed.internationalStudentType || '',
-      }));
-    }
+    const loadData = async () => {
+      // Load basic form data from localStorage
+      const savedData = localStorage.getItem('credora_application_form');
+      if (savedData) {
+        const parsed = JSON.parse(savedData);
+        setFormData(prev => ({
+          ...prev,
+          employmentStatus: parsed.employmentStatus || '',
+          citizenshipStatus: parsed.citizenshipStatus || '',
+          internationalStudentType: parsed.internationalStudentType || '',
+        }));
+      }
+      
+      // Load documents from database
+      const userData = localStorage.getItem('credora_user');
+      const user = userData ? JSON.parse(userData) : null;
+      
+      if (user?.id) {
+        try {
+          const response = await fetch(`/api/applications?userId=${user.id}`);
+          const result = await response.json();
+          
+          if (response.ok && result.applications && result.applications.length > 0) {
+            const latestApp = result.applications[0];
+            
+            if (latestApp.documents) {
+              const createFileObject = (docInfo: any) => {
+                if (!docInfo) return null;
+                return {
+                  name: docInfo.name,
+                  size: docInfo.size || 1024 * 1024,
+                  type: docInfo.type || 'application/pdf'
+                } as File;
+              };
+              
+              setFormData(prev => ({
+                ...prev,
+                governmentIdFile: createFileObject(latestApp.documents.governmentId),
+                incomeVerificationFile: createFileObject(latestApp.documents.incomeVerification),
+                studentIdFile: createFileObject(latestApp.documents.studentId),
+              }));
+            }
+          }
+        } catch (error) {
+          console.error('Error loading documents from database:', error);
+        }
+      }
+    };
+    
+    loadData();
   }, []);
 
-  const handleFileUpload = (fileType: keyof FormData, file: File) => {
+  const handleFileUpload = async (fileType: keyof FormData, file: File) => {
     // File size validation
     const maxSize = fileType === 'incomeVerificationFile' ? 100 * 1024 * 1024 : 10 * 1024 * 1024; // 100MB for income, 10MB for others
     
@@ -114,10 +156,151 @@ export default function DocumentsPage() {
       return;
     }
 
+    // File type validation
+    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+    if (!allowedTypes.includes(file.type)) {
+      alert('Invalid file type. Please upload PDF, JPG, or PNG files only.');
+      return;
+    }
+
+    // Show uploading state
+    setUploading(prev => ({ ...prev, [fileType]: true }));
+    
+    // Clear any existing error for this field
+    setErrors(prev => ({ ...prev, [fileType]: '' }));
+
+    try {
+      // Get user ID from localStorage
+      const userData = localStorage.getItem('credora_user');
+      const user = userData ? JSON.parse(userData) : null;
+      
+      if (!user?.id) {
+        alert('Please sign in to upload documents');
+        return;
+      }
+
+      // Upload to Supabase via API
+      const uploadFormData = new FormData();
+      uploadFormData.append('file', file);
+      uploadFormData.append('userId', user.id);
+      uploadFormData.append('documentType', fileType.replace('File', ''));
+
+      const response = await fetch('/api/upload-document', {
+        method: 'POST',
+        body: uploadFormData
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Upload failed');
+      }
+      
+      // Update form data with uploaded file info
+      setFormData(prev => ({
+        ...prev,
+        [fileType]: file
+      }));
+
+      // Save document info to database
+      const userDataString = localStorage.getItem('credora_user');
+      const currentUser = userDataString ? JSON.parse(userDataString) : null;
+      
+      if (currentUser?.id) {
+        const documentData = {
+          userId: currentUser.id,
+          documents: {
+            [fileType.replace('File', '')]: {
+              name: file.name,
+              size: file.size,
+              type: file.type,
+              filePath: result.filePath,
+              fileUrl: result.fileUrl,
+              uploadedAt: new Date().toISOString()
+            }
+          }
+        };
+
+        // Save to database via applications API
+        try {
+          // First try to update existing application
+          const updateResponse = await fetch('/api/applications', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(documentData)
+          });
+          
+          // If no application exists, create one
+          if (!updateResponse.ok) {
+            console.log('No existing application, creating new one');
+            await fetch('/api/applications', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                userId: currentUser.id,
+                firstName: currentUser.firstName || '',
+                lastName: currentUser.lastName || '',
+                email: currentUser.email || '',
+                documents: {
+                  [fileType.replace('File', '')]: {
+                    name: file.name,
+                    size: file.size,
+                    type: file.type,
+                    filePath: result.filePath,
+                    fileUrl: result.fileUrl,
+                    uploadedAt: new Date().toISOString()
+                  }
+                }
+              })
+            });
+          }
+        } catch (apiError) {
+          console.error('API error:', apiError);
+        }
+      }
+
+      console.log(`Successfully uploaded ${fileType}:`, result.fileName);
+    } catch (error) {
+      console.error(`Error uploading ${fileType}:`, error);
+      alert('Upload failed. Please try again.');
+    } finally {
+      // Hide uploading state
+      setUploading(prev => ({ ...prev, [fileType]: false }));
+    }
+  };
+
+  const removeFile = async (fileType: keyof FormData) => {
+    // Remove from form data
     setFormData(prev => ({
       ...prev,
-      [fileType]: file
+      [fileType]: null
     }));
+    
+    // Remove from database
+    const userDataString = localStorage.getItem('credora_user');
+    const currentUser = userDataString ? JSON.parse(userDataString) : null;
+    
+    if (currentUser?.id) {
+      try {
+        const documentData = {
+          userId: currentUser.id,
+          documents: {
+            [fileType.replace('File', '')]: null // Set to null to remove
+          }
+        };
+
+        await fetch('/api/applications', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(documentData)
+        });
+      } catch (error) {
+        console.error('Error removing document from database:', error);
+      }
+    }
+    
+    // Clear any errors
+    setErrors(prev => ({ ...prev, [fileType]: '' }));
   };
 
   const handleDrop = (e: React.DragEvent, fileType: keyof FormData) => {
@@ -138,9 +321,6 @@ export default function DocumentsPage() {
     setDragOver(null);
   };
 
-  const removeFile = (fileType: keyof FormData) => {
-    setFormData(prev => ({ ...prev, [fileType]: null }));
-  };
 
   const getGovernmentIdDescription = () => {
     if (formData.citizenshipStatus === 'international student') {
@@ -168,101 +348,82 @@ export default function DocumentsPage() {
     return (completedSteps.length / getTotalSteps()) * 100;
   };
 
+  const validateDocuments = () => {
+    const newErrors: {[key: string]: string} = {};
+    
+    if (!formData.governmentIdFile) newErrors.governmentIdFile = 'Government ID is required';
+    if (!formData.incomeVerificationFile) newErrors.incomeVerificationFile = 'Income verification is required';
+    
+    // Student ID is required for students or international students
+    if ((formData.employmentStatus === 'student' || formData.citizenshipStatus === 'international_student') && !formData.studentIdFile) {
+      newErrors.studentIdFile = 'Student ID is required';
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const nextStep = () => {
-    router.push('/apply/review');
+    if (validateDocuments()) {
+      // Save documents to localStorage
+      const savedData = localStorage.getItem('credora_application_form');
+      const existingData = savedData ? JSON.parse(savedData) : {};
+      const updatedData = { 
+        ...existingData, 
+        documents: {
+          governmentId: formData.governmentIdFile?.name || '',
+          incomeVerification: formData.incomeVerificationFile?.name || '',
+          studentId: formData.studentIdFile?.name || ''
+        }
+      };
+      localStorage.setItem('credora_application_form', JSON.stringify(updatedData));
+      
+      router.push('/apply/review');
+    }
   };
 
   const prevStep = () => {
-    router.push('/apply');
+    router.push('/apply/rental');
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto pt-24 pb-8 px-4 sm:px-6 lg:px-8">
-        {/* Modern Progress Header */}
-        <div className="mb-12">
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent mb-4">
-              Lease Guarantor Application
-            </h1>
-            <p className="text-lg text-gray-600 mb-6">
-              Step {getCurrentStepNumber()} of {getTotalSteps()} • {steps.find(s => s.name.toLowerCase().includes('documents'))?.estimatedTime} remaining
-            </p>
-            
-            {/* Progress Bar */}
-            <div className="max-w-md mx-auto">
-              <div className="flex justify-between text-xs text-gray-500 mb-2">
-                <span>Progress</span>
-                <span>{Math.round(getProgressPercentage())}% complete</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-100 to-slate-200 pt-8">
+      {/* Progress Header */}
+      <div className="bg-white border-b border-slate-200 sticky top-0 z-10">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-slate-900">Documents</h1>
+              <p className="text-slate-600 mt-1">Step {getCurrentStepNumber()} of {getTotalSteps()}</p>
+            </div>
+            <div className="text-right">
+              <div className="text-sm text-slate-500 mb-1">Progress</div>
+              <div className="w-32 bg-slate-200 rounded-full h-2">
                 <div 
-                  className="h-2 bg-gradient-to-r from-gray-600 to-gray-800 rounded-full transition-all duration-700 ease-out"
+                  className="bg-gradient-to-r from-slate-600 to-slate-700 h-2 rounded-full transition-all duration-300"
                   style={{ width: `${getProgressPercentage()}%` }}
-                />
+                ></div>
               </div>
             </div>
-          </div>
-          
-          {/* Step Indicators */}
-          <div className="flex justify-center items-center space-x-4 overflow-x-auto pb-4">
-            {steps.map((step, index) => {
-              const stepKey = ['personal', 'employment', 'rental', 'documents', 'review', 'submit'][index];
-              const isCompleted = completedSteps.includes(stepKey);
-              const isCurrent = stepKey === 'documents';
-              const StepIcon = step.icon;
-              
-              return (
-                <div key={step.name} className="flex flex-col items-center min-w-0 flex-shrink-0">
-                  <div className={`
-                    relative w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 mb-2
-                    ${
-                      isCompleted 
-                        ? 'bg-gradient-to-r from-gray-600 to-gray-700 shadow-lg shadow-gray-200' 
-                        : isCurrent 
-                        ? 'bg-gradient-to-r from-gray-800 to-gray-900 shadow-lg shadow-gray-300 scale-110' 
-                        : 'bg-gray-100 border-2 border-gray-300'
-                    }
-                  `}>
-                    {isCompleted ? (
-                      <CheckCircleIcon className={`w-6 h-6 text-white`} />
-                    ) : (
-                      <StepIcon className={`w-6 h-6 ${
-                        isCurrent ? 'text-white' : 'text-gray-400'
-                      }`} />
-                    )}
-                  </div>
-                  <div className="text-center">
-                    <p className={`text-sm font-medium ${
-                      isCurrent ? 'text-gray-900' : isCompleted ? 'text-gray-700' : 'text-gray-500'
-                    }`}>
-                      {step.name}
-                    </p>
-                    <p className={`text-xs ${
-                      isCurrent ? 'text-gray-600' : 'text-gray-400'
-                    }`}>
-                      {step.estimatedTime}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
           </div>
         </div>
+      </div>
 
-        {/* Modern Application Form */}
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8 sm:p-12 transition-all duration-500">
+      {/* Main Content */}
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Form */}
+        <div className="bg-white rounded-xl shadow-lg p-8">
+          <div className="mb-8">
+            <h2 className="text-2xl font-semibold text-slate-800 mb-2">Document Upload</h2>
+            <p className="text-slate-600">Please upload the required documents for verification.</p>
+          </div>
           <div className="space-y-6">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Upload Required Documents</h2>
-              <p className="text-gray-600">Please upload clear, legible copies of the required documents. All files are encrypted and stored securely.</p>
-            </div>
 
             <div className="space-y-8">
               {/* Government ID */}
               <div className="space-y-4">
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Government-Issued ID *</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Government-Issued ID <span className="text-red-500">*</span></h3>
                   <p className="text-sm text-gray-600 mb-4">{getGovernmentIdDescription()}</p>
                 </div>
                 
@@ -280,7 +441,14 @@ export default function DocumentsPage() {
                   onDragOver={(e) => handleDragOver(e, 'governmentId')}
                   onDragLeave={handleDragLeave}
                 >
-                  {formData.governmentIdFile ? (
+                  {uploading.governmentIdFile ? (
+                    <div className="space-y-4">
+                      <div className="w-full bg-slate-200 rounded-full h-3">
+                        <div className="bg-gradient-to-r from-slate-600 to-slate-700 h-3 rounded-full animate-pulse"></div>
+                      </div>
+                      <p className="text-slate-600 font-medium text-center">Uploading...</p>
+                    </div>
+                  ) : formData.governmentIdFile ? (
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
                         <DocumentTextIcon className="w-8 h-8 text-green-600 mr-3" />
@@ -318,13 +486,14 @@ export default function DocumentsPage() {
                     </div>
                   )}
                 </div>
+                {errors.governmentIdFile && <p className="text-red-500 text-sm mt-2">{errors.governmentIdFile}</p>}
               </div>
 
               {/* Student ID - Required for Students Only */}
               {formData.employmentStatus === 'student' && (
                 <div className="space-y-4">
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Student ID *</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Student ID <span className="text-red-500">*</span></h3>
                     <p className="text-sm text-gray-600 mb-4">Current, unexpired student identification card (required for all students)</p>
                   </div>
                   
@@ -342,7 +511,14 @@ export default function DocumentsPage() {
                     onDragOver={(e) => handleDragOver(e, 'studentId')}
                     onDragLeave={handleDragLeave}
                   >
-                    {formData.studentIdFile ? (
+                    {uploading.studentIdFile ? (
+                      <div className="space-y-4">
+                        <div className="w-full bg-slate-200 rounded-full h-3">
+                          <div className="bg-gradient-to-r from-slate-600 to-slate-700 h-3 rounded-full animate-pulse"></div>
+                        </div>
+                        <p className="text-slate-600 font-medium text-center">Uploading...</p>
+                      </div>
+                    ) : formData.studentIdFile ? (
                       <div className="flex items-center justify-between">
                         <div className="flex items-center">
                           <DocumentTextIcon className="w-8 h-8 text-green-600 mr-3" />
@@ -380,13 +556,14 @@ export default function DocumentsPage() {
                       </div>
                     )}
                   </div>
+                  {errors.studentIdFile && <p className="text-red-500 text-sm mt-2">{errors.studentIdFile}</p>}
                 </div>
               )}
 
               {/* Income Verification */}
               <div className="space-y-4">
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Proof of Income *</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Proof of Income <span className="text-red-500">*</span></h3>
                   <p className="text-sm text-gray-600 mb-4">{getIncomeVerificationDescription()}</p>
                 </div>
                 
@@ -404,7 +581,14 @@ export default function DocumentsPage() {
                   onDragOver={(e) => handleDragOver(e, 'incomeVerification')}
                   onDragLeave={handleDragLeave}
                 >
-                  {formData.incomeVerificationFile ? (
+                  {uploading.incomeVerificationFile ? (
+                    <div className="space-y-4">
+                      <div className="w-full bg-slate-200 rounded-full h-3">
+                        <div className="bg-gradient-to-r from-slate-600 to-slate-700 h-3 rounded-full animate-pulse"></div>
+                      </div>
+                      <p className="text-slate-600 font-medium text-center">Uploading...</p>
+                    </div>
+                  ) : formData.incomeVerificationFile ? (
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
                         <DocumentTextIcon className="w-8 h-8 text-green-600 mr-3" />
@@ -442,32 +626,30 @@ export default function DocumentsPage() {
                     </div>
                   )}
                 </div>
+                {errors.incomeVerificationFile && <p className="text-red-500 text-sm mt-2">{errors.incomeVerificationFile}</p>}
               </div>
             </div>
 
             {/* Modern Navigation Controls */}
-            <div className="flex items-center justify-between pt-8 mt-8 border-t border-gray-100">
-              <div className="flex items-center space-x-4">
-                <button
-                  type="button"
-                  onClick={prevStep}
-                  className="flex items-center space-x-2 px-6 py-3 text-gray-600 hover:text-gray-800 font-medium transition-all duration-200"
-                >
-                  <ChevronLeftIcon className="w-5 h-5" />
-                  <span>Previous</span>
-                </button>
-              </div>
+            {/* Navigation Buttons */}
+            <div className="flex justify-between pt-8">
+              <button
+                type="button"
+                onClick={prevStep}
+                className="flex items-center px-6 py-3 text-slate-600 hover:text-slate-800 font-medium transition-colors"
+              >
+                <ChevronLeftIcon className="w-5 h-5 mr-2" />
+                Back to Rental Info
+              </button>
               
-              <div className="flex items-center space-x-4">
-                <button
-                  type="button"
-                  onClick={nextStep}
-                  className="flex items-center space-x-2 px-8 py-3 rounded-xl font-semibold text-white transition-all duration-200 transform hover:scale-105 bg-gradient-to-r from-gray-700 to-gray-800 shadow-lg shadow-gray-200 hover:shadow-gray-300"
-                >
-                  <span>Continue</span>
-                  <ChevronRightIcon className="w-5 h-5" />
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={nextStep}
+                className="flex items-center px-8 py-3 bg-gradient-to-r from-slate-600 to-slate-700 text-white rounded-lg hover:from-slate-700 hover:to-slate-800 transition-all transform hover:scale-105 shadow-lg hover:shadow-xl"
+              >
+                Next
+                <ChevronRightIcon className="w-5 h-5 ml-2" />
+              </button>
             </div>
           </div>
         </div>

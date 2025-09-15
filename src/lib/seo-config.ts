@@ -30,7 +30,7 @@ export function createMetadata({
     description,
     keywords: [
       "apartment cosigner",
-      "lease guarantor",
+      "lease cosigner",
       "rental approval",
       "apartment approval guaranteed",
       "professional cosigning",

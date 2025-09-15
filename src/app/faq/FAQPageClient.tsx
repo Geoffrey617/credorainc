@@ -339,7 +339,7 @@ export default function FAQPageClient() {
             <Link href="/contact" className="bg-white text-slate-700 px-8 py-3 rounded-xl font-semibold hover:bg-slate-100 transition-colors">
               Contact Support
             </Link>
-            <Link href="/apply" className="border-2 border-white text-white px-8 py-3 rounded-xl font-semibold hover:bg-white hover:text-slate-700 transition-colors">
+            <Link href="/auth/signin" className="border-2 border-white text-white px-8 py-3 rounded-xl font-semibold hover:bg-white hover:text-slate-700 transition-colors">
               Start Application
             </Link>
           </div>

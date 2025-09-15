@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import ConditionalNavigation from "../components/ConditionalNavigation";
-import AuthSessionProvider from "../components/SessionProvider";
 import CookieBanner from "../components/CookieBanner";
 
 const geistSans = Geist({
@@ -65,7 +64,7 @@ export const metadata: Metadata = {
     site: '@CredoraInc',
     creator: '@CredoraInc',
     title: 'Credora Inc - Apartment finder & Lease Cosigner service',
-    description: 'Apartment Finder and lease guarantor service. Get approved in 24-48 hours.',
+    description: 'Apartment Finder and lease cosigner service. Get approved in 24-48 hours.',
     images: ['https://credorainc.com/twitter-image.jpg'],
   },
   verification: {
@@ -101,7 +100,7 @@ export default function RootLayout({
         },
         "description": "Professional apartment lease cosigning services with guaranteed approval. Serving all 50 states.",
         "foundingDate": "2020",
-        "slogan": "Apartment Finder and lease guarantor service",
+        "slogan": "Apartment Finder and lease cosigner service",
         "contactPoint": [
           {
             "@type": "ContactPoint",
@@ -260,7 +259,7 @@ export default function RootLayout({
         {/* Theme and App Configuration */}
         <meta name="theme-color" content="#334155" />
         <meta name="msapplication-TileColor" content="#334155" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="Credora Inc" />
         <meta name="application-name" content="Credora Inc" />
@@ -268,11 +267,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <AuthSessionProvider>
           <ConditionalNavigation />
           {children}
           <CookieBanner />
-        </AuthSessionProvider>
       </body>
     </html>
   );

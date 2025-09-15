@@ -5,6 +5,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { detectCardType, formatCardNumber } from '@/utils/card-detection';
 import { getSortedUSStates } from '@/utils/us-states';
+import AddressAutocomplete from '@/components/AddressAutocomplete';
+import { loadStripe } from '@stripe/stripe-js';
 
 interface User {
   email: string;
@@ -51,6 +53,21 @@ export default function ApartmentFinderPaymentPage() {
   const [isAppleDevice, setIsAppleDevice] = useState(false);
   const [currentStep, setCurrentStep] = useState('card'); // 'card' or 'billing'
   const [detectedCardType, setDetectedCardType] = useState<{ type: string | null; logoPath: string | null }>({ type: null, logoPath: null });
+  const [billingAddress, setBillingAddress] = useState({
+    street: '',
+    city: '',
+    state: '',
+    zipCode: ''
+  });
+
+  const handleBillingAddressSelect = (addressData: any) => {
+    setBillingAddress({
+      street: addressData.street,
+      city: addressData.city,
+      state: addressData.state,
+      zipCode: addressData.zipCode
+    });
+  };
 
   useEffect(() => {
     // Detect Apple devices/browsers
@@ -476,32 +493,87 @@ export default function ApartmentFinderPaymentPage() {
         cardholderName: formData.get('card-name') as string || '',
       };
 
-      // Process payment with Stripe
-      const { processStripePayment, validateCardDetails } = await import('@/utils/stripe-payment');
-      
-      // Validate card details
-      const validation = validateCardDetails(cardDetails);
+      // Basic form validation
+      if (!cardDetails.cardNumber || !cardDetails.expiryDate || !cardDetails.cvv || !cardDetails.cardholderName) {
+        alert('Please fill in all card details');
+        setIsProcessing(false);
+        return;
+      }
 
-      if (!validation.isValid) {
-        alert('Please check your card details:\n' + validation.errors.join('\n'));
+      if (!billingAddress.street || !billingAddress.city || !billingAddress.state || !billingAddress.zipCode) {
+        alert('Please fill in all billing address fields');
         setIsProcessing(false);
         return;
       }
 
       // Process payment with Stripe
-      const paymentResult = await processStripePayment(
-        {
+      console.log('💳 Processing Stripe payment for apartment finder...');
+
+      // Step 1: Create payment intent
+      const paymentIntentResponse = await fetch('/api/create-payment-intent', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
           amount: paymentData.amount, // $250 apartment finder fee
+          currency: 'usd',
+          customerEmail: paymentData.userEmail,
+          customerName: user?.name || 'Apartment Finder Customer',
+          service: 'Apartment Finder Service',
           description: paymentData.description,
-          metadata: {
-            type: 'apartment_finder_fee',
-            requestId: paymentData.requestId,
-            userEmail: paymentData.userEmail,
-            timestamp: new Date().toISOString(),
+        }),
+      });
+
+      if (!paymentIntentResponse.ok) {
+        const errorData = await paymentIntentResponse.json();
+        throw new Error(errorData.error || 'Failed to create payment intent');
+      }
+
+      const { clientSecret, paymentIntentId } = await paymentIntentResponse.json();
+
+      // Step 2: Load Stripe and confirm payment
+      const stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
+      
+      if (!stripe) {
+        throw new Error('Failed to load Stripe');
+      }
+
+      // Confirm payment with card details
+      const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+        payment_method: {
+          card: {
+            number: cardDetails.cardNumber.replace(/\s/g, ''),
+            exp_month: parseInt(cardDetails.expiryDate.split('/')[0]),
+            exp_year: parseInt('20' + cardDetails.expiryDate.split('/')[1]),
+            cvc: cardDetails.cvv,
+          },
+          billing_details: {
+            name: cardDetails.cardholderName,
+            address: {
+              line1: billingAddress.street,
+              city: billingAddress.city,
+              state: billingAddress.state,
+              postal_code: billingAddress.zipCode,
+              country: 'US',
+            },
           },
         },
-        cardDetails
-      );
+      });
+
+      if (error) {
+        throw new Error(error.message || 'Payment failed');
+      }
+
+      if (paymentIntent.status !== 'succeeded') {
+        throw new Error('Payment was not completed successfully');
+      }
+
+      const paymentResult = {
+        success: true,
+        paymentIntentId: paymentIntent.id,
+        clientSecret,
+      };
 
       if (!paymentResult.success) {
         throw new Error(paymentResult.error || 'Payment failed');
@@ -555,12 +627,8 @@ export default function ApartmentFinderPaymentPage() {
       
       console.log('💳 Payment processed and request submitted:', paymentData.requestId);
       
-      setShowSuccess(true);
-      
-      // Redirect to tracking page after 3 seconds
-      setTimeout(() => {
-        router.push('/apartment-finder/track');
-      }, 3000);
+      // Redirect to success page with payment information
+      router.push(`/apartment-finder/success?payment_intent=${paymentResult.paymentIntentId}&request_id=${paymentData.requestId}&amount=${paymentResult.amount}`);
       
     } catch (error: any) {
       console.error('Payment processing error:', error);
@@ -733,21 +801,14 @@ export default function ApartmentFinderPaymentPage() {
                   <div className="bg-white rounded-lg p-6 border border-slate-200 shadow-sm h-full">
                     <h4 className="text-lg font-semibold text-slate-800 mb-4">Card Information</h4>
                     <div className="space-y-5 card-form">
-                      <div className="flex justify-between items-center mb-2">
+                      <div className="mb-2">
                         <label className="block text-sm font-medium text-slate-700">Card Number</label>
-                        {/* Accepted Cards Display */}
-                        <div className="flex space-x-1.5">
-                          <img src="/assets/logos/visa.png" alt="Visa" className="h-4 w-auto object-contain opacity-90 hover:opacity-100 transition-opacity" onError={(e) => e.currentTarget.style.display = 'none'} />
-                          <img src="/assets/logos/mastercard.png" alt="Mastercard" className="h-4 w-auto object-contain opacity-90 hover:opacity-100 transition-opacity" onError={(e) => e.currentTarget.style.display = 'none'} />
-                          <img src="/assets/logos/amex.png" alt="American Express" className="h-4 w-auto object-contain opacity-90 hover:opacity-100 transition-opacity" onError={(e) => e.currentTarget.style.display = 'none'} />
-                          <img src="/assets/logos/discover.png" alt="Discover" className="h-4 w-auto object-contain opacity-90 hover:opacity-100 transition-opacity" onError={(e) => e.currentTarget.style.display = 'none'} />
-                        </div>
                       </div>
                       <div className="relative">
                         <input
                           type="text"
                           placeholder="1234 5678 9012 3456"
-                          className="w-full px-4 py-3 pr-16 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent text-slate-900 bg-white font-mono"
+                          className="w-full px-4 py-3 pr-32 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent text-slate-900 bg-white font-mono"
                           maxLength={23}
                           autoComplete="cc-number"
                           name="card-number"
@@ -777,20 +838,28 @@ export default function ApartmentFinderPaymentPage() {
                             }
                           }}
                         />
-                        {/* Card Provider Logo */}
-                        {detectedCardType.logoPath && (
-                          <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                        {/* Card Provider Logos - Inside Input */}
+                        <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-1">
+                          {detectedCardType.logoPath ? (
+                            /* Show detected card logo */
                             <img
                               src={detectedCardType.logoPath}
                               alt={`${detectedCardType.type} logo`}
-                              className="h-4 w-auto object-contain transition-opacity duration-200"
+                              className="h-6 w-auto object-contain transition-opacity duration-200"
                               onError={(e) => {
-                                // Hide image if logo file doesn't exist
                                 e.currentTarget.style.display = 'none';
                               }}
                             />
-                          </div>
-                        )}
+                          ) : (
+                            /* Show accepted cards when no card detected */
+                            <>
+                              <img src="/assets/logos/visa.png" alt="Visa" className="h-5 w-auto object-contain opacity-90" onError={(e) => e.currentTarget.style.display = 'none'} />
+                              <img src="/assets/logos/mastercard.png" alt="Mastercard" className="h-5 w-auto object-contain opacity-90" onError={(e) => e.currentTarget.style.display = 'none'} />
+                              <img src="/assets/logos/amex.png" alt="American Express" className="h-5 w-auto object-contain opacity-90" onError={(e) => e.currentTarget.style.display = 'none'} />
+                              <img src="/assets/logos/discover.png" alt="Discover" className="h-5 w-auto object-contain opacity-90" onError={(e) => e.currentTarget.style.display = 'none'} />
+                            </>
+                          )}
+                        </div>
                       </div>
               </div>
               
@@ -878,55 +947,14 @@ export default function ApartmentFinderPaymentPage() {
                 <h4 className="text-lg font-semibold text-slate-800 mb-4">Billing Address</h4>
                 
                 <div className="space-y-5 w-full">
-                  <div className="relative mb-2">
+                  <div className="mb-2">
                     <label className="block text-sm font-medium text-slate-700 mb-2">Street Address</label>
-                    <input
-                      type="text"
+                    <AddressAutocomplete
+                      value={billingAddress.street}
+                      onChange={(value) => setBillingAddress({...billingAddress, street: value})}
+                      onAddressSelect={handleBillingAddressSelect}
                       placeholder="123 Main Street"
-                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent text-slate-900 bg-white"
-                      autoComplete="off"
-                      name="street-address"
-                      onChange={(e) => {
-                        const query = e.target.value;
-                        setAddressQuery(query);
-                        if (query.length >= 3) {
-                          fetchAddressSuggestions(query);
-                        } else {
-                          setShowAddressSuggestions(false);
-                          setAddressSuggestions([]);
-                        }
-                      }}
-                      onFocus={() => {
-                        if (addressQuery.length >= 3 && addressSuggestions.length > 0) {
-                          setShowAddressSuggestions(true);
-                        }
-                      }}
-                      onBlur={() => {
-                        // Delay hiding to allow clicking on suggestions
-                        setTimeout(() => setShowAddressSuggestions(false), 200);
-                      }}
                     />
-                    
-                    {/* Address Suggestions Dropdown */}
-                    {showAddressSuggestions && addressSuggestions.length > 0 && (
-                      <div className="absolute top-full left-0 right-0 bg-white border border-slate-300 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto mt-1">
-                        {addressSuggestions.map((suggestion, index) => (
-                          <div
-                            key={index}
-                            className="px-4 py-3 hover:bg-slate-50 cursor-pointer border-b border-slate-100 last:border-b-0"
-                            onClick={() => handleAddressSelect(suggestion)}
-                          >
-                            <div className="flex items-center">
-                              <svg className="w-4 h-4 text-slate-400 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                              </svg>
-                              <span className="text-slate-900 truncate">{suggestion}</span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
                   </div>
                   
                   <div className="mt-4">
@@ -946,6 +974,8 @@ export default function ApartmentFinderPaymentPage() {
                       <input
                         type="text"
                         placeholder="Boston"
+                        value={billingAddress.city}
+                        onChange={(e) => setBillingAddress({...billingAddress, city: e.target.value})}
                         className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent text-slate-900 bg-white"
                         autoComplete="address-level2"
                         name="city"
@@ -954,6 +984,8 @@ export default function ApartmentFinderPaymentPage() {
                     <div className="col-span-1 min-h-fit">
                       <label className="block text-sm font-medium text-slate-700 mb-2">State</label>
                       <select 
+                        value={billingAddress.state}
+                        onChange={(e) => setBillingAddress({...billingAddress, state: e.target.value})}
                         className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent text-slate-900 bg-white"
                         autoComplete="address-level1"
                         name="state"
@@ -968,29 +1000,18 @@ export default function ApartmentFinderPaymentPage() {
                     </div>
                   </div>
                   
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 mt-2 min-h-fit h-auto">
-                    <div className="col-span-1 min-h-fit">
-                      <label className="block text-sm font-medium text-slate-700 mb-2">ZIP Code</label>
-                      <input
-                        type="text"
-                        placeholder="02101"
-                        className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent text-slate-900 bg-white"
-                        maxLength={10}
-                        autoComplete="postal-code"
-                        name="postal-code"
-                      />
-                    </div>
-                    <div className="col-span-1 min-h-fit">
-                      <label className="block text-sm font-medium text-slate-700 mb-2">Country</label>
-                      <select 
-                        className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent text-slate-900 bg-white"
-                        autoComplete="country"
-                        name="country"
-                      >
-                        <option value="US">United States</option>
-                        <option value="CA">Canada</option>
-                      </select>
-                    </div>
+                  <div className="mt-2">
+                    <label className="block text-sm font-medium text-slate-700 mb-2">ZIP Code</label>
+                    <input
+                      type="text"
+                      placeholder="02101"
+                      value={billingAddress.zipCode}
+                      onChange={(e) => setBillingAddress({...billingAddress, zipCode: e.target.value})}
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent text-slate-900 bg-white"
+                      maxLength={10}
+                      autoComplete="postal-code"
+                      name="postal-code"
+                    />
                   </div>
                 </div>
               </div>

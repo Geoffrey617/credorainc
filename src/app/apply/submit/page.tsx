@@ -17,6 +17,8 @@ import {
 } from '@heroicons/react/24/outline';
 import { detectCardType, formatCardNumber } from '@/utils/card-detection';
 import { getSortedUSStates } from '@/utils/us-states';
+import AddressAutocomplete from '@/components/AddressAutocomplete';
+import { stripePromise, STRIPE_CONFIG } from '@/lib/stripe-config';
 
 // Modern application steps with enhanced descriptions
 const steps = [
@@ -107,9 +109,16 @@ export default function SubmitPage() {
   const [completedSteps] = useState<string[]>(['personal', 'employment', 'rental', 'documents', 'review']);
   const [isProcessing, setIsProcessing] = useState(false);
   const [detectedCardType, setDetectedCardType] = useState<{ type: string | null; logoPath: string | null }>({ type: null, logoPath: null });
+  const [isAppleDevice, setIsAppleDevice] = useState(false);
 
-  // Load form data from localStorage
+  // Load form data from localStorage and detect Apple device
   useEffect(() => {
+    // Detect Apple devices/browsers
+    const userAgent = navigator.userAgent.toLowerCase();
+    const isApple = /iphone|ipad|ipod|macintosh|mac os x/.test(userAgent) || 
+                   /safari/.test(userAgent) && !/chrome|chromium|edg/.test(userAgent);
+    setIsAppleDevice(isApple);
+
     const savedData = localStorage.getItem('credora_application_form');
     if (savedData) {
       const parsedData = JSON.parse(savedData);
@@ -124,6 +133,17 @@ export default function SubmitPage() {
       }));
     }
   }, []);
+
+  // Handle billing address autocomplete selection
+  const handleBillingAddressSelect = (addressData: any) => {
+    setPaymentData(prev => ({
+      ...prev,
+      billingAddress: addressData.street,
+      billingCity: addressData.city,
+      billingState: addressData.state,
+      billingZipCode: addressData.zipCode
+    }));
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -168,75 +188,156 @@ export default function SubmitPage() {
     setIsProcessing(true);
 
     try {
-      // Process payment with Stripe
-      const { processStripePayment, validateCardDetails } = await import('@/utils/stripe-payment');
-      
-      // Prepare card details for validation
-      const cardDetails = {
-        cardNumber: paymentData.cardNumber.replace(/\s/g, ''),
-        expiryDate: paymentData.expiryDate,
-        cvv: paymentData.cvv,
-        cardholderName: paymentData.cardholderName,
-      };
+      // Create payment intent with Stripe
+      const paymentIntentResponse = await fetch('/api/create-payment-intent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: STRIPE_CONFIG.applicationFee,
+          currency: STRIPE_CONFIG.currency,
+          customerEmail: formData.email,
+          customerName: `${formData.firstName} ${formData.lastName}`
+        })
+      });
 
-      // Validate card details
-      const validation = validateCardDetails(cardDetails);
-      if (!validation.isValid) {
-        alert('Please check your card details:\n' + validation.errors.join('\n'));
-        setIsProcessing(false);
-        return;
+      const { clientSecret, paymentIntentId } = await paymentIntentResponse.json();
+
+      if (!clientSecret) {
+        throw new Error('Failed to create payment intent');
       }
 
-      // Process payment with Stripe
-      const paymentResult = await processStripePayment(
-        {
-          amount: 55, // $55 guarantor service application fee
-          description: 'Credora Guarantor Service Application Fee - Background check and processing',
-          metadata: {
-            type: 'application_fee',
-            applicantName: `${formData.firstName} ${formData.lastName}`,
-            applicantEmail: formData.email,
-            timestamp: new Date().toISOString(),
+      // Get Stripe instance
+      const stripe = await stripePromise;
+      if (!stripe) {
+        throw new Error('Stripe failed to load');
+      }
+
+      // Confirm payment with card details
+      const { error: stripeError, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+        payment_method: {
+          card: {
+            number: paymentData.cardNumber.replace(/\s/g, ''),
+            exp_month: parseInt(paymentData.expiryDate.split('/')[0]),
+            exp_year: parseInt(`20${paymentData.expiryDate.split('/')[1]}`),
+            cvc: paymentData.cvv,
+          },
+          billing_details: {
+            name: paymentData.cardholderName,
+            address: {
+              line1: paymentData.billingAddress,
+              city: paymentData.billingCity,
+              state: paymentData.billingState,
+              postal_code: paymentData.billingZipCode,
+              country: 'US',
+            },
           },
         },
-        cardDetails
-      );
+      });
 
-      if (!paymentResult.success) {
-        throw new Error(paymentResult.error || 'Payment failed');
+      if (stripeError) {
+        throw new Error(stripeError.message || 'Payment failed');
       }
+
+      if (paymentIntent?.status !== 'succeeded') {
+        throw new Error('Payment was not completed');
+      }
+
+      const paymentResult = {
+        success: true,
+        paymentIntentId: paymentIntent.id,
+        amount: paymentIntent.amount / 100,
+      };
 
       console.log('✅ Payment successful:', paymentResult.paymentIntentId);
       
-      // Store payment and application info in localStorage
-      const applicationData = {
-        ...JSON.parse(localStorage.getItem('credora_application_form') || '{}'),
-        paymentIntentId: paymentResult.paymentIntentId,
-        applicationFee: 55,
-        status: 'submitted',
-        submittedAt: new Date().toISOString(),
-        paymentStatus: 'paid'
-      };
+      // Get complete application data from localStorage
+      const savedFormData = JSON.parse(localStorage.getItem('credora_application_form') || '{}');
       
-      localStorage.setItem('credora_application_form', JSON.stringify(applicationData));
+      // Get user info
+      const userData = localStorage.getItem('credora_user');
+      const user = userData ? JSON.parse(userData) : null;
       
-      // Store payment info separately for tracking
-      const paymentInfo = {
-        paymentIntentId: paymentResult.paymentIntentId,
-        amount: 55,
-        status: 'paid',
-        paidAt: new Date().toISOString(),
-        description: 'Guarantor Service Application Fee',
-        applicantName: `${formData.firstName} ${formData.lastName}`,
-        applicantEmail: formData.email
-      };
-      localStorage.setItem('credora_application_payment', JSON.stringify(paymentInfo));
+      // Save complete application to Supabase database
+      if (user?.id) {
+        const completeApplicationData = {
+          userId: user.id,
+          firstName: savedFormData.firstName || formData.firstName,
+          lastName: savedFormData.lastName || formData.lastName,
+          email: savedFormData.email || formData.email,
+          status: 'submitted',
+          paymentStatus: 'paid',
+          monthlyRent: savedFormData.monthlyRent,
+          personal_info: {
+            firstName: savedFormData.firstName,
+            lastName: savedFormData.lastName,
+            email: savedFormData.email,
+            phone: savedFormData.phone,
+            dateOfBirth: savedFormData.dateOfBirth,
+            citizenshipStatus: savedFormData.citizenshipStatus,
+            internationalStudentType: savedFormData.internationalStudentType,
+            ssn: savedFormData.ssn,
+            currentAddress: savedFormData.currentAddress,
+            currentCity: savedFormData.currentCity,
+            currentState: savedFormData.currentState,
+            currentZip: savedFormData.currentZip
+          },
+          employment_info: {
+            employmentStatus: savedFormData.employmentStatus,
+            employerName: savedFormData.employerName,
+            jobTitle: savedFormData.jobTitle,
+            lengthOfEmployment: savedFormData.lengthOfEmployment,
+            annualIncome: savedFormData.annualIncome,
+            businessName: savedFormData.businessName,
+            businessType: savedFormData.businessType,
+            yearsInBusiness: savedFormData.yearsInBusiness,
+            selfEmployedIncome: savedFormData.selfEmployedIncome,
+            retirementIncome: savedFormData.retirementIncome,
+            pensionSource: savedFormData.pensionSource,
+            socialSecurityIncome: savedFormData.socialSecurityIncome,
+            disabilityDuration: savedFormData.disabilityDuration,
+            disabilityType: savedFormData.disabilityType,
+            disabilityBenefits: savedFormData.disabilityBenefits,
+            schoolName: savedFormData.schoolName,
+            studentType: savedFormData.studentType,
+            academicYear: savedFormData.academicYear
+          },
+          rental_info: {
+            desiredAddress: savedFormData.desiredAddress,
+            desiredCity: savedFormData.desiredCity,
+            desiredState: savedFormData.desiredState,
+            zipCode: savedFormData.zipCode,
+            monthlyRent: savedFormData.monthlyRent,
+            moveInDate: savedFormData.moveInDate,
+            landlordName: savedFormData.landlordName,
+            landlordPhone: savedFormData.landlordPhone,
+            propertyWebsite: savedFormData.propertyWebsite
+          },
+          documents: savedFormData.documents || {},
+          payment_info: {
+            paymentIntentId: paymentResult.paymentIntentId,
+            amount: 55,
+            status: 'paid',
+            paidAt: new Date().toISOString(),
+            description: 'Cosigner Service Application Fee'
+          }
+        };
+
+        // Save to database
+        const dbResponse = await fetch('/api/applications', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(completeApplicationData)
+        });
+
+        if (dbResponse.ok) {
+          console.log('✅ Application saved to database');
+        } else {
+          console.error('❌ Failed to save application to database');
+        }
+      }
       
-      // Show success message and redirect to dashboard
-      alert(`✅ Application submitted successfully! Payment ID: ${paymentResult.paymentIntentId?.substring(0, 10) || 'N/A'}...`);
-      
-      // Redirect to dashboard to view application status
-      router.push('/dashboard');
+      // Redirect to success page with payment information
+      router.push(`/apply/success?payment_intent=${paymentResult.paymentIntentId}&amount=${paymentResult.amount}`);
       
     } catch (error: any) {
       console.error('Payment failed:', error);
@@ -278,86 +379,37 @@ export default function SubmitPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto pt-24 pb-8 px-4 sm:px-6 lg:px-8">
-        {/* Modern Progress Header */}
-        <div className="mb-12">
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent mb-4">
-              Lease Guarantor Application
-            </h1>
-            <p className="text-lg text-gray-600 mb-6">
-              Step {getCurrentStepNumber()} of {getTotalSteps()} • {steps.find(s => s.name.toLowerCase().includes('submit'))?.estimatedTime} remaining
-            </p>
-            
-            {/* Progress Bar */}
-            <div className="max-w-md mx-auto">
-              <div className="flex justify-between text-xs text-gray-500 mb-2">
-                <span>Progress</span>
-                <span>{Math.round(getProgressPercentage())}% complete</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-100 to-slate-200 pt-8">
+      {/* Progress Header */}
+      <div className="bg-white border-b border-slate-200 sticky top-0 z-10">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-slate-900">Submit Application</h1>
+              <p className="text-slate-600 mt-1">Step {getCurrentStepNumber()} of {getTotalSteps()}</p>
+            </div>
+            <div className="text-right">
+              <div className="text-sm text-slate-500 mb-1">Progress</div>
+              <div className="w-32 bg-slate-200 rounded-full h-2">
                 <div 
-                  className="h-2 bg-gradient-to-r from-gray-600 to-gray-800 rounded-full transition-all duration-700 ease-out"
+                  className="bg-gradient-to-r from-slate-600 to-slate-700 h-2 rounded-full transition-all duration-300"
                   style={{ width: `${getProgressPercentage()}%` }}
-                />
+                ></div>
               </div>
             </div>
-          </div>
-          
-          {/* Step Indicators */}
-          <div className="flex justify-center items-center space-x-4 overflow-x-auto pb-4">
-            {steps.map((step, index) => {
-              const stepKey = ['personal', 'employment', 'rental', 'documents', 'review', 'submit'][index];
-              const isCompleted = completedSteps.includes(stepKey);
-              const isCurrent = stepKey === 'submit';
-              const StepIcon = step.icon;
-              
-              return (
-                <div key={step.name} className="flex flex-col items-center min-w-0 flex-shrink-0">
-                  <div className={`
-                    relative w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 mb-2
-                    ${
-                      isCompleted 
-                        ? 'bg-gradient-to-r from-gray-600 to-gray-700 shadow-lg shadow-gray-200' 
-                        : isCurrent 
-                        ? 'bg-gradient-to-r from-gray-800 to-gray-900 shadow-lg shadow-gray-300 scale-110' 
-                        : 'bg-gray-100 border-2 border-gray-300'
-                    }
-                  `}>
-                    {isCompleted ? (
-                      <CheckCircleIcon className={`w-6 h-6 text-white`} />
-                    ) : (
-                      <StepIcon className={`w-6 h-6 ${
-                        isCurrent ? 'text-white' : 'text-gray-400'
-                      }`} />
-                    )}
-                  </div>
-                  <div className="text-center">
-                    <p className={`text-sm font-medium ${
-                      isCurrent ? 'text-gray-900' : isCompleted ? 'text-gray-700' : 'text-gray-500'
-                    }`}>
-                      {step.name}
-                    </p>
-                    <p className={`text-xs ${
-                      isCurrent ? 'text-gray-600' : 'text-gray-400'
-                    }`}>
-                      {step.estimatedTime}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
           </div>
         </div>
+      </div>
 
-        {/* Modern Application Form */}
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8 sm:p-12 transition-all duration-500">
+      {/* Main Content */}
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Form */}
+        <div className="bg-white rounded-xl shadow-lg p-8">
+          <div className="mb-8">
+            <h2 className="text-2xl font-semibold text-slate-800 mb-2">Payment & Submit</h2>
+            <p className="text-slate-600">Complete your application with the $55 application fee.</p>
+          </div>
           <div className="space-y-6">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Submit Application & Pay Fee</h2>
-              <p className="text-gray-600">Complete your application by paying the $55 application fee. Your information is secure and encrypted.</p>
-            </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Application Fee & Security */}
@@ -394,9 +446,40 @@ export default function SubmitPage() {
               {/* Payment Form */}
               <div className="lg:col-span-2">
                 <form onSubmit={handleSubmit} className="space-y-6">
+                  {/* Apple Pay Button - Only show on Apple devices */}
+                  {isAppleDevice && (
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">Choose Payment Method</h3>
+                      
+                      <div className="mb-4">
+                        <button 
+                          type="button"
+                          onClick={handleSubmit}
+                          disabled={isProcessing}
+                          className="w-full bg-black text-white px-6 py-4 rounded-xl font-medium hover:bg-gray-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                        >
+                          <svg className="w-6 h-6 mr-3" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+                          </svg>
+                          {isProcessing ? 'Processing...' : 'Pay with Apple Pay'}
+                        </button>
+                      </div>
+
+                      {/* Or Divider */}
+                      <div className="relative my-6">
+                        <div className="absolute inset-0 flex items-center">
+                          <div className="w-full border-t border-gray-300"></div>
+                        </div>
+                        <div className="relative flex justify-center text-sm">
+                          <span className="px-4 bg-white text-gray-500">or pay with card</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Card Information */}
                   <div className="space-y-4">
-                    <h3 className="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">Payment Information</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">{isAppleDevice ? 'Card Information' : 'Payment Information'}</h3>
                     
                     <div className="space-y-4">
                       <div className="space-y-2">
@@ -416,18 +499,9 @@ export default function SubmitPage() {
                       </div>
 
                       <div className="space-y-2">
-                        <div className="flex justify-between items-center">
-                          <label htmlFor="cardNumber" className="block text-sm font-semibold text-gray-700">
-                            Card Number *
-                          </label>
-                          {/* Accepted Cards Display */}
-                          <div className="flex space-x-1.5">
-                            <img src="/assets/logos/visa.png" alt="Visa" className="h-5 w-auto object-contain opacity-90 hover:opacity-100 transition-opacity" onError={(e) => e.currentTarget.style.display = 'none'} />
-                            <img src="/assets/logos/mastercard.png" alt="Mastercard" className="h-5 w-auto object-contain opacity-90 hover:opacity-100 transition-opacity" onError={(e) => e.currentTarget.style.display = 'none'} />
-                            <img src="/assets/logos/amex.png" alt="American Express" className="h-5 w-auto object-contain opacity-90 hover:opacity-100 transition-opacity" onError={(e) => e.currentTarget.style.display = 'none'} />
-                            <img src="/assets/logos/discover.png" alt="Discover" className="h-5 w-auto object-contain opacity-90 hover:opacity-100 transition-opacity" onError={(e) => e.currentTarget.style.display = 'none'} />
-                          </div>
-                        </div>
+                        <label htmlFor="cardNumber" className="block text-sm font-semibold text-gray-700 mb-2">
+                          Card Number *
+                        </label>
                         <div className="relative">
                           <input
                             type="text"
@@ -435,24 +509,32 @@ export default function SubmitPage() {
                             name="cardNumber"
                             value={paymentData.cardNumber}
                             onChange={handleInputChange}
-                            className="w-full px-4 py-3 pr-16 border-2 border-gray-300 rounded-xl focus:border-gray-500 focus:ring-2 focus:ring-gray-500 focus:ring-opacity-20 transition-all duration-200 bg-white hover:border-gray-400 text-gray-900 placeholder-gray-500 font-sans"
+                            className="w-full px-4 py-3 pr-32 border-2 border-gray-300 rounded-xl focus:border-gray-500 focus:ring-2 focus:ring-gray-500 focus:ring-opacity-20 transition-all duration-200 bg-white hover:border-gray-400 text-gray-900 placeholder-gray-500 font-sans"
                             placeholder="1234 5678 9012 3456"
                             required
                           />
-                          {/* Card Provider Logo */}
-                          {detectedCardType.logoPath && (
-                            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                          {/* Card Provider Logos - Inside Input */}
+                          <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-1">
+                            {detectedCardType.logoPath ? (
+                              /* Show detected card logo */
                               <img
                                 src={detectedCardType.logoPath}
                                 alt={`${detectedCardType.type} logo`}
-                                className="h-5 w-auto object-contain transition-opacity duration-200"
+                                className="h-6 w-auto object-contain transition-opacity duration-200"
                                 onError={(e) => {
-                                  // Hide image if logo file doesn't exist
                                   e.currentTarget.style.display = 'none';
                                 }}
                               />
-                            </div>
-                          )}
+                            ) : (
+                              /* Show accepted cards when no card detected */
+                              <>
+                                <img src="/assets/logos/visa.png" alt="Visa" className="h-5 w-auto object-contain opacity-90" onError={(e) => e.currentTarget.style.display = 'none'} />
+                                <img src="/assets/logos/mastercard.png" alt="Mastercard" className="h-5 w-auto object-contain opacity-90" onError={(e) => e.currentTarget.style.display = 'none'} />
+                                <img src="/assets/logos/amex.png" alt="American Express" className="h-5 w-auto object-contain opacity-90" onError={(e) => e.currentTarget.style.display = 'none'} />
+                                <img src="/assets/logos/discover.png" alt="Discover" className="h-5 w-auto object-contain opacity-90" onError={(e) => e.currentTarget.style.display = 'none'} />
+                              </>
+                            )}
+                          </div>
                         </div>
                       </div>
 
@@ -501,15 +583,12 @@ export default function SubmitPage() {
                         <label htmlFor="billingAddress" className="block text-sm font-semibold text-gray-700">
                           Street Address *
                         </label>
-                        <input
-                          type="text"
-                          id="billingAddress"
-                          name="billingAddress"
+                        <AddressAutocomplete
                           value={paymentData.billingAddress}
-                          onChange={handleInputChange}
-                          className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-gray-500 focus:ring-2 focus:ring-gray-500 focus:ring-opacity-20 transition-all duration-200 bg-white hover:border-gray-400 text-gray-900 placeholder-gray-500 font-sans"
-                          placeholder="123 Main Street"
-                          required
+                          onChange={(value) => setPaymentData(prev => ({ ...prev, billingAddress: value }))}
+                          onAddressSelect={handleBillingAddressSelect}
+                          placeholder="Start typing your billing address..."
+                          className="border-2 border-gray-300 rounded-xl focus:border-gray-500 focus:ring-2 focus:ring-gray-500 focus:ring-opacity-20 transition-all duration-200 bg-white hover:border-gray-400 text-gray-900 placeholder-gray-500 font-sans"
                         />
                       </div>
 

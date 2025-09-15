@@ -41,7 +41,7 @@ export default function ForRentersPage() {
               Everything You Need as a Renter
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              From finding the perfect apartment to getting approved with our lease guarantor service - we've got you covered every step of the way.
+              From finding the perfect apartment to getting approved with our lease cosigner service - we've got you covered every step of the way.
             </p>
           </div>
         </div>
@@ -101,14 +101,14 @@ export default function ForRentersPage() {
               <div className="relative h-48">
                 <Image
                   src="https://images.unsplash.com/photo-1554469384-e58fac16e23a?ixlib=rb-4.0.3&auto=format&fit=crop&w=2340&q=80"
-                  alt="Lease guarantor service"
+                  alt="Lease cosigner service"
                   fill
                   className="object-cover"
                 />
                 <div className="absolute inset-0 bg-green-600/20"></div>
               </div>
               <div className="p-8">
-                <h3 className="text-2xl font-semibold text-gray-900 mb-4">Lease Guarantor Service</h3>
+                <h3 className="text-2xl font-semibold text-gray-900 mb-4">Lease Cosigner Service</h3>
                 <p className="text-gray-600 mb-6 leading-relaxed">
                   Get approved for apartments with our professional cosigners. Perfect for those with limited credit and rental history.
                 </p>
@@ -171,7 +171,7 @@ export default function ForRentersPage() {
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-4">Frequently Asked Questions</h3>
               <p className="text-gray-600 mb-6">
-                Get instant answers to common questions about our lease guarantor service and rental process.
+                Get instant answers to common questions about our lease cosigner service and rental process.
               </p>
               <Link href="/faq" className="text-slate-600 font-semibold hover:text-slate-700 transition-colors">
                 View FAQ →

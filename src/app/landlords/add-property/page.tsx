@@ -54,17 +54,9 @@ export default function AddPropertyPage() {
         
         if (verifiedLandlord) {
           const data = JSON.parse(verifiedLandlord);
-          if (data.subscriptionStatus !== 'active') {
-            router.push('/landlords/settings');
-            return;
-          }
           setLandlordData(data);
         } else if (unverifiedLandlord) {
           const data = JSON.parse(unverifiedLandlord);
-          if (data.subscriptionStatus !== 'active') {
-            router.push('/landlords/settings');
-            return;
-          }
           setLandlordData(data);
         } else {
           router.push('/auth/landlords/signin');

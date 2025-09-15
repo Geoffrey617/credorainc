@@ -52,48 +52,88 @@ export default function LandlordDashboard() {
 
   // Load landlord data on component mount
   useEffect(() => {
-    const loadLandlordData = () => {
+    const loadLandlordData = async () => {
       try {
         // Check for verified landlord data
         const verifiedLandlord = localStorage.getItem('credora_verified_landlord');
         const unverifiedLandlord = localStorage.getItem('credora_unverified_landlord');
         
+        let landlordInfo = null;
         if (verifiedLandlord) {
-          const data = JSON.parse(verifiedLandlord);
-          setLandlordData(prev => ({
-            ...prev,
-            firstName: data.firstName || '',
-            lastName: data.lastName || '',
-            email: data.email || '',
-            company: data.company || '',
-            plan: data.plan || 'Basic',
-            subscriptionStatus: data.subscriptionStatus || 'inactive',
-            subscriptionExpiry: data.subscriptionExpiry || '',
-            idVerificationStatus: data.idVerificationStatus || 'not_submitted',
-            accountStatus: data.accountStatus || 'active_unverified'
-          }));
+          landlordInfo = JSON.parse(verifiedLandlord);
         } else if (unverifiedLandlord) {
-          const data = JSON.parse(unverifiedLandlord);
-          setLandlordData(prev => ({
-            ...prev,
-            firstName: data.firstName || '',
-            lastName: data.lastName || '',
-            email: data.email || '',
-            company: data.company || '',
-            plan: data.plan || 'Basic',
-            subscriptionStatus: data.subscriptionStatus || 'inactive',
-            subscriptionExpiry: data.subscriptionExpiry || '',
-            idVerificationStatus: data.idVerificationStatus || 'not_submitted',
-            accountStatus: data.accountStatus || 'active_unverified'
-          }));
+          landlordInfo = JSON.parse(unverifiedLandlord);
         } else {
           // No landlord data found, redirect to sign in
           console.log('No landlord data found, redirecting to sign in');
           router.push('/auth/landlords/signin');
           return;
         }
+
+        // Load real subscription data from database
+        if (landlordInfo?.email) {
+          try {
+            console.log('🔍 Loading real subscription data for:', landlordInfo.email);
+            const response = await fetch(`/api/landlords/subscription?email=${encodeURIComponent(landlordInfo.email)}`);
+            
+            if (response.ok) {
+              const subscriptionData = await response.json();
+              
+              // Use real subscription data from database/Stripe
+              setLandlordData(prev => ({
+                ...prev,
+                firstName: subscriptionData.landlord.firstName || landlordInfo.firstName || '',
+                lastName: subscriptionData.landlord.lastName || landlordInfo.lastName || '',
+                email: subscriptionData.landlord.email || landlordInfo.email || '',
+                company: subscriptionData.landlord.company || landlordInfo.company || '',
+                plan: subscriptionData.landlord.subscriptionPlan || 'none',
+                subscriptionStatus: subscriptionData.landlord.subscriptionStatus || 'inactive',
+                subscriptionExpiry: subscriptionData.landlord.subscriptionExpiry || '',
+                idVerificationStatus: landlordInfo.idVerificationStatus || 'not_submitted',
+                accountStatus: landlordInfo.accountStatus || 'active_unverified'
+              }));
+              
+              console.log('✅ Real subscription data loaded:', {
+                plan: subscriptionData.landlord.subscriptionPlan,
+                status: subscriptionData.landlord.subscriptionStatus
+              });
+            } else {
+              console.log('⚠️ Subscription API failed, using localStorage data');
+              // Fallback to localStorage data
+              setLandlordData(prev => ({
+                ...prev,
+                firstName: landlordInfo.firstName || '',
+                lastName: landlordInfo.lastName || '',
+                email: landlordInfo.email || '',
+                company: landlordInfo.company || '',
+                plan: landlordInfo.plan || 'none',
+                subscriptionStatus: landlordInfo.subscriptionStatus || 'inactive',
+                subscriptionExpiry: landlordInfo.subscriptionExpiry || '',
+                idVerificationStatus: landlordInfo.idVerificationStatus || 'not_submitted',
+                accountStatus: landlordInfo.accountStatus || 'active_unverified'
+              }));
+            }
+          } catch (error) {
+            console.error('❌ Error loading subscription data:', error);
+            // Fallback to localStorage data
+            setLandlordData(prev => ({
+              ...prev,
+              firstName: landlordInfo.firstName || '',
+              lastName: landlordInfo.lastName || '',
+              email: landlordInfo.email || '',
+              company: landlordInfo.company || '',
+              plan: landlordInfo.plan || 'none',
+              subscriptionStatus: landlordInfo.subscriptionStatus || 'inactive',
+              subscriptionExpiry: landlordInfo.subscriptionExpiry || '',
+              idVerificationStatus: landlordInfo.idVerificationStatus || 'not_submitted',
+              accountStatus: landlordInfo.accountStatus || 'active_unverified'
+            }));
+          }
+        }
         
         setIsLoading(false);
+        
+        // No redirects - let them access dashboard and see setup requirements
       } catch (error) {
         console.error('Error loading landlord data:', error);
         router.push('/auth/landlords/signin');
@@ -102,6 +142,19 @@ export default function LandlordDashboard() {
 
     loadLandlordData();
   }, [router]);
+
+  // Check completion status for dashboard display (no redirects)
+  const getSetupProgress = (landlordInfo: any) => {
+    const idVerified = landlordInfo.idVerificationStatus === 'approved';
+    const hasSubscription = landlordInfo.subscriptionStatus === 'active' && landlordInfo.plan !== 'none';
+    
+    return {
+      idVerified,
+      hasSubscription,
+      completionPercentage: ((idVerified ? 1 : 0) + (hasSubscription ? 1 : 0)) / 2 * 100,
+      isComplete: idVerified && hasSubscription
+    };
+  };
 
   // Load properties from database
   const loadProperties = async () => {
@@ -177,7 +230,7 @@ export default function LandlordDashboard() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active': return 'bg-green-100 text-green-800';
-      case 'rented': return 'bg-blue-100 text-blue-800';
+      case 'rented': return 'bg-gray-100 text-gray-800';
       case 'pending': return 'bg-yellow-100 text-yellow-800';
       case 'approved': return 'bg-green-100 text-green-800';
       default: return 'bg-gray-100 text-gray-800';
@@ -280,13 +333,13 @@ export default function LandlordDashboard() {
           <div className="space-y-8">
             {/* Onboarding Checklist */}
             {(landlordData.idVerificationStatus !== 'approved' || landlordData.subscriptionStatus !== 'active') && (
-              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-6">
+              <div className="bg-gradient-to-r from-gray-50 to-slate-50 border border-gray-200 rounded-lg p-6">
                 <div className="flex items-start justify-between mb-4">
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-1">Complete Your Setup</h3>
                     <p className="text-gray-600 text-sm">Finish these steps to maximize your rental success</p>
                   </div>
-                  <div className="flex items-center bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                  <div className="flex items-center bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm font-medium">
                     {(() => {
                       const completed = [
                         landlordData.idVerificationStatus === 'approved',
@@ -344,7 +397,7 @@ export default function LandlordDashboard() {
                       ) : (
                         <Link 
                           href="/auth/landlords/id-verification"
-                          className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors"
+                          className="bg-gray-700 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-800 transition-colors"
                         >
                           {landlordData.idVerificationStatus === 'rejected' ? 'Resubmit' : 'Verify ID'}
                         </Link>
@@ -384,7 +437,7 @@ export default function LandlordDashboard() {
                       ) : (
                         <button
                           onClick={() => setActiveTab('subscription')}
-                          className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors"
+                          className="bg-gray-700 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-800 transition-colors"
                         >
                           Choose Plan
                         </button>
@@ -409,7 +462,7 @@ export default function LandlordDashboard() {
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div 
-                      className="bg-blue-600 h-2 rounded-full transition-all duration-500"
+                      className="bg-gray-700 h-2 rounded-full transition-all duration-500"
                       style={{
                         width: `${(() => {
                           const completed = [
@@ -430,7 +483,7 @@ export default function LandlordDashboard() {
               <div className="bg-white rounded-lg shadow p-6">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
-                    <div className="w-8 h-8 bg-blue-500 rounded-md flex items-center justify-center">
+                    <div className="w-8 h-8 bg-gray-700 rounded-md flex items-center justify-center">
                       <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                       </svg>
@@ -493,7 +546,7 @@ export default function LandlordDashboard() {
             </div>
 
             {/* Subscription Warning */}
-            {landlordData.subscriptionStatus !== 'active' && (
+            {(landlordData.subscriptionStatus !== 'active' || landlordData.plan === 'none') && (
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
                 <div className="flex items-center">
                   <svg className="w-6 h-6 text-yellow-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -506,9 +559,9 @@ export default function LandlordDashboard() {
                     </p>
                     <Link
                       href="/landlords/settings"
-                      className="inline-block mt-3 bg-yellow-600 text-white px-4 py-2 rounded-lg hover:bg-yellow-700 transition-colors font-medium"
+                      className="inline-block mt-3 bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors font-medium"
                     >
-                      Subscribe Now - Starting at $20/month
+                      Subscribe Now - Starting at $25/month
                     </Link>
                   </div>
                 </div>
@@ -628,7 +681,7 @@ export default function LandlordDashboard() {
                     ) : (
                       <Link
                         href="/landlords/settings"
-                        className="inline-block bg-yellow-600 text-white px-4 py-2 rounded-lg hover:bg-yellow-700 transition-colors"
+                        className="inline-block bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors"
                       >
                         Subscribe Now
                       </Link>
@@ -771,47 +824,14 @@ export default function LandlordDashboard() {
             <SubscriptionPlans
               currentPlan={landlordData.subscriptionStatus === 'active' ? landlordData.plan.toLowerCase() : undefined}
               onPlanSelect={(plan) => {
-                // Handle plan selection
-                console.log('Selected plan:', plan);
+                // Store selected plan and show payment modal
+                console.log('📋 Plan selected:', plan.name, 'Price:', plan.price);
                 
-                // Update landlord data with new subscription
-                const updatedLandlordData = {
-                  ...landlordData,
-                  plan: plan.name,
-                  subscriptionStatus: 'active',
-                  subscriptionExpiry: new Date(Date.now() + (plan.interval === 'yearly' ? 365 : 30) * 24 * 60 * 60 * 1000).toISOString()
-                };
-
-                // Update localStorage
-                try {
-                  const verifiedLandlord = localStorage.getItem('credora_verified_landlord');
-                  const unverifiedLandlord = localStorage.getItem('credora_unverified_landlord');
-                  
-                  if (verifiedLandlord) {
-                    const data = JSON.parse(verifiedLandlord);
-                    const updatedData = Array.isArray(data) ? 
-                      data.map(l => l.email === landlordData.email ? { ...l, ...updatedLandlordData } : l) :
-                      { ...data, ...updatedLandlordData };
-                    localStorage.setItem('credora_verified_landlord', JSON.stringify(updatedData));
-                  } else if (unverifiedLandlord) {
-                    const data = JSON.parse(unverifiedLandlord);
-                    const updatedData = Array.isArray(data) ? 
-                      data.map(l => l.email === landlordData.email ? { ...l, ...updatedLandlordData } : l) :
-                      { ...data, ...updatedLandlordData };
-                    localStorage.setItem('credora_unverified_landlord', JSON.stringify(updatedData));
-                  }
-
-                  // Update state
-                  setLandlordData(updatedLandlordData);
-                  
-                  // Show success message and redirect back to overview
-                  alert(`Successfully subscribed to ${plan.name} plan! You can now list properties and manage tenants.`);
-                  setActiveTab('overview');
-                  
-                } catch (error) {
-                  console.error('Error updating subscription:', error);
-                  alert('Error processing subscription. Please try again.');
-                }
+                // Store plan details for payment processing
+                localStorage.setItem('credora_selected_landlord_plan', JSON.stringify(plan));
+                
+                // Redirect to landlord settings payment modal
+                router.push(`/landlords/settings?showPayment=true&plan=${plan.id}&price=${plan.price}`);
               }}
               showSkipOption={landlordData.subscriptionStatus !== 'active'}
               onSkip={() => {

@@ -201,7 +201,7 @@ export default function LandlordsPageClient() {
               <div className="grid md:grid-cols-2 gap-8">
                 <div className="bg-white rounded-xl p-8 shadow-lg border border-slate-200">
                   <h3 className="text-2xl font-bold text-slate-800 mb-4">Basic Plan</h3>
-                  <div className="text-4xl font-bold text-slate-700 mb-2">$20</div>
+                  <div className="text-4xl font-bold text-slate-700 mb-2">$25</div>
                   <p className="text-slate-600 mb-6">Per month - Self-service property listing</p>
                   <ul className="space-y-3 mb-8">
                     <li className="flex items-center text-slate-600">
@@ -236,7 +236,7 @@ export default function LandlordsPageClient() {
                     Most Popular
                   </div>
                   <h3 className="text-2xl font-bold mb-4">Premium Plan</h3>
-                  <div className="text-4xl font-bold mb-2">$60</div>
+                  <div className="text-4xl font-bold mb-2">$75</div>
                   <p className="text-slate-200 mb-6">Per month - Full-service tenant matching</p>
                   <ul className="space-y-3 mb-8">
                     <li className="flex items-center">
