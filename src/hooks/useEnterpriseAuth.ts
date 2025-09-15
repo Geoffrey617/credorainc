@@ -99,7 +99,7 @@ export function useEnterpriseAuth() {
     };
 
     // Store in sessionStorage (clears on tab close)
-    sessionStorage.setItem(SESSION_KEY, JSON.stringify(sessionData));
+    sessionStorage.setItem(TEMP_SESSION_KEY, JSON.stringify(sessionData));
     
     setUser(userData);
     setIsAuthenticated(true);
