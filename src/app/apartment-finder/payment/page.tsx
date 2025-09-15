@@ -540,25 +540,34 @@ export default function ApartmentFinderPaymentPage() {
       }
 
       // Confirm payment with card details
-      const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
-        payment_method: {
-          card: {
-            number: cardDetails.cardNumber.replace(/\s/g, ''),
-            exp_month: parseInt(cardDetails.expiryDate.split('/')[0]),
-            exp_year: parseInt('20' + cardDetails.expiryDate.split('/')[1]),
-            cvc: cardDetails.cvv,
-          },
-          billing_details: {
-            name: cardDetails.cardholderName,
-            address: {
-              line1: billingAddress.street,
-              city: billingAddress.city,
-              state: billingAddress.state,
-              postal_code: billingAddress.zipCode,
-              country: 'US',
-            },
+      // Create payment method first, then confirm payment
+      const { error: pmError, paymentMethod } = await stripe.createPaymentMethod({
+        type: 'card',
+        card: {
+          number: cardDetails.cardNumber.replace(/\s/g, ''),
+          exp_month: parseInt(cardDetails.expiryDate.split('/')[0]),
+          exp_year: parseInt('20' + cardDetails.expiryDate.split('/')[1]),
+          cvc: cardDetails.cvv,
+        },
+        billing_details: {
+          name: cardDetails.cardholderName,
+          address: {
+            line1: billingAddress.street,
+            city: billingAddress.city,
+            state: billingAddress.state,
+            postal_code: billingAddress.zipCode,
+            country: 'US',
           },
         },
+      });
+
+      if (pmError) {
+        throw new Error(pmError.message || 'Failed to create payment method');
+      }
+
+      // Confirm payment with the payment method
+      const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+        payment_method: paymentMethod.id,
       });
 
       if (error) {
