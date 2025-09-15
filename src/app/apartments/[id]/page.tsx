@@ -3,11 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 
-// Required for static export with dynamic routes
-export async function generateStaticParams() {
-  // Return empty array for now - pages will be generated on-demand
-  return [];
-}
+export const dynamic = 'force-static';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Star, MapPin, Bed, Bath, Square, Calendar, Phone, Mail, ArrowLeft, ExternalLink, Check, X } from 'lucide-react';
