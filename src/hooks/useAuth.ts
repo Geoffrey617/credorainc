@@ -22,7 +22,7 @@ export function useAuth() {
     // Check for existing session
     const loadUser = async () => {
       const currentUser = await auth.getCurrentUser()
-      setUser(currentUser)
+      setUser(currentUser as User | null)
       setLoading(false)
     }
     loadUser()
