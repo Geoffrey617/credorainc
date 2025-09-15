@@ -245,8 +245,8 @@ export default function ApplicationsPage() {
                     </div>
                   </div>
 
-                  {/* Progress Bar for Pending Applications */}
-                  {appStatus === 'pending' && (
+                  {/* Progress Bar for Under Review Applications */}
+                  {appStatus === 'under_review' && (
                     <div className="mt-4 pt-4 border-t border-slate-200">
                       <div className="flex justify-between items-center mb-2">
                         <span className="text-sm font-medium text-slate-700">Application Progress</span>
