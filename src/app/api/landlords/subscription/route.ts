@@ -73,7 +73,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get Stripe subscription if exists
-    let stripeSubscription = null;
+    let stripeSubscription: any = null;
     if (landlord.stripe_customer_id && landlord.stripe_subscription_id) {
       try {
         stripeSubscription = await stripe.subscriptions.retrieve(landlord.stripe_subscription_id);
