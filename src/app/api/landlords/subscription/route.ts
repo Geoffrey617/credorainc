@@ -188,7 +188,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Create subscription
-    const subscription = await stripe.subscriptions.create({
+    const subscription: any = await stripe.subscriptions.create({
       customer: customer.id,
       items: [{ price: plan.priceId }],
       default_payment_method: paymentMethod.id,
@@ -274,7 +274,7 @@ export async function PUT(request: NextRequest) {
     }
 
     // Update Stripe subscription
-    const subscription = await stripe.subscriptions.update(landlord.stripe_subscription_id, {
+    const subscription: any = await stripe.subscriptions.update(landlord.stripe_subscription_id, {
       items: [{
         id: (await stripe.subscriptions.retrieve(landlord.stripe_subscription_id)).items.data[0].id,
         price: newPlan.priceId,
@@ -342,7 +342,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Cancel Stripe subscription
-    const subscription = await stripe.subscriptions.update(landlord.stripe_subscription_id, {
+    const subscription: any = await stripe.subscriptions.update(landlord.stripe_subscription_id, {
       cancel_at_period_end: true
     });
 
