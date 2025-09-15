@@ -580,24 +580,24 @@ export default function ApartmentFinderPaymentPage() {
         throw new Error('Payment was not completed successfully');
       }
 
-      const paymentResult = {
+      const finalResult = {
         success: true,
         paymentIntentId: paymentIntent.id,
         clientSecret,
       };
 
-      if (!paymentResult.success) {
-        throw new Error(paymentResult.error || 'Payment failed');
+      if (!finalResult.success) {
+        throw new Error(finalResult.error || 'Payment failed');
       }
 
-      console.log('✅ Payment successful:', paymentResult.paymentIntentId);
+      console.log('✅ Payment successful:', finalResult.paymentIntentId);
       
       // Now that payment is successful, finalize the request submission
       const finalRequest = {
         ...draftRequest,
         status: 'submitted', // Change from draft to submitted
         paymentStatus: 'paid',
-        paymentIntentId: paymentResult.paymentIntentId,
+        paymentIntentId: finalResult.paymentIntentId,
         paidAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         notes: 'Payment received. Your request is now being reviewed by our team.'
@@ -611,7 +611,7 @@ export default function ApartmentFinderPaymentPage() {
       
       // Store payment info
       const paymentInfo = {
-        paymentIntentId: paymentResult.paymentIntentId,
+        paymentIntentId: finalResult.paymentIntentId,
         requestId: paymentData.requestId,
         amount: paymentData.amount,
         status: 'paid',
@@ -639,7 +639,7 @@ export default function ApartmentFinderPaymentPage() {
       console.log('💳 Payment processed and request submitted:', paymentData.requestId);
       
       // Redirect to success page with payment information
-      router.push(`/apartment-finder/success?payment_intent=${paymentResult.paymentIntentId}&request_id=${paymentData.requestId}&amount=${paymentResult.amount}`);
+      router.push(`/apartment-finder/success?payment_intent=${finalResult.paymentIntentId}&request_id=${paymentData.requestId}&amount=55`);
       
     } catch (error: any) {
       console.error('Payment processing error:', error);
