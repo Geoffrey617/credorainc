@@ -188,67 +188,51 @@ export default function SubmitPage() {
     setIsProcessing(true);
 
     try {
-      // Create payment intent with Stripe
-      const paymentIntentResponse = await fetch('/api/create-payment-intent', {
+      // Process payment server-side with card details
+      const paymentResponse = await fetch('/api/create-payment-intent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           amount: STRIPE_CONFIG.applicationFee,
           currency: STRIPE_CONFIG.currency,
           customerEmail: formData.email,
-          customerName: `${formData.firstName} ${formData.lastName}`
+          customerName: `${formData.firstName} ${formData.lastName}`,
+          service: 'Cosigner Application Fee',
+          description: 'Credora Cosigner Application Fee',
+          cardDetails: {
+            cardNumber: paymentData.cardNumber.replace(/\s/g, ''),
+            expiryDate: paymentData.expiryDate,
+            cvv: paymentData.cvv,
+            cardholderName: paymentData.cardholderName,
+            zipCode: paymentData.zipCode
+          },
+          billingAddress: {
+            street: paymentData.billingAddress,
+            city: paymentData.billingCity,
+            state: paymentData.billingState,
+            zipCode: paymentData.zipCode
+          }
         })
       });
 
-      const { clientSecret, paymentIntentId } = await paymentIntentResponse.json();
-
-      if (!clientSecret) {
-        throw new Error('Failed to create payment intent');
+      if (!paymentResponse.ok) {
+        const errorData = await paymentResponse.json();
+        throw new Error(errorData.error || 'Payment failed');
       }
 
-      // Get Stripe instance
-      const stripe = await stripePromise;
-      if (!stripe) {
-        throw new Error('Stripe failed to load');
+      const paymentResult = await paymentResponse.json();
+
+      if (!paymentResult.success) {
+        throw new Error(paymentResult.error || 'Payment failed');
       }
 
-      // Confirm payment with card details
-      const { error: stripeError, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
-        payment_method: {
-          card: {
-            number: paymentData.cardNumber.replace(/\s/g, ''),
-            exp_month: parseInt(paymentData.expiryDate.split('/')[0]),
-            exp_year: parseInt(`20${paymentData.expiryDate.split('/')[1]}`),
-            cvc: paymentData.cvv,
-          },
-          billing_details: {
-            name: paymentData.cardholderName,
-            address: {
-              line1: paymentData.billingAddress,
-              city: paymentData.billingCity,
-              state: paymentData.billingState,
-              postal_code: paymentData.billingZipCode,
-              country: 'US',
-            },
-          },
-        },
-      });
+      const paymentIntent = paymentResult.paymentIntent;
 
-      if (stripeError) {
-        throw new Error(stripeError.message || 'Payment failed');
+      if (paymentIntent.status !== 'succeeded') {
+        throw new Error('Payment was not completed successfully');
       }
 
-      if (paymentIntent?.status !== 'succeeded') {
-        throw new Error('Payment was not completed');
-      }
-
-      const paymentResult = {
-        success: true,
-        paymentIntentId: paymentIntent.id,
-        amount: paymentIntent.amount / 100,
-      };
-
-      console.log('✅ Payment successful:', paymentResult.paymentIntentId);
+      console.log('✅ Payment successful:', paymentIntent.id);
       
       // Get complete application data from localStorage
       const savedFormData = JSON.parse(localStorage.getItem('credora_application_form') || '{}');
