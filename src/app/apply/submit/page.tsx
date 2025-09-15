@@ -204,13 +204,13 @@ export default function SubmitPage() {
             expiryDate: paymentData.expiryDate,
             cvv: paymentData.cvv,
             cardholderName: paymentData.cardholderName,
-            zipCode: paymentData.zipCode
+            zipCode: paymentData.billingZipCode
           },
           billingAddress: {
             street: paymentData.billingAddress,
             city: paymentData.billingCity,
             state: paymentData.billingState,
-            zipCode: paymentData.zipCode
+            zipCode: paymentData.billingZipCode
           }
         })
       });
