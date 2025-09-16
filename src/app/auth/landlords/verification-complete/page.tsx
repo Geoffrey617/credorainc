@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
-export default function VerificationCompletePage() {
+function VerificationCompleteContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [status, setStatus] = useState<'loading' | 'success' | 'pending' | 'failed'>('loading');
@@ -214,5 +214,20 @@ export default function VerificationCompletePage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function VerificationCompletePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8 text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading verification status...</p>
+        </div>
+      </div>
+    }>
+      <VerificationCompleteContent />
+    </Suspense>
   );
 }

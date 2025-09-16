@@ -3,8 +3,9 @@ import { NextRequest, NextResponse } from 'next/server';
 export const dynamic = 'force-static';
 
 export async function GET(request: NextRequest) {
-  const searchParams = request.nextUrl.searchParams;
-  const query = searchParams.get('q');
+  // Extract query from URL manually for static export compatibility
+  const url = new URL(request.url);
+  const query = url.searchParams.get('q');
 
   if (!query || query.length < 3) {
     return NextResponse.json({ suggestions: [] });
