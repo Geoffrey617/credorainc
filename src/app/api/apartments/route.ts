@@ -16,7 +16,9 @@ const supabase = createClient(supabaseUrl, supabaseKey)
 
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url)
+    // Handle URL parsing for static export compatibility
+    const url = new URL(request.url || 'http://localhost:3000')
+    const { searchParams } = url
     
     // Parse query parameters
     const page = parseInt(searchParams.get('page') || '1')

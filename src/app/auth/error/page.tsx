@@ -6,6 +6,8 @@ export const metadata: Metadata = {
   description: 'An error occurred during authentication. Please try again.',
 }
 
+export const dynamic = 'force-static'
+
 interface ErrorPageProps {
   searchParams: Promise<{
     error?: string
