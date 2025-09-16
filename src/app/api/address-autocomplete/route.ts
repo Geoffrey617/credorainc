@@ -1,17 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-static';
+export const runtime = 'nodejs';
 
 export async function GET(request: NextRequest) {
-  // Extract query from URL manually for static export compatibility
-  const url = new URL(request.url || 'http://localhost:3000');
-  const query = url.searchParams.get('q');
-
-  if (!query || query.length < 3) {
-    return NextResponse.json({ suggestions: [] });
-  }
-
   try {
+    // Extract query from URL manually for static export compatibility
+    const url = new URL(request.url || 'http://localhost:3000/api/address-autocomplete');
+    const query = url.searchParams.get('q');
+
+    if (!query || query.length < 3) {
+      return NextResponse.json({ suggestions: [] });
+    }
     console.log('🔍 Server-side address search for:', query);
 
     // Using Nominatim (OpenStreetMap) - free and reliable
