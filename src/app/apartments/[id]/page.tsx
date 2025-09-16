@@ -2,8 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-
-export const dynamic = 'force-static';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Star, MapPin, Bed, Bath, Square, Calendar, Phone, Mail, ArrowLeft, ExternalLink, Check, X } from 'lucide-react';
