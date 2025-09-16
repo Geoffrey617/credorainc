@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
 // Configure for static export compatibility
-export const dynamic = 'force-dynamic'
+export const dynamic = 'force-static'
 export const runtime = 'nodejs'
 
 // Initialize Stripe - in production, use your secret key
