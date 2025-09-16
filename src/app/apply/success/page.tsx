@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { 
@@ -22,7 +22,7 @@ interface ApplicationData {
   applicationId?: string;
 }
 
-export default function ApplicationSuccessPage() {
+function ApplicationSuccessContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [applicationData, setApplicationData] = useState<ApplicationData | null>(null);
@@ -125,5 +125,20 @@ export default function ApplicationSuccessPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function ApplicationSuccessPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center">
+        <div className="max-w-md w-full bg-white dark:bg-slate-800 rounded-lg shadow-md p-8 text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-slate-600 dark:text-slate-300">Loading application status...</p>
+        </div>
+      </div>
+    }>
+      <ApplicationSuccessContent />
+    </Suspense>
   );
 }
