@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@supabase/supabase-js'
@@ -9,7 +9,7 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 const supabase = createClient(supabaseUrl, supabaseKey)
 
-export default function VerifyEmailPage() {
+function VerifyEmailContent() {
   const [status, setStatus] = useState<'loading' | 'success' | 'error' | 'expired'>('loading')
   const [message, setMessage] = useState('')
   const [debugInfo, setDebugInfo] = useState<string[]>([])
@@ -220,4 +220,19 @@ export default function VerifyEmailPage() {
       </div>
     </div>
   )
+}
+
+export default function VerifyEmailPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8 text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Verifying your email...</p>
+        </div>
+      </div>
+    }>
+      <VerifyEmailContent />
+    </Suspense>
+  );
 }
