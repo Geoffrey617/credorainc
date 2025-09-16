@@ -3,6 +3,15 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
+
+// Generate static params for static export
+export async function generateStaticParams() {
+  return [
+    { id: '1' },
+    { id: '2' },
+    { id: '3' },
+  ]
+}
 import Link from 'next/link';
 import { Star, MapPin, Bed, Bath, Square, Calendar, Phone, Mail, ArrowLeft, ExternalLink, Check, X } from 'lucide-react';
 import ReviewsSection from '@/components/ReviewsSection';
