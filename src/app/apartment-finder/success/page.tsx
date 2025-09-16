@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { CheckCircleIcon } from '@heroicons/react/24/outline';
@@ -15,7 +15,7 @@ interface ApartmentRequestData {
   requestId?: string;
 }
 
-export default function ApartmentFinderSuccessPage() {
+function ApartmentFinderSuccessContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [requestData, setRequestData] = useState<ApartmentRequestData | null>(null);
@@ -110,5 +110,20 @@ export default function ApartmentFinderSuccessPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function ApartmentFinderSuccessPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
+        <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8 text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-slate-600">Loading success status...</p>
+        </div>
+      </div>
+    }>
+      <ApartmentFinderSuccessContent />
+    </Suspense>
   );
 }
