@@ -5,6 +5,15 @@ import { NextRequest, NextResponse } from 'next/server'
 export const dynamic = 'force-static'
 export const runtime = 'nodejs'
 
+// Generate static params for static export
+export async function generateStaticParams() {
+  return [
+    { id: '1' },
+    { id: '2' },
+    { id: '3' },
+  ]
+}
+
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
