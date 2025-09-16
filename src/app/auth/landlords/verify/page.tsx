@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 
-export default function LandlordVerifyEmail() {
+function LandlordVerifyEmailContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [verificationStatus, setVerificationStatus] = useState<'loading' | 'success' | 'error' | 'expired'>('loading');
@@ -244,5 +244,20 @@ export default function LandlordVerifyEmail() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LandlordVerifyEmail() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
+        <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8 text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-slate-600">Verifying your email...</p>
+        </div>
+      </div>
+    }>
+      <LandlordVerifyEmailContent />
+    </Suspense>
   );
 }
