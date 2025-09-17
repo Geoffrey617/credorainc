@@ -52,6 +52,16 @@ export default function CookieBanner({
     localStorage.setItem('credora_cookie_consent', JSON.stringify(allPreferences));
     localStorage.setItem('credora_cookie_consent_date', new Date().toISOString());
     
+    // Initialize Google Analytics if available
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('config', 'G-KECYNPFCHS', {
+        anonymize_ip: true,
+        allow_google_signals: true,
+        allow_ad_personalization_signals: true
+      });
+      console.log('✅ Google Analytics enabled via Accept All');
+    }
+    
     setIsVisible(false);
     onAcceptAll?.();
   };
@@ -59,6 +69,26 @@ export default function CookieBanner({
   const handleSavePreferences = () => {
     localStorage.setItem('credora_cookie_consent', JSON.stringify(preferences));
     localStorage.setItem('credora_cookie_consent_date', new Date().toISOString());
+    
+    // Initialize Google Analytics based on user preferences
+    if (typeof window !== 'undefined' && window.gtag) {
+      if (preferences.analytics) {
+        window.gtag('config', 'G-KECYNPFCHS', {
+          anonymize_ip: true,
+          allow_google_signals: preferences.advertising,
+          allow_ad_personalization_signals: preferences.advertising
+        });
+        console.log('✅ Google Analytics enabled via preferences');
+      } else {
+        // Disable analytics
+        window.gtag('config', 'G-KECYNPFCHS', {
+          send_page_view: false,
+          allow_google_signals: false,
+          allow_ad_personalization_signals: false
+        });
+        console.log('❌ Google Analytics disabled via preferences');
+      }
+    }
     
     setIsVisible(false);
     onSavePreferences?.(preferences);
