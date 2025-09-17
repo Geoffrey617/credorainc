@@ -20,8 +20,8 @@ export const metadata: Metadata = createMetadata({
 
 export default function CookiePolicyPage() {
   const breadcrumbSchema = createBreadcrumbSchema([
-    { name: "Home", path: "" },
-    { name: "Cookie Policy", path: "/cookies" }
+    { name: "Home", url: "https://credorainc.com" },
+    { name: "Cookie Policy", url: "https://credorainc.com/cookies" }
   ]);
   return (
     <>
