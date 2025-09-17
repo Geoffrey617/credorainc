@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { auth } from '@/lib/supabase-auth'
+import { supabase } from '../lib/supabase-auth'
 
 export interface User {
   id: string
@@ -21,7 +21,7 @@ export function useAuth() {
   useEffect(() => {
     // Check for existing session
     const loadUser = async () => {
-      const currentUser = await auth.getCurrentUser()
+      const { data: { user: currentUser } } = await supabase.auth.getUser()
       setUser(currentUser as User | null)
       setLoading(false)
     }
@@ -30,7 +30,7 @@ export function useAuth() {
 
   const signOut = async () => {
     try {
-      await auth.signOut()
+      await supabase.auth.signOut()
       setUser(null)
     } catch (error) {
       console.error('Sign out error:', error)
