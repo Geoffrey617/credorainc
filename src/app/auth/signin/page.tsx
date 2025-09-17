@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../../../lib/supabase-auth'
-import { signInWithEmail } from '../../../lib/firebase-auth';
+import { signInWithEmail, firebaseAuth } from '../../../lib/firebase-auth';
 
 export default function SignInPage() {
   const router = useRouter();
@@ -30,6 +30,11 @@ export default function SignInPage() {
     
     try {
       const result = await firebaseAuth.signInWithGoogle();
+      
+      if (result.error || !result.user) {
+        setError(result.error || 'Google sign-in failed. Please try again.');
+        return;
+      }
       
       // Store user data in localStorage for consistency
       localStorage.setItem('credora_user', JSON.stringify(result.user));
