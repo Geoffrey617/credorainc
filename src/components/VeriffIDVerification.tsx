@@ -16,11 +16,19 @@ export interface VeriffVerificationData {
 
 interface VeriffIDVerificationProps {
   onVerificationComplete?: (result: VeriffVerificationData) => void;
+  onSkip?: () => void;
+  showSkipOption?: boolean;
+  existingData?: any;
+  landlordId?: string;
   className?: string;
 }
 
 export default function VeriffIDVerification({ 
   onVerificationComplete,
+  onSkip,
+  showSkipOption = false,
+  existingData,
+  landlordId,
   className = ""
 }: VeriffIDVerificationProps) {
   const [isLoading, setIsLoading] = useState(false);
@@ -67,13 +75,24 @@ export default function VeriffIDVerification({
           <p className="text-gray-600 mb-4">
             Please verify your identity to continue. This process is secure and takes just a few minutes.
           </p>
-          <button
-            onClick={startVerification}
-            disabled={isLoading}
-            className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50"
-          >
-            {isLoading ? 'Starting...' : 'Start Verification'}
-          </button>
+          <div className="space-y-3">
+            <button
+              onClick={startVerification}
+              disabled={isLoading}
+              className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50"
+            >
+              {isLoading ? 'Starting...' : 'Start Verification'}
+            </button>
+            
+            {showSkipOption && (
+              <button
+                onClick={onSkip}
+                className="block mx-auto text-gray-500 hover:text-gray-700 text-sm underline"
+              >
+                Skip for now
+              </button>
+            )}
+          </div>
         </div>
       )}
       
