@@ -30,6 +30,10 @@ export default function GoogleAnalytics({ trackingId, enabled = true }: GoogleAn
     const analyticsEnabled = enabled && checkCookieConsent();
 
     if (analyticsEnabled && window.gtag) {
+      // Get preferences for configuration
+      const cookieConsent = localStorage.getItem('credora_cookie_consent');
+      const preferences = cookieConsent ? JSON.parse(cookieConsent) : null;
+      
       // Initialize Google Analytics
       window.dataLayer = window.dataLayer || [];
       window.gtag('js', new Date());
