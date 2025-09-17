@@ -11,11 +11,22 @@ interface SubscriptionPlan {
 
 interface SubscriptionPlansProps {
   onSelectPlan?: (planId: string) => void;
+  onPlanSelect?: (plan: any) => void;
+  currentPlan?: string;
+  showSkipOption?: boolean;
+  onSkip?: () => void;
   className?: string;
 }
 
-export default function SubscriptionPlans({ onSelectPlan, className = "" }: SubscriptionPlansProps) {
-  const [selectedPlan, setSelectedPlan] = useState<string>('');
+export default function SubscriptionPlans({ 
+  onSelectPlan, 
+  onPlanSelect,
+  currentPlan,
+  showSkipOption = false,
+  onSkip,
+  className = "" 
+}: SubscriptionPlansProps) {
+  const [selectedPlan, setSelectedPlan] = useState<string>(currentPlan || '');
 
   const plans: SubscriptionPlan[] = [
     {
@@ -67,7 +78,9 @@ export default function SubscriptionPlans({ onSelectPlan, className = "" }: Subs
 
   const handleSelectPlan = (planId: string) => {
     setSelectedPlan(planId);
+    const selectedPlanData = plans.find(p => p.id === planId);
     onSelectPlan?.(planId);
+    onPlanSelect?.(selectedPlanData);
   };
 
   return (
@@ -159,11 +172,20 @@ export default function SubscriptionPlans({ onSelectPlan, className = "" }: Subs
           <p className="text-slate-600 mb-4">
             All plans include a 14-day free trial. No credit card required.
           </p>
-          <div className="flex justify-center space-x-8 text-sm text-slate-500">
+          <div className="flex justify-center space-x-8 text-sm text-slate-500 mb-6">
             <span>✓ Cancel anytime</span>
             <span>✓ 24/7 support</span>
             <span>✓ No setup fees</span>
           </div>
+          
+          {showSkipOption && (
+            <button
+              onClick={onSkip}
+              className="text-slate-500 hover:text-slate-700 text-sm underline"
+            >
+              Skip subscription setup for now
+            </button>
+          )}
         </div>
       </div>
     </div>
