@@ -1,13 +1,26 @@
 // Card detection utility
-export const detectCardType = (cardNumber: string): string => {
+export interface CardDetectionResult {
+  type: string | null;
+  logoPath: string | null;
+}
+
+export const detectCardType = (cardNumber: string): CardDetectionResult => {
   const cleanNumber = cardNumber.replace(/\D/g, '');
   
-  if (cleanNumber.startsWith('4')) return 'visa';
-  if (cleanNumber.startsWith('5') || cleanNumber.startsWith('2')) return 'mastercard';
-  if (cleanNumber.startsWith('3')) return 'amex';
-  if (cleanNumber.startsWith('6')) return 'discover';
+  if (cleanNumber.startsWith('4')) {
+    return { type: 'visa', logoPath: '/assets/logos/visa.svg' };
+  }
+  if (cleanNumber.startsWith('5') || cleanNumber.startsWith('2')) {
+    return { type: 'mastercard', logoPath: '/assets/logos/mastercard.svg' };
+  }
+  if (cleanNumber.startsWith('3')) {
+    return { type: 'amex', logoPath: '/assets/logos/amex.svg' };
+  }
+  if (cleanNumber.startsWith('6')) {
+    return { type: 'discover', logoPath: '/assets/logos/discover.svg' };
+  }
   
-  return 'unknown';
+  return { type: null, logoPath: null };
 };
 
 export const formatCardNumber = (cardNumber: string): string => {
