@@ -1,22 +1,36 @@
 import React, { useState } from 'react';
 
 interface AddressAutocompleteProps {
-  onSelect: (address: string) => void;
+  value?: string;
+  onChange?: (value: string) => void;
+  onSelect?: (address: string) => void;
+  onAddressSelect?: (addressData: any) => void;
   placeholder?: string;
   className?: string;
 }
 
 export default function AddressAutocomplete({ 
+  value: externalValue,
+  onChange,
   onSelect, 
+  onAddressSelect,
   placeholder = "Enter address...",
   className = ""
 }: AddressAutocompleteProps) {
-  const [value, setValue] = useState('');
+  const [internalValue, setInternalValue] = useState('');
   const [suggestions, setSuggestions] = useState<string[]>([]);
+
+  // Use external value if provided, otherwise use internal state
+  const value = externalValue !== undefined ? externalValue : internalValue;
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
-    setValue(inputValue);
+    
+    if (externalValue !== undefined) {
+      onChange?.(inputValue);
+    } else {
+      setInternalValue(inputValue);
+    }
     
     // Simple mock suggestions - in real app would use Google Places API
     if (inputValue.length > 2) {
@@ -31,9 +45,15 @@ export default function AddressAutocomplete({
   };
 
   const handleSelect = (address: string) => {
-    setValue(address);
+    if (externalValue !== undefined) {
+      onChange?.(address);
+    } else {
+      setInternalValue(address);
+    }
+    
     setSuggestions([]);
-    onSelect(address);
+    onSelect?.(address);
+    onAddressSelect?.({ street: address });
   };
 
   return (
