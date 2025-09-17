@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { signInWithEmail } from '../../../../lib/firebase-auth';
+import { signInWithEmail, firebaseAuth } from '../../../../lib/firebase-auth';
 
 export default function LandlordSignIn() {
   const [formData, setFormData] = useState({

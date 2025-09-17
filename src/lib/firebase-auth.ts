@@ -53,3 +53,35 @@ export const signOut = async () => {
     return { error: error instanceof Error ? error.message : 'Sign out failed' };
   }
 };
+
+export const signInWithGoogle = async () => {
+  // Mock Google sign-in - replace with actual Firebase implementation
+  try {
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    return {
+      user: {
+        uid: 'google-mock-uid',
+        email: 'user@gmail.com',
+        displayName: 'Google User',
+        photoURL: 'https://via.placeholder.com/150',
+        providerId: 'google.com'
+      },
+      error: null,
+    };
+  } catch (error) {
+    return {
+      user: null,
+      error: error instanceof Error ? error.message : 'Google sign-in failed',
+    };
+  }
+};
+
+// Firebase auth object for compatibility
+export const firebaseAuth = {
+  signInWithEmail,
+  signUpWithEmail,
+  signInWithGoogle,
+  signOut
+};
