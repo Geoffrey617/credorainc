@@ -4,12 +4,16 @@ interface AnimatedHeroProps {
   title?: string;
   subtitle?: string;
   className?: string;
+  images?: string[];
+  interval?: number;
 }
 
 export default function AnimatedHero({ 
   title = "Welcome to Credora",
   subtitle = "Your trusted partner for apartment lease cosigning",
-  className = ""
+  className = "",
+  images = [],
+  interval = 3000
 }: AnimatedHeroProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [currentText, setCurrentText] = useState('');
@@ -25,11 +29,11 @@ export default function AnimatedHero({
   useEffect(() => {
     setIsVisible(true);
     
-    const interval = setInterval(() => {
+    const intervalId = setInterval(() => {
       setTextIndex((prev) => (prev + 1) % animatedTexts.length);
-    }, 3000);
+    }, interval);
 
-    return () => clearInterval(interval);
+    return () => clearInterval(intervalId);
   }, []);
 
   useEffect(() => {
