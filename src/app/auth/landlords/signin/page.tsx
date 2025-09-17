@@ -28,6 +28,11 @@ export default function LandlordSignIn() {
       // Use Firebase Google auth like the general sign-in page
       const result = await firebaseAuth.signInWithGoogle();
       
+      if (result.error || !result.user) {
+        setError(result.error || 'Google sign-in failed. Please try again.');
+        return;
+      }
+      
       // Store landlord data in localStorage for consistency
       const landlordData = {
         ...result.user,
