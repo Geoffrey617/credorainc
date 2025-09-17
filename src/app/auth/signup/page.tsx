@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { signUpWithEmail } from '../../../lib/firebase-auth';
+import { signUpWithEmail, firebaseAuth } from '../../../lib/firebase-auth';
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -67,6 +67,11 @@ export default function SignUpPage() {
     
     try {
       const result = await firebaseAuth.signInWithGoogle();
+      
+      if (result.error || !result.user) {
+        setError(result.error || 'Google sign-up failed. Please try again.');
+        return;
+      }
       
       // Store user data in localStorage for consistency
       localStorage.setItem('credora_user', JSON.stringify(result.user));
