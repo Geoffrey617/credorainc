@@ -30,8 +30,8 @@ export default function AuthenticatedNavigation({ userEmail }: AuthenticatedNavi
   const getDisplayName = () => {
     // Use user data from the auth hook
     if (user) {
-      if (user.firstName || user.first_name) {
-        return user.firstName || user.first_name;
+      if (user.firstName || (user as any).first_name) {
+        return user.firstName || (user as any).first_name;
       } else if (user.name) {
         return user.name.split(' ')[0]; // Get first name from full name
       }
