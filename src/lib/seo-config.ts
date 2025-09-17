@@ -114,7 +114,7 @@ export function generateMetaTags(seoConfig: SEOConfig) {
   }
 
   if (seoConfig.canonical) {
-    tags.push({ rel: 'canonical', href: seoConfig.canonical });
+    tags.push({ name: 'canonical', content: seoConfig.canonical });
   }
 
   if (seoConfig.noindex) {
