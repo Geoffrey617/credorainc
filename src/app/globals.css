@@ -1,6 +1,7 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Tailwind CSS directives temporarily removed for build compatibility */
+/* @tailwind base; */
+/* @tailwind components; */
+/* @tailwind utilities; */
 
 
 :root {
