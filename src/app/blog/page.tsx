@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { generatePageSEO, generateMetaTags } from '../../lib/seo-config';
+import { generatePageSEO, generateMetaTags, createMetadata } from '../../lib/seo-config';
 import BlogPageClient from './BlogPageClient';
 
 export const metadata: Metadata = createMetadata({

@@ -123,3 +123,58 @@ export function generateMetaTags(seoConfig: SEOConfig) {
 
   return tags;
 }
+
+// Next.js Metadata API compatible function
+export function createMetadata(config: {
+  title: string;
+  description: string;
+  path?: string;
+  keywords?: string[];
+  noindex?: boolean;
+}): any {
+  const baseUrl = 'https://credorainc.com';
+  const fullUrl = config.path ? `${baseUrl}${config.path}` : baseUrl;
+  
+  return {
+    title: config.title,
+    description: config.description,
+    keywords: config.keywords?.join(', '),
+    canonical: fullUrl,
+    openGraph: {
+      title: config.title,
+      description: config.description,
+      url: fullUrl,
+      siteName: 'Credora Inc',
+      type: 'website',
+      images: [
+        {
+          url: `${baseUrl}/og-image.jpg`,
+          width: 1200,
+          height: 630,
+          alt: config.title,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: config.title,
+      description: config.description,
+      images: [`${baseUrl}/og-image.jpg`],
+    },
+    robots: config.noindex ? 'noindex, nofollow' : 'index, follow',
+  };
+}
+
+// Breadcrumb schema for SEO
+export function createBreadcrumbSchema(items: Array<{ name: string; url: string }>) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: item.name,
+      item: item.url,
+    })),
+  };
+}
