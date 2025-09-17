@@ -96,7 +96,7 @@ export default function PaymentPage() {
     
     try {
       // Process payment with Stripe
-      const { processStripePayment, validateCardDetails } = await import('@/utils/stripe-payment');
+      const { createPaymentIntent, validatePaymentAmount } = await import('../../../utils/stripe-payment');
       
       // Validate card details
       const validation = validateCardDetails({
