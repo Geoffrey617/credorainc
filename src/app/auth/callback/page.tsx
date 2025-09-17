@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabase-auth'
+import { supabase } from '../../../lib/supabase-auth'
 
 export default function AuthCallbackPage() {
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
