@@ -101,7 +101,7 @@ export default function CookieBanner({
                 <div className="flex flex-col sm:flex-row gap-3 lg:ml-6">
                   <button
                     onClick={handleAcceptAll}
-                    className="bg-green-600 hover:bg-green-700 text-white px-6 py-2.5 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                    className="bg-slate-700 hover:bg-slate-800 text-white px-6 py-2.5 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2"
                   >
                     Accept all
                   </button>
@@ -161,7 +161,7 @@ export default function CookieBanner({
                       </p>
                     </div>
                     <div className="ml-4">
-                      <div className="w-12 h-6 bg-green-500 rounded-full flex items-center justify-end px-1">
+                      <div className="w-12 h-6 bg-slate-600 rounded-full flex items-center justify-end px-1">
                         <div className="w-4 h-4 bg-white rounded-full"></div>
                       </div>
                     </div>
@@ -178,8 +178,8 @@ export default function CookieBanner({
                     <div className="ml-4">
                       <button
                         onClick={() => handleTogglePreference('functional')}
-                        className={`w-12 h-6 rounded-full flex items-center transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                          preferences.functional ? 'bg-green-500 justify-end' : 'bg-gray-300 justify-start'
+                        className={`w-12 h-6 rounded-full flex items-center transition-colors focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 ${
+                          preferences.functional ? 'bg-slate-600 justify-end' : 'bg-gray-300 justify-start'
                         }`}
                       >
                         <div className="w-4 h-4 bg-white rounded-full mx-1"></div>
@@ -198,8 +198,8 @@ export default function CookieBanner({
                     <div className="ml-4">
                       <button
                         onClick={() => handleTogglePreference('analytics')}
-                        className={`w-12 h-6 rounded-full flex items-center transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                          preferences.analytics ? 'bg-green-500 justify-end' : 'bg-gray-300 justify-start'
+                        className={`w-12 h-6 rounded-full flex items-center transition-colors focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 ${
+                          preferences.analytics ? 'bg-slate-600 justify-end' : 'bg-gray-300 justify-start'
                         }`}
                       >
                         <div className="w-4 h-4 bg-white rounded-full mx-1"></div>
@@ -218,8 +218,8 @@ export default function CookieBanner({
                     <div className="ml-4">
                       <button
                         onClick={() => handleTogglePreference('advertising')}
-                        className={`w-12 h-6 rounded-full flex items-center transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                          preferences.advertising ? 'bg-green-500 justify-end' : 'bg-gray-300 justify-start'
+                        className={`w-12 h-6 rounded-full flex items-center transition-colors focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 ${
+                          preferences.advertising ? 'bg-slate-600 justify-end' : 'bg-gray-300 justify-start'
                         }`}
                       >
                         <div className="w-4 h-4 bg-white rounded-full mx-1"></div>
@@ -238,8 +238,8 @@ export default function CookieBanner({
                     <div className="ml-4">
                       <button
                         onClick={() => handleTogglePreference('saleOfInfo')}
-                        className={`w-12 h-6 rounded-full flex items-center transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                          preferences.saleOfInfo ? 'bg-green-500 justify-end' : 'bg-gray-300 justify-start'
+                        className={`w-12 h-6 rounded-full flex items-center transition-colors focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 ${
+                          preferences.saleOfInfo ? 'bg-slate-600 justify-end' : 'bg-gray-300 justify-start'
                         }`}
                       >
                         <div className="w-4 h-4 bg-white rounded-full mx-1"></div>
@@ -252,7 +252,7 @@ export default function CookieBanner({
               <div className="flex flex-col sm:flex-row gap-3">
                 <button
                   onClick={handleSavePreferences}
-                  className="bg-green-600 hover:bg-green-700 text-white px-6 py-2.5 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                  className="bg-slate-700 hover:bg-slate-800 text-white px-6 py-2.5 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2"
                 >
                   Confirm
                 </button>
