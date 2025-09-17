@@ -173,7 +173,9 @@ export const PAYMENT_DESCRIPTIONS = {
 
 export const STRIPE_CONFIG = {
   CURRENCY: 'usd',
+  currency: 'usd', // Lowercase for compatibility
   COUNTRY: 'US',
+  applicationFee: 5500, // $55.00 in cents
   SUPPORTED_PAYMENT_METHODS: ['card'],
   APPEARANCE: {
     theme: 'stripe' as const,

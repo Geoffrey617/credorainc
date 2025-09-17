@@ -17,6 +17,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { detectCardType, formatCardNumber } from '../../../utils/card-detection';
 import { getSortedUSStates } from '../../../utils/us-states';
+import { STRIPE_CONFIG } from '../../../utils/stripe-payment';
 import AddressAutocomplete from '../../../components/AddressAutocomplete';
 
 // Modern application steps with enhanced descriptions
