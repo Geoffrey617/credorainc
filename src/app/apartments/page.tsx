@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { generatePageSEO, generateMetaTags, createMetadata } from '../../lib/seo-config';
+import { generatePageSEO, generateMetaTags, createMetadata, createBreadcrumbSchema } from '../../lib/seo-config';
 import ApartmentsPageClient from './ApartmentsPageClient';
 
 export const metadata: Metadata = createMetadata({
