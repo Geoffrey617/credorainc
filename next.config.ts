@@ -21,14 +21,13 @@ const nextConfig: NextConfig = {
     trailingSlash: true,
   }),
   
-  // Disable TypeScript checking during build to resolve dependency issues
+  // TypeScript and ESLint configuration
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
   
-  // Disable ESLint during build 
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: false,
   },
   
   serverExternalPackages: ['resend'],
