@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react';
 interface CustomLiveChatProps {
   className?: string;
   position?: 'bottom-right' | 'bottom-left';
+  isOpen?: boolean;
+  onClose?: () => void;
 }
 
 declare global {
@@ -14,9 +16,14 @@ declare global {
 
 export default function CustomLiveChat({ 
   className = "",
-  position = 'bottom-right' 
+  position = 'bottom-right',
+  isOpen: externalIsOpen,
+  onClose
 }: CustomLiveChatProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [internalIsOpen, setInternalIsOpen] = useState(false);
+  
+  // Use external isOpen if provided, otherwise use internal state
+  const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen;
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
@@ -56,10 +63,19 @@ export default function CustomLiveChat({
     if (window.Tawk_API) {
       if (isOpen) {
         window.Tawk_API.minimize();
+        if (externalIsOpen !== undefined) {
+          onClose?.();
+        } else {
+          setInternalIsOpen(false);
+        }
       } else {
         window.Tawk_API.maximize();
+        if (externalIsOpen !== undefined) {
+          // External control - parent manages state
+        } else {
+          setInternalIsOpen(true);
+        }
       }
-      setIsOpen(!isOpen);
     }
   };
 
