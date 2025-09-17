@@ -59,3 +59,7 @@ export const getStateByValue = (value: string) => {
 export const getStateByLabel = (label: string) => {
   return US_STATES.find(state => state.label.toLowerCase() === label.toLowerCase());
 };
+
+export const getSortedUSStates = () => {
+  return [...US_STATES].sort((a, b) => a.label.localeCompare(b.label));
+};
