@@ -4,6 +4,8 @@ export interface VeriffVerificationData {
   status: 'approved' | 'declined' | 'pending' | 'failed';
   sessionId: string;
   timestamp: string;
+  submittedAt: string;
+  completedAt: string;
   firstName?: string;
   lastName?: string;
   documentType?: string;
@@ -33,10 +35,13 @@ export default function VeriffIDVerification({
       await new Promise(resolve => setTimeout(resolve, 2000));
       
       // Simulate successful verification
+      const now = new Date().toISOString();
       const result: VeriffVerificationData = {
         status: 'approved',
         sessionId: 'mock-session-id',
-        timestamp: new Date().toISOString(),
+        timestamp: now,
+        submittedAt: now,
+        completedAt: now,
         firstName: 'John',
         lastName: 'Doe',
         documentType: 'passport',
