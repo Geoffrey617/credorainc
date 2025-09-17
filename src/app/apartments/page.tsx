@@ -20,8 +20,8 @@ export const metadata: Metadata = createMetadata({
 
 export default function ApartmentsPage() {
   const breadcrumbSchema = createBreadcrumbSchema([
-    { name: "Home", path: "" },
-    { name: "Find Apartments", path: "/apartments" }
+    { name: "Home", url: "https://credorainc.com" },
+    { name: "Find Apartments", url: "https://credorainc.com/apartments" }
   ]);
 
   return (
