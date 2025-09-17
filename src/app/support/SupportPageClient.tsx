@@ -64,10 +64,10 @@ export default function SupportPageClient() {
                 Speak directly with our support team
               </p>
               <a 
-                href="tel:+18002733672"
+                href="tel:+18559976615"
                 className="bg-white text-blue-700 px-6 py-2 rounded-lg font-semibold hover:bg-blue-50 transition-colors inline-block"
               >
-                (800) 273-3672
+                855-997-6615
               </a>
             </div>
 

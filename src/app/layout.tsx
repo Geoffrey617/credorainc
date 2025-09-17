@@ -113,10 +113,10 @@ export default function RootLayout({
         ],
         "address": {
           "@type": "PostalAddress",
-          "streetAddress": "123 Business Ave, Suite 500",
+          "streetAddress": "50 California Street, Suite 1500",
           "addressLocality": "San Francisco",
           "addressRegion": "CA",
-          "postalCode": "94102",
+          "postalCode": "94111",
           "addressCountry": "US"
         },
         "sameAs": [
@@ -199,10 +199,10 @@ export default function RootLayout({
         "email": "support@credorainc.com",
         "address": {
           "@type": "PostalAddress",
-          "streetAddress": "123 Business Ave, Suite 500",
+          "streetAddress": "50 California Street, Suite 1500",
           "addressLocality": "San Francisco",
           "addressRegion": "CA",
-          "postalCode": "94102",
+          "postalCode": "94111",
           "addressCountry": "US"
         },
         "openingHoursSpecification": [

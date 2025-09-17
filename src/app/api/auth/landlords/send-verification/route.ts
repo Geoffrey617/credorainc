@@ -195,7 +195,7 @@ export async function POST(request: NextRequest) {
                     <p style="font-size: 13px; color: #ffffff; margin: 0 0 8px 0; font-weight: bold; font-family: Arial, Helvetica, sans-serif;">Need Help?</p>
                     <p style="font-size: 13px; color: #94a3b8; margin: 0; line-height: 1.4; font-family: Arial, Helvetica, sans-serif;">
                         Email: <a href="mailto:landlords@credorainc.com" style="color: #60a5fa; text-decoration: none; font-weight: bold;">landlords@credorainc.com</a> | 
-                        Phone: <a href="tel:+1-800-273-3672" style="color: #60a5fa; text-decoration: none; font-weight: bold;">1-800-CREDORA</a>
+                        Phone: <a href="tel:+1-855-997-6615" style="color: #60a5fa; text-decoration: none; font-weight: bold;">855-997-6615</a>
                     </p>
                 </div>
                 

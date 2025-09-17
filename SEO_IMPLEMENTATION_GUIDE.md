@@ -32,8 +32,8 @@ Business Name: Credora LLC
 Category: Financial Service / Real Estate Service
 Description: Professional apartment lease cosigning services with guaranteed approval. Serving all 50 states.
 Website: https://credora.com
-Phone: 1-800-CREDORA (1-800-273-3672)
-Address: 123 Business Ave, Suite 500, New York, NY 10001
+Phone: 855-997-6615
+Address: 50 California Street, Suite 1500, San Francisco, CA 94111
 ```
 
 ### 2. **Submit to Search Engines**

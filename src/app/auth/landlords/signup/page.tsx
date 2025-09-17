@@ -363,7 +363,7 @@ export default function LandlordSignUp() {
                 value={formData.phone}
                 onChange={handleInputChange}
                 className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent transition-colors text-slate-900"
-                placeholder="773-312-3687"
+                placeholder="855-997-6615"
               />
             </div>
 
