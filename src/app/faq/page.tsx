@@ -21,8 +21,8 @@ export const metadata: Metadata = createMetadata({
 
 export default function FAQPage() {
   const breadcrumbSchema = createBreadcrumbSchema([
-    { name: "Home", path: "" },
-    { name: "FAQ", path: "/faq" }
+    { name: "Home", url: "https://credorainc.com" },
+    { name: "FAQ", url: "https://credorainc.com/faq" }
   ]);
 
   return (
