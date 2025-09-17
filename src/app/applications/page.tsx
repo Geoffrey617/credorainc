@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useSimpleAuth } from '../../hooks/useSimpleAuth';
+import { useSimpleAuth } from '../../../hooks/useSimpleAuth';
 
 interface Application {
   id: number;

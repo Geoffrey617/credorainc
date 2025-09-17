@@ -15,9 +15,9 @@ import {
   LockClosedIcon,
   ShieldExclamationIcon
 } from '@heroicons/react/24/outline';
-import { detectCardType, formatCardNumber } from '../../utils/card-detection';
-import { getSortedUSStates } from '../../utils/us-states';
-import AddressAutocomplete from '../../components/AddressAutocomplete';
+import { detectCardType, formatCardNumber } from '../../../utils/card-detection';
+import { getSortedUSStates } from '../../../utils/us-states';
+import AddressAutocomplete from '../../../components/AddressAutocomplete';
 
 // Modern application steps with enhanced descriptions
 const steps = [
