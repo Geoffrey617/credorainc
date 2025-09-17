@@ -96,6 +96,11 @@ export default function GoogleAnalytics({ trackingId, enabled = true }: GoogleAn
             console.log('✅ Google Analytics loaded and configured');
           }
         }}
+        onError={(error) => {
+          console.warn('⚠️ Google Analytics failed to load:', error);
+          console.warn('This could be due to ad blockers, network issues, or privacy extensions');
+          console.warn('Analytics tracking will be disabled for this session');
+        }}
       />
     </>
   );

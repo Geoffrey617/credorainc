@@ -26,9 +26,14 @@ export function useSimpleAuth(): UseSimpleAuthReturn {
     // Check for existing session on mount
     const checkAuth = async () => {
       try {
-        const savedUser = localStorage.getItem('user');
+        // Check for user data in multiple possible keys for compatibility
+        const savedUser = localStorage.getItem('credora_user') || localStorage.getItem('user');
         if (savedUser) {
-          setUser(JSON.parse(savedUser));
+          const userData = JSON.parse(savedUser);
+          setUser(userData);
+          console.log('✅ User loaded from localStorage:', userData.email);
+        } else {
+          console.log('📭 No saved user found in localStorage');
         }
       } catch (error) {
         console.error('Error checking auth:', error);
@@ -51,7 +56,7 @@ export function useSimpleAuth(): UseSimpleAuthReturn {
       };
       
       setUser(mockUser);
-      localStorage.setItem('user', JSON.stringify(mockUser));
+      localStorage.setItem('credora_user', JSON.stringify(mockUser));
       return true;
     } catch (error) {
       console.error('Login error:', error);
@@ -63,7 +68,10 @@ export function useSimpleAuth(): UseSimpleAuthReturn {
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('user');
+    localStorage.removeItem('credora_user');
+    localStorage.removeItem('user'); // Remove legacy key as well
+    localStorage.removeItem('credora_session');
+    console.log('🚪 User logged out and localStorage cleared');
   };
 
   return {
