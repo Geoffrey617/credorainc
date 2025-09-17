@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import VeriffIDVerification from '../../../../components/VeriffIDVerification';
+import VeriffIDVerification, { VeriffVerificationData } from '../../../../components/VeriffIDVerification';
 import Link from 'next/link';
 
 export default function LandlordIDVerificationPage() {
