@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import SubscriptionPlans from '@/components/SubscriptionPlans';
+import SubscriptionPlans from '../../../components/SubscriptionPlans';
 
 interface LandlordData {
   firstName: string;

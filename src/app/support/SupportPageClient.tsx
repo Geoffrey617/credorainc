@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import CustomLiveChat from '@/components/CustomLiveChat';
+import CustomLiveChat from '../../components/CustomLiveChat';
 
 export default function SupportPageClient() {
   const [isChatOpen, setIsChatOpen] = useState(false);
