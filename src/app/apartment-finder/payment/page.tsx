@@ -3,9 +3,9 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { detectCardType, formatCardNumber } from '@/utils/card-detection';
-import { getSortedUSStates } from '@/utils/us-states';
-import AddressAutocomplete from '@/components/AddressAutocomplete';
+import { detectCardType, formatCardNumber } from '../../utils/card-detection';
+import { getSortedUSStates } from '../../utils/us-states';
+import AddressAutocomplete from '../../components/AddressAutocomplete';
 import { loadStripe } from '@stripe/stripe-js';
 
 interface User {

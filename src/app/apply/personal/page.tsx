@@ -13,8 +13,8 @@ import {
   HomeIcon,
   ChevronLeftIcon
 } from '@heroicons/react/24/outline';
-import { getSortedUSStates } from '@/utils/us-states';
-import AddressAutocomplete from '@/components/AddressAutocomplete';
+import { getSortedUSStates } from '../../utils/us-states';
+import AddressAutocomplete from '../../components/AddressAutocomplete';
 
 // Application steps
 const steps = [
