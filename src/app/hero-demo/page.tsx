@@ -1,7 +1,7 @@
 'use client';
 
-import AnimatedHero from '@/components/AnimatedHero';
-import CSSAnimatedHero from '@/components/CSSAnimatedHero';
+import AnimatedHero from '../../components/AnimatedHero';
+import CSSAnimatedHero from '../../components/CSSAnimatedHero';
 import { useState } from 'react';
 
 export default function HeroDemoPage() {

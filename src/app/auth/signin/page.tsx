@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { auth } from '@/lib/supabase-auth'
-import { firebaseAuth } from '@/lib/firebase-auth';
+import { supabase } from '../../../lib/supabase-auth'
+import { signInWithEmail } from '../../../lib/firebase-auth';
 
 export default function SignInPage() {
   const router = useRouter();
