@@ -114,10 +114,13 @@ export interface StripePaymentData {
   billingAddress?: any;
 }
 
-export const processStripePayment = async (paymentData: StripePaymentData): Promise<PaymentResult> => {
+export const processStripePayment = async (
+  paymentData: { amount: number; description: string; metadata?: any },
+  cardDetails: CardDetails
+): Promise<PaymentResult> => {
   try {
     // First validate the card details
-    const validation = validateCardDetails(paymentData.cardDetails);
+    const validation = validateCardDetails(cardDetails);
     if (!validation.isValid) {
       return {
         success: false,
@@ -135,8 +138,8 @@ export const processStripePayment = async (paymentData: StripePaymentData): Prom
         amount: paymentData.amount * 100, // Convert to cents
         currency: 'usd',
         description: paymentData.description,
-        cardDetails: paymentData.cardDetails,
-        billingAddress: paymentData.billingAddress
+        metadata: paymentData.metadata,
+        cardDetails: cardDetails
       }),
     });
 
