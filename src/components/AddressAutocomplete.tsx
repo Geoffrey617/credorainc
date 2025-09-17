@@ -7,6 +7,7 @@ interface AddressAutocompleteProps {
   onAddressSelect?: (addressData: any) => void;
   placeholder?: string;
   className?: string;
+  error?: string;
 }
 
 export default function AddressAutocomplete({ 
@@ -15,7 +16,8 @@ export default function AddressAutocomplete({
   onSelect, 
   onAddressSelect,
   placeholder = "Enter address...",
-  className = ""
+  className = "",
+  error
 }: AddressAutocompleteProps) {
   const [internalValue, setInternalValue] = useState('');
   const [suggestions, setSuggestions] = useState<string[]>([]);
@@ -63,8 +65,14 @@ export default function AddressAutocomplete({
         value={value}
         onChange={handleInputChange}
         placeholder={placeholder}
-        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+          error ? 'border-red-300 focus:ring-red-500' : 'border-gray-300'
+        }`}
       />
+      
+      {error && (
+        <p className="mt-1 text-sm text-red-600">{error}</p>
+      )}
       
       {suggestions.length > 0 && (
         <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg">
