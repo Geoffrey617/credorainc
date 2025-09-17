@@ -40,7 +40,7 @@ export function useAuth() {
   return {
     user,
     loading,
-    isAuthenticated: auth.isAuthenticated(),
+    isAuthenticated: !!user,
     signOut
   }
 }
