@@ -1,99 +1,61 @@
-/**
- * Complete list of US states with their abbreviations
- * For use in address forms and state selection dropdowns
- */
-
-export interface USState {
-  name: string;
-  abbreviation: string;
-}
-
-export const US_STATES: USState[] = [
-  { name: 'Alabama', abbreviation: 'AL' },
-  { name: 'Alaska', abbreviation: 'AK' },
-  { name: 'Arizona', abbreviation: 'AZ' },
-  { name: 'Arkansas', abbreviation: 'AR' },
-  { name: 'California', abbreviation: 'CA' },
-  { name: 'Colorado', abbreviation: 'CO' },
-  { name: 'Connecticut', abbreviation: 'CT' },
-  { name: 'Delaware', abbreviation: 'DE' },
-  { name: 'Florida', abbreviation: 'FL' },
-  { name: 'Georgia', abbreviation: 'GA' },
-  { name: 'Hawaii', abbreviation: 'HI' },
-  { name: 'Idaho', abbreviation: 'ID' },
-  { name: 'Illinois', abbreviation: 'IL' },
-  { name: 'Indiana', abbreviation: 'IN' },
-  { name: 'Iowa', abbreviation: 'IA' },
-  { name: 'Kansas', abbreviation: 'KS' },
-  { name: 'Kentucky', abbreviation: 'KY' },
-  { name: 'Louisiana', abbreviation: 'LA' },
-  { name: 'Maine', abbreviation: 'ME' },
-  { name: 'Maryland', abbreviation: 'MD' },
-  { name: 'Massachusetts', abbreviation: 'MA' },
-  { name: 'Michigan', abbreviation: 'MI' },
-  { name: 'Minnesota', abbreviation: 'MN' },
-  { name: 'Mississippi', abbreviation: 'MS' },
-  { name: 'Missouri', abbreviation: 'MO' },
-  { name: 'Montana', abbreviation: 'MT' },
-  { name: 'Nebraska', abbreviation: 'NE' },
-  { name: 'Nevada', abbreviation: 'NV' },
-  { name: 'New Hampshire', abbreviation: 'NH' },
-  { name: 'New Jersey', abbreviation: 'NJ' },
-  { name: 'New Mexico', abbreviation: 'NM' },
-  { name: 'New York', abbreviation: 'NY' },
-  { name: 'North Carolina', abbreviation: 'NC' },
-  { name: 'North Dakota', abbreviation: 'ND' },
-  { name: 'Ohio', abbreviation: 'OH' },
-  { name: 'Oklahoma', abbreviation: 'OK' },
-  { name: 'Oregon', abbreviation: 'OR' },
-  { name: 'Pennsylvania', abbreviation: 'PA' },
-  { name: 'Rhode Island', abbreviation: 'RI' },
-  { name: 'South Carolina', abbreviation: 'SC' },
-  { name: 'South Dakota', abbreviation: 'SD' },
-  { name: 'Tennessee', abbreviation: 'TN' },
-  { name: 'Texas', abbreviation: 'TX' },
-  { name: 'Utah', abbreviation: 'UT' },
-  { name: 'Vermont', abbreviation: 'VT' },
-  { name: 'Virginia', abbreviation: 'VA' },
-  { name: 'Washington', abbreviation: 'WA' },
-  { name: 'West Virginia', abbreviation: 'WV' },
-  { name: 'Wisconsin', abbreviation: 'WI' },
-  { name: 'Wyoming', abbreviation: 'WY' },
-  { name: 'District of Columbia', abbreviation: 'DC' },
-  { name: 'American Samoa', abbreviation: 'AS' },
-  { name: 'Guam', abbreviation: 'GU' },
-  { name: 'Northern Mariana Islands', abbreviation: 'MP' },
-  { name: 'Puerto Rico', abbreviation: 'PR' },
-  { name: 'United States Minor Outlying Islands', abbreviation: 'UM' },
-  { name: 'U.S. Virgin Islands', abbreviation: 'VI' }
+// US States data
+export const US_STATES = [
+  { value: 'AL', label: 'Alabama' },
+  { value: 'AK', label: 'Alaska' },
+  { value: 'AZ', label: 'Arizona' },
+  { value: 'AR', label: 'Arkansas' },
+  { value: 'CA', label: 'California' },
+  { value: 'CO', label: 'Colorado' },
+  { value: 'CT', label: 'Connecticut' },
+  { value: 'DE', label: 'Delaware' },
+  { value: 'FL', label: 'Florida' },
+  { value: 'GA', label: 'Georgia' },
+  { value: 'HI', label: 'Hawaii' },
+  { value: 'ID', label: 'Idaho' },
+  { value: 'IL', label: 'Illinois' },
+  { value: 'IN', label: 'Indiana' },
+  { value: 'IA', label: 'Iowa' },
+  { value: 'KS', label: 'Kansas' },
+  { value: 'KY', label: 'Kentucky' },
+  { value: 'LA', label: 'Louisiana' },
+  { value: 'ME', label: 'Maine' },
+  { value: 'MD', label: 'Maryland' },
+  { value: 'MA', label: 'Massachusetts' },
+  { value: 'MI', label: 'Michigan' },
+  { value: 'MN', label: 'Minnesota' },
+  { value: 'MS', label: 'Mississippi' },
+  { value: 'MO', label: 'Missouri' },
+  { value: 'MT', label: 'Montana' },
+  { value: 'NE', label: 'Nebraska' },
+  { value: 'NV', label: 'Nevada' },
+  { value: 'NH', label: 'New Hampshire' },
+  { value: 'NJ', label: 'New Jersey' },
+  { value: 'NM', label: 'New Mexico' },
+  { value: 'NY', label: 'New York' },
+  { value: 'NC', label: 'North Carolina' },
+  { value: 'ND', label: 'North Dakota' },
+  { value: 'OH', label: 'Ohio' },
+  { value: 'OK', label: 'Oklahoma' },
+  { value: 'OR', label: 'Oregon' },
+  { value: 'PA', label: 'Pennsylvania' },
+  { value: 'RI', label: 'Rhode Island' },
+  { value: 'SC', label: 'South Carolina' },
+  { value: 'SD', label: 'South Dakota' },
+  { value: 'TN', label: 'Tennessee' },
+  { value: 'TX', label: 'Texas' },
+  { value: 'UT', label: 'Utah' },
+  { value: 'VT', label: 'Vermont' },
+  { value: 'VA', label: 'Virginia' },
+  { value: 'WA', label: 'Washington' },
+  { value: 'WV', label: 'West Virginia' },
+  { value: 'WI', label: 'Wisconsin' },
+  { value: 'WY', label: 'Wyoming' }
 ];
 
-/**
- * Get a sorted array of US states for use in dropdown menus
- * @returns Array of USState objects sorted alphabetically by name
- */
-export function getSortedUSStates(): USState[] {
-  return [...US_STATES].sort((a, b) => a.name.localeCompare(b.name));
-}
+export const getStateByValue = (value: string) => {
+  return US_STATES.find(state => state.value === value);
+};
 
-/**
- * Get state name from abbreviation
- * @param abbreviation Two-letter state abbreviation (e.g., 'CA')
- * @returns Full state name or null if not found
- */
-export function getStateNameFromAbbreviation(abbreviation: string): string | null {
-  const state = US_STATES.find(state => state.abbreviation === abbreviation.toUpperCase());
-  return state ? state.name : null;
-}
-
-/**
- * Get state abbreviation from name
- * @param name Full state name (e.g., 'California')
- * @returns Two-letter state abbreviation or null if not found
- */
-export function getStateAbbreviationFromName(name: string): string | null {
-  const state = US_STATES.find(state => 
-    state.name.toLowerCase() === name.toLowerCase()
-  );
-  return state ? state.abbreviation : null;
-}
+export const getStateByLabel = (label: string) => {
+  return US_STATES.find(state => state.label.toLowerCase() === label.toLowerCase());
+};

@@ -1,139 +1,72 @@
-'use client';
-
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 
 interface User {
-  id?: string;
+  id: string;
   email: string;
-  firstName?: string;
-  lastName?: string;
-  first_name?: string;
-  last_name?: string;
-  name?: string;
-  userType?: string;
+  name: string;
 }
 
-export function useSimpleAuth() {
-  const router = useRouter();
+interface UseSimpleAuthReturn {
+  user: User | null;
+  isLoading: boolean;
+  isAuthenticated: boolean;
+  login: (email: string, password: string) => Promise<boolean>;
+  logout: () => void;
+}
+
+export function useSimpleAuth(): UseSimpleAuthReturn {
   const [user, setUser] = useState<User | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Only run on client side
-    if (typeof window === 'undefined') {
-      setIsLoading(false);
-      return;
-    }
-
-    const checkAuth = () => {
+    // Check for existing session on mount
+    const checkAuth = async () => {
       try {
-        // SYNCHRONOUS session check for immediate results
-        const tempSession = sessionStorage.getItem('credora_session_temp');
-        
-        // Clear any old persistent sessions (we don't want persistence)
-        if (localStorage.getItem('credora_persistent_session')) {
-          localStorage.removeItem('credora_persistent_session');
-        }
-        
-        if (tempSession) {
-          const sessionData = JSON.parse(tempSession);
-          
-          if (sessionData && sessionData.user) {
-            // Check if session is still active (30 minutes)
-            const timeSinceActivity = Date.now() - (sessionData.lastActivity || sessionData.loginTime);
-            const SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutes
-            
-            if (timeSinceActivity < SESSION_TIMEOUT) {
-              // Valid session found
-              setUser(sessionData.user);
-              setIsAuthenticated(true);
-              
-              // Update activity timestamp
-              sessionData.lastActivity = Date.now();
-              sessionStorage.setItem('credora_session_temp', JSON.stringify(sessionData));
-              
-              console.log('✅ Valid session restored for:', sessionData.user.email);
-            } else {
-              // Session expired
-              console.log('⏰ Session expired, clearing...');
-              sessionStorage.removeItem('credora_session_temp');
-              setUser(null);
-              setIsAuthenticated(false);
-            }
-          } else {
-            // Invalid session data
-            sessionStorage.removeItem('credora_session_temp');
-            setUser(null);
-            setIsAuthenticated(false);
-          }
-        } else {
-          // No session found
-          setUser(null);
-          setIsAuthenticated(false);
+        const savedUser = localStorage.getItem('user');
+        if (savedUser) {
+          setUser(JSON.parse(savedUser));
         }
       } catch (error) {
-        console.error('❌ Session check error:', error);
-        sessionStorage.removeItem('credora_session_temp');
-        setUser(null);
-        setIsAuthenticated(false);
+        console.error('Error checking auth:', error);
+      } finally {
+        setIsLoading(false);
       }
-      
-      // Always set loading to false after check
-      setIsLoading(false);
     };
 
-    // Run immediately
     checkAuth();
+  }, []);
 
-    // Set up activity tracking
-    const handleActivity = () => {
-      if (isAuthenticated) {
-        const tempSession = sessionStorage.getItem('credora_session_temp');
-        
-        if (tempSession) {
-          try {
-            const data = JSON.parse(tempSession);
-            data.lastActivity = Date.now();
-            sessionStorage.setItem('credora_session_temp', JSON.stringify(data));
-          } catch (e) {}
-        }
-      }
-    };
+  const login = async (email: string, password: string): Promise<boolean> => {
+    setIsLoading(true);
+    try {
+      // Mock login - in real app would call API
+      const mockUser: User = {
+        id: '1',
+        email,
+        name: email.split('@')[0]
+      };
+      
+      setUser(mockUser);
+      localStorage.setItem('user', JSON.stringify(mockUser));
+      return true;
+    } catch (error) {
+      console.error('Login error:', error);
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    // Track user activity
-    const events = ['mousedown', 'keypress', 'scroll', 'click'];
-    events.forEach(event => {
-      document.addEventListener(event, handleActivity, true);
-    });
-
-    // Check auth periodically
-    const interval = setInterval(checkAuth, 60000); // Every minute
-
-    return () => {
-      events.forEach(event => {
-        document.removeEventListener(event, handleActivity, true);
-      });
-      clearInterval(interval);
-    };
-  }, [isAuthenticated]);
-
-  const signOut = () => {
-    sessionStorage.removeItem('credora_session_temp');
-    localStorage.removeItem('credora_persistent_session');
-    localStorage.removeItem('credora_user');
-    localStorage.removeItem('credora_verified_user');
-    localStorage.removeItem('credora_session');
+  const logout = () => {
     setUser(null);
-    setIsAuthenticated(false);
-    router.push('/auth/signin');
+    localStorage.removeItem('user');
   };
 
   return {
     user,
-    isAuthenticated,
     isLoading,
-    signOut
+    isAuthenticated: !!user,
+    login,
+    logout
   };
 }
