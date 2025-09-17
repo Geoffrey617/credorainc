@@ -61,6 +61,52 @@ export const calculateApplicationFee = (rentAmount: number, isStudent: boolean =
   return rentAmount; // 100% for working professionals
 };
 
+export interface CardDetails {
+  cardNumber: string;
+  expiryDate: string;
+  cvv: string;
+  cardholderName?: string;
+}
+
+export interface CardValidationResult {
+  isValid: boolean;
+  errors: string[];
+}
+
+export const validateCardDetails = (cardDetails: CardDetails): CardValidationResult => {
+  const errors: string[] = [];
+  
+  // Validate card number
+  const cleanCardNumber = cardDetails.cardNumber.replace(/\D/g, '');
+  if (!cleanCardNumber || cleanCardNumber.length < 13 || cleanCardNumber.length > 19) {
+    errors.push('Invalid card number');
+  }
+  
+  // Validate expiry date (MM/YY format)
+  const expiryRegex = /^(0[1-9]|1[0-2])\/\d{2}$/;
+  if (!expiryRegex.test(cardDetails.expiryDate)) {
+    errors.push('Invalid expiry date (MM/YY format required)');
+  } else {
+    const [month, year] = cardDetails.expiryDate.split('/');
+    const currentDate = new Date();
+    const expiryDate = new Date(2000 + parseInt(year), parseInt(month) - 1);
+    if (expiryDate < currentDate) {
+      errors.push('Card has expired');
+    }
+  }
+  
+  // Validate CVV
+  const cvvRegex = /^\d{3,4}$/;
+  if (!cvvRegex.test(cardDetails.cvv)) {
+    errors.push('Invalid CVV (3-4 digits required)');
+  }
+  
+  return {
+    isValid: errors.length === 0,
+    errors
+  };
+};
+
 export const PAYMENT_DESCRIPTIONS = {
   APPLICATION_FEE: 'Credora Apartment Application Processing Fee',
   COSIGNER_SERVICE: 'Credora Professional Cosigner Service',
