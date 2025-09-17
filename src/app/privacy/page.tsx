@@ -20,8 +20,8 @@ export const metadata: Metadata = createMetadata({
 
 export default function PrivacyPolicyPage() {
   const breadcrumbSchema = createBreadcrumbSchema([
-    { name: "Home", path: "" },
-    { name: "Privacy Policy", path: "/privacy" }
+    { name: "Home", url: "https://credorainc.com" },
+    { name: "Privacy Policy", url: "https://credorainc.com/privacy" }
   ]);
   return (
     <>
