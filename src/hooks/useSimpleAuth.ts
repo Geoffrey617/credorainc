@@ -15,6 +15,7 @@ interface UseSimpleAuthReturn {
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
+  signOut: () => void;
 }
 
 export function useSimpleAuth(): UseSimpleAuthReturn {
@@ -70,6 +71,7 @@ export function useSimpleAuth(): UseSimpleAuthReturn {
     isLoading,
     isAuthenticated: !!user,
     login,
-    logout
+    logout,
+    signOut: logout // Alias for logout function
   };
 }
