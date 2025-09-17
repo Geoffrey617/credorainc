@@ -56,8 +56,8 @@ export default function SettingsPage() {
         // Fallback to auth user data
         setUser(authUser);
         setFormData({
-          firstName: authUser?.firstName || authUser?.first_name || '',
-          lastName: authUser?.lastName || authUser?.last_name || '',
+          firstName: (authUser as any)?.firstName || (authUser as any)?.first_name || '',
+          lastName: (authUser as any)?.lastName || (authUser as any)?.last_name || '',
           email: authUser?.email || '',
           phone: (authUser as any)?.phone || ''
         });
