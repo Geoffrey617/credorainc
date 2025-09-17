@@ -1,6 +1,6 @@
 
 import type { Metadata } from "next";
-import { createMetadata, createBreadcrumbSchema } from '@/lib/seo-config';
+import { generatePageSEO, generateMetaTags } from '../../lib/seo-config';
 import FAQPageClient from './FAQPageClient';
 
 export const metadata: Metadata = createMetadata({

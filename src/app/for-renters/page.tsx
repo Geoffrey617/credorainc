@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { createMetadata, createBreadcrumbSchema } from '@/lib/seo-config';
+import { generatePageSEO, generateMetaTags } from '../../lib/seo-config';
 import Link from 'next/link';
 import Image from 'next/image';
 
