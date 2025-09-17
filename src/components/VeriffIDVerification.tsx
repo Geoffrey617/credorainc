@@ -1,7 +1,19 @@
 import React, { useState } from 'react';
 
+export interface VeriffVerificationData {
+  status: 'approved' | 'declined' | 'pending' | 'failed';
+  sessionId: string;
+  timestamp: string;
+  firstName?: string;
+  lastName?: string;
+  documentType?: string;
+  documentNumber?: string;
+  nationality?: string;
+  dateOfBirth?: string;
+}
+
 interface VeriffIDVerificationProps {
-  onVerificationComplete?: (result: any) => void;
+  onVerificationComplete?: (result: VeriffVerificationData) => void;
   className?: string;
 }
 
@@ -21,10 +33,14 @@ export default function VeriffIDVerification({
       await new Promise(resolve => setTimeout(resolve, 2000));
       
       // Simulate successful verification
-      const result = {
+      const result: VeriffVerificationData = {
         status: 'approved',
         sessionId: 'mock-session-id',
         timestamp: new Date().toISOString(),
+        firstName: 'John',
+        lastName: 'Doe',
+        documentType: 'passport',
+        nationality: 'US'
       };
       
       setVerificationStatus('completed');
