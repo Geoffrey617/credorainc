@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { signUpWithEmail } from '../../../../lib/firebase-auth';
+import { signUpWithEmail, firebaseAuth } from '../../../../lib/firebase-auth';
 
 export default function LandlordSignUp() {
   const [formData, setFormData] = useState({
@@ -87,6 +87,11 @@ export default function LandlordSignUp() {
     try {
       // Use Firebase Google auth like the general sign-up page
       const result = await firebaseAuth.signInWithGoogle();
+      
+      if (result.error || !result.user) {
+        setError(result.error || 'Google sign-up failed. Please try again.');
+        return;
+      }
       
       // Store landlord data in localStorage for consistency
       const landlordData = {
