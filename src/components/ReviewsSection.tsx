@@ -10,10 +10,11 @@ interface Review {
 
 interface ReviewsSectionProps {
   apartmentId: string;
+  apartmentName?: string;
   className?: string;
 }
 
-export default function ReviewsSection({ apartmentId, className = "" }: ReviewsSectionProps) {
+export default function ReviewsSection({ apartmentId, apartmentName, className = "" }: ReviewsSectionProps) {
   // Mock reviews data - in real app would fetch from API
   const reviews: Review[] = [
     {
