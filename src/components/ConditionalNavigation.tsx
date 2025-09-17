@@ -4,7 +4,7 @@ import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import Navigation from './Navigation';
 import AuthenticatedNavigation from './AuthenticatedNavigation';
-import { useSimpleAuth } from '@/hooks/useSimpleAuth';
+import { useSimpleAuth } from '../hooks/useSimpleAuth';
 
 export default function ConditionalNavigation() {
   const pathname = usePathname();
