@@ -107,6 +107,60 @@ export const validateCardDetails = (cardDetails: CardDetails): CardValidationRes
   };
 };
 
+export interface StripePaymentData {
+  amount: number;
+  description: string;
+  cardDetails: CardDetails;
+  billingAddress?: any;
+}
+
+export const processStripePayment = async (paymentData: StripePaymentData): Promise<PaymentResult> => {
+  try {
+    // First validate the card details
+    const validation = validateCardDetails(paymentData.cardDetails);
+    if (!validation.isValid) {
+      return {
+        success: false,
+        error: validation.errors.join(', ')
+      };
+    }
+
+    // Create payment intent via API
+    const response = await fetch('/api/create-payment-intent', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        amount: paymentData.amount * 100, // Convert to cents
+        currency: 'usd',
+        description: paymentData.description,
+        cardDetails: paymentData.cardDetails,
+        billingAddress: paymentData.billingAddress
+      }),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      return {
+        success: false,
+        error: result.error || 'Payment processing failed'
+      };
+    }
+
+    return {
+      success: true,
+      paymentIntentId: result.paymentIntentId || result.id
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Payment processing failed'
+    };
+  }
+};
+
 export const PAYMENT_DESCRIPTIONS = {
   APPLICATION_FEE: 'Credora Apartment Application Processing Fee',
   COSIGNER_SERVICE: 'Credora Professional Cosigner Service',
