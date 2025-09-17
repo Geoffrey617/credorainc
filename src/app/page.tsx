@@ -1292,7 +1292,7 @@ export default function Home() {
               
               <div className="text-xs text-gray-500 max-w-4xl mx-auto">
                 <p className="mb-2">
-                  <strong>Legal Notice:</strong> Credora Inc is incorporated in the State of Delaware and operates as an apartment finder and lease cosigner service headquartered in San Francisco, California. 
+                  <strong>Legal Notice:</strong> Credora Inc is incorporated in the State of Delaware and operates as an apartment finder and lease cosigner service with mailing address in San Francisco, California. 
                   Our services are subject to employment verification and rental history review processes. Fees are non-refundable except as outlined in our Terms of Service.
                 </p>
                 <p className="mb-2">

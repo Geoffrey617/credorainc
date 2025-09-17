@@ -275,8 +275,8 @@ npm run dev
 **Credora Lease Cosigning Services**
 - **Website**: https://credora.com
 - **Email**: info@credora.com
-- **Phone**: 1-800-CREDORA
-- **Address**: [Your Business Address]
+- **Phone**: 855-997-6615
+- **Mailing Address**: 50 California Street, Suite 1500, San Francisco, CA 94111
 
 ## 📝 License
 

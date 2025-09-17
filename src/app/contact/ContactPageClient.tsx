@@ -240,7 +240,7 @@ export default function ContactPageClient() {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="font-semibold text-slate-900 mb-1">Office Location</h3>
+                    <h3 className="font-semibold text-slate-900 mb-1">Mailing Address</h3>
                     <p className="text-slate-600">
                       50 California Street<br />
                       Suite 1500<br />
