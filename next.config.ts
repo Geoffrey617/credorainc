@@ -14,12 +14,8 @@ const nextConfig: NextConfig = {
     unoptimized: process.env.NODE_ENV === 'production',
   },
   
-  // Use static export for production builds (Netlify deployment)
-  // Client-side authentication with Supabase
-  ...(process.env.NODE_ENV === 'production' && {
-    output: 'export',
-    trailingSlash: true,
-  }),
+  // Enable server-side functionality for API routes and Resend emails
+  // Netlify supports Next.js server-side functionality
   
   // TypeScript and ESLint configuration
   typescript: {

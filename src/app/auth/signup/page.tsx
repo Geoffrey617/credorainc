@@ -111,26 +111,35 @@ export default function SignUpPage() {
     }
 
     try {
-      // Use client-side Supabase authentication for static export compatibility
-      const { signUpWithEmail } = await import('../../../lib/firebase-auth');
-      const result = await signUpWithEmail(formData.email, formData.password);
+      // Register user via API with Resend email verification
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          password: formData.password,
+          userType: 'tenant' // Default to tenant, landlords have separate signup
+        }),
+      });
 
-      if (result.error || !result.user) {
+      // Check if response is JSON or HTML
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error('Server returned non-JSON response. API routes may not be properly configured.');
+      }
+
+      const result = await response.json();
+
+      if (!response.ok) {
         throw new Error(result.error || 'Account creation failed');
       }
 
-      // Store user data in localStorage
-      const userData = {
-        ...result.user,
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        userType: 'tenant'
-      };
-      
-      localStorage.setItem('credora_user', JSON.stringify(userData));
-      localStorage.setItem('credora_session', 'firebase_session');
-
       console.log('✅ User registered successfully:', result.user?.email);
+      console.log('📧 Verification email sent via Resend to:', result.user?.email);
       
       // Show verification message instead of redirecting
       setShowVerificationMessage(true);
