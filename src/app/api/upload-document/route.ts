@@ -52,7 +52,6 @@ export async function POST(request: NextRequest) {
     if (error) {
       console.error('🚨 Storage upload error details:', {
         message: error.message,
-        statusCode: error.statusCode,
         error: error
       });
       
