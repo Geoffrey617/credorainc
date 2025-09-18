@@ -10,8 +10,8 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       },
     ],
-    // Only unoptimize images for static export in production
-    unoptimized: process.env.NODE_ENV === 'production',
+    // Enable image optimization for server-side functionality
+    unoptimized: false,
   },
   
   // Enable server-side functionality for API routes and Resend emails
