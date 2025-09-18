@@ -27,13 +27,25 @@ export function useSimpleAuth(): UseSimpleAuthReturn {
     const checkAuth = async () => {
       try {
         // Check for user data in multiple possible keys for compatibility
-        const savedUser = localStorage.getItem('credora_user') || localStorage.getItem('user');
+        let savedUser = localStorage.getItem('credora_user') || localStorage.getItem('user');
+        let storageType = 'localStorage';
+        
+        // If not found in localStorage, check sessionStorage (temporary sessions)
+        if (!savedUser) {
+          const sessionData = sessionStorage.getItem('credora_session_temp');
+          if (sessionData) {
+            const session = JSON.parse(sessionData);
+            savedUser = JSON.stringify(session.user);
+            storageType = 'sessionStorage';
+          }
+        }
+        
         if (savedUser) {
           const userData = JSON.parse(savedUser);
           setUser(userData);
-          console.log('✅ User loaded from localStorage:', userData.email);
+          console.log(`✅ User loaded from ${storageType}:`, userData.email);
         } else {
-          console.log('📭 No saved user found in localStorage');
+          console.log('📭 No saved user found in localStorage or sessionStorage');
         }
       } catch (error) {
         console.error('Error checking auth:', error);
@@ -71,7 +83,8 @@ export function useSimpleAuth(): UseSimpleAuthReturn {
     localStorage.removeItem('credora_user');
     localStorage.removeItem('user'); // Remove legacy key as well
     localStorage.removeItem('credora_session');
-    console.log('🚪 User logged out and localStorage cleared');
+    sessionStorage.removeItem('credora_session_temp'); // Clear temporary session
+    console.log('🚪 User logged out and all storage cleared');
   };
 
   return {
