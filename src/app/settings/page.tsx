@@ -77,16 +77,22 @@ export default function SettingsPage() {
   };
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      console.log('🚫 Not authenticated, redirecting to sign in');
-      router.push('/auth/signin');
-      return;
-    }
-    
-    if (isAuthenticated && authUser?.email) {
+    // Add a small delay to prevent race conditions
+    const timeoutId = setTimeout(() => {
+      if (!isLoading && !isAuthenticated) {
+        console.log('🚫 Not authenticated after timeout, redirecting to sign in');
+        router.push('/auth/signin');
+      }
+    }, 500); // 500ms delay to allow auth state to stabilize
+
+    return () => clearTimeout(timeoutId);
+  }, [isAuthenticated, isLoading, router]);
+
+  useEffect(() => {
+    if (!isLoading && isAuthenticated && authUser?.email) {
       loadUserProfile(authUser.email);
     }
-  }, [isAuthenticated, isLoading, authUser, router]);
+  }, [isAuthenticated, isLoading, authUser]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

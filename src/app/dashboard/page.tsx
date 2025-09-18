@@ -10,10 +10,15 @@ export default function DashboardPage() {
   const { user, isAuthenticated, isLoading } = useSimpleAuth();
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      console.log('🚫 Not authenticated, redirecting to sign in');
-      router.push('/auth/signin');
-    }
+    // Add a small delay to prevent race conditions
+    const timeoutId = setTimeout(() => {
+      if (!isLoading && !isAuthenticated) {
+        console.log('🚫 Not authenticated after timeout, redirecting to sign in');
+        router.push('/auth/signin');
+      }
+    }, 500); // 500ms delay to allow auth state to stabilize
+
+    return () => clearTimeout(timeoutId);
   }, [isAuthenticated, isLoading, router]);
 
 

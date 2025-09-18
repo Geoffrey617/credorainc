@@ -69,6 +69,9 @@ export default function SignInPage() {
       sessionStorage.setItem('credora_session_temp', JSON.stringify(sessionData));
       console.log('🔐 Firebase Google session created');
       
+      // Dispatch auth change event to update navigation
+      window.dispatchEvent(new CustomEvent('credora-auth-change'));
+      
       // Redirect to dashboard
       router.push('/dashboard');
     } catch (err: any) {
@@ -118,6 +121,9 @@ export default function SignInPage() {
         // Always use sessionStorage - no persistence across tab close
         sessionStorage.setItem('credora_session_temp', JSON.stringify(sessionData));
         console.log('🔐 Enterprise session created - expires on tab close (no persistence)');
+        
+        // Dispatch auth change event to update navigation
+        window.dispatchEvent(new CustomEvent('credora-auth-change'));
         
         // Redirect based on user type or default to dashboard
         if (result.user.userType === 'landlord') {
