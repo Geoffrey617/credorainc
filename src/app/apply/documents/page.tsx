@@ -240,17 +240,17 @@ export default function DocumentsPage() {
       // Save document info to database
       const documentData = {
         userId: userId,
-          documents: {
-            [fileType.replace('File', '')]: {
-              name: file.name,
-              size: file.size,
-              type: file.type,
-              filePath: result.filePath,
-              fileUrl: result.fileUrl,
-              uploadedAt: new Date().toISOString()
-            }
+        documents: {
+          [fileType.replace('File', '')]: {
+            name: file.name,
+            size: file.size,
+            type: file.type,
+            filePath: result.filePath,
+            fileUrl: result.fileUrl,
+            uploadedAt: new Date().toISOString()
           }
-        };
+        }
+      };
 
         // Save to database via applications API
         try {
