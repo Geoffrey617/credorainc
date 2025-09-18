@@ -10,8 +10,13 @@
 
 [functions]
   node_bundler = "esbuild"
+  
+# Next.js server-side configuration
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/___netlify-handler"
+  status = 200
 
-# Redirects for Next.js routing
 [[redirects]]
   from = "/*"
   to = "/.netlify/functions/___netlify-handler"
