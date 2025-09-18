@@ -17,6 +17,7 @@ interface HereSuggestion {
     countryCode: string;
     countryName: string;
     state: string;
+    stateName?: string; // Full state name for reference
     county: string;
     city: string;
     district: string;
