@@ -51,6 +51,8 @@ export async function POST(request: NextRequest) {
 
     // Save document metadata to database
     try {
+      console.log('💾 Starting database save for:', { userId, sessionId, documentType, fileName: file.name });
+      
       const documentData = {
         userId: userId,
         sessionId: sessionId,
@@ -66,13 +68,23 @@ export async function POST(request: NextRequest) {
         }
       };
 
+      console.log('📋 Document data to save:', documentData);
+
       // Try to update existing application first
-      const { data: existingApps } = await supabase
+      console.log('🔍 Looking for existing applications for user:', userId);
+      const { data: existingApps, error: fetchError } = await supabase
         .from('applications')
         .select('*')
         .eq('user_id', userId)
         .order('created_at', { ascending: false })
         .limit(1);
+        
+      if (fetchError) {
+        console.error('🚨 Error fetching existing applications:', fetchError);
+        throw new Error(`Failed to fetch applications: ${fetchError.message}`);
+      }
+      
+      console.log('📊 Found existing applications:', existingApps?.length || 0);
 
       if (existingApps && existingApps.length > 0) {
         // Update existing application
