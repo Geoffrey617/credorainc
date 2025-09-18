@@ -40,28 +40,24 @@ function VerifyEmailContent() {
       addDebug(`📧 Email from URL: ${email}`);
       addDebug(`🔑 Token from URL: ${token?.substring(0, 20)}...`);
       
-      // For now, let's use a simple approach since we might not have the verification columns yet
-      // Try to decode the token from the send-verification API (base64url format)
-      let tokenData
-      try {
-        const decodedToken = Buffer.from(token!, 'base64url').toString()
-        tokenData = JSON.parse(decodedToken)
-        addDebug(`✅ Token decoded successfully`);
-        addDebug(`📋 Token email: ${tokenData.email}`);
-      } catch (decodeError) {
-        addDebug(`❌ Token decode failed, using fallback`);
-        // If token decode fails, it might be from the registration API (simple format)
-        // For now, let's just verify the email if it's provided
-        if (email) {
-          tokenData = { email, expires: Date.now() + (24 * 60 * 60 * 1000) }
-          addDebug(`🔄 Using fallback token data`);
-        } else {
-          setStatus('error')
-          setMessage('Invalid verification token format')
-          addDebug(`❌ No email provided and token decode failed`);
-          return
-        }
+      // Handle simple verification token format from register API
+      addDebug(`🔍 Processing verification token: ${token?.substring(0, 10)}...`);
+      
+      // Use simple token verification approach (token is a simple random string)
+      // The token from registration API is a simple random string, not encoded JSON
+      if (!email) {
+        setStatus('error')
+        setMessage('Invalid verification link - missing email parameter')
+        addDebug(`❌ No email provided in verification URL`);
+        return
       }
+      
+      const tokenData = { 
+        email, 
+        token: token,
+        expires: Date.now() + (24 * 60 * 60 * 1000) // 24 hours from now
+      }
+      addDebug(`✅ Using simple token verification for email: ${email}`);
       
       // Check if token is expired
       if (tokenData.expires && Date.now() > tokenData.expires) {

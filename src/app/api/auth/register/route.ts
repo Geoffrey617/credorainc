@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
               <p style="margin: 0 0 30px 0; font-size: 16px;">Click below to verify now:</p>
               
               <div style="text-align: center; margin: 30px 0;">
-                <a href="${process.env.NEXTAUTH_URL}/auth/verify?token=${verificationToken}" 
+                <a href="${process.env.NEXTAUTH_URL}/auth/verify?token=${verificationToken}&email=${encodeURIComponent(email)}" 
                    style="display: inline-block; background: linear-gradient(135deg, #64748b 0%, #475569 100%); color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">
                   Verify Email
                 </a>
