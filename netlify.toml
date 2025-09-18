@@ -1,6 +1,5 @@
 [build]
   command = "npm run build"
-  publish = ".next"
 
 [build.environment]
   NODE_VERSION = "20"
@@ -11,16 +10,7 @@
 [functions]
   node_bundler = "esbuild"
   
-# Next.js server-side configuration
-[[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/___netlify-handler"
-  status = 200
-
-[[redirects]]
-  from = "/*"
-  to = "/.netlify/functions/___netlify-handler"
-  status = 200
+# Let Netlify Next.js plugin handle all routing automatically
 
 # Headers for security and performance
 [[headers]]
