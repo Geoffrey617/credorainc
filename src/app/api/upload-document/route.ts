@@ -49,11 +49,74 @@ export async function POST(request: NextRequest) {
       .from('application-documents')
       .getPublicUrl(fileName);
 
+    // Save document metadata to database
+    try {
+      const documentData = {
+        userId: userId,
+        sessionId: sessionId,
+        documents: {
+          [documentType]: {
+            name: file.name,
+            size: file.size,
+            type: file.type,
+            filePath: data.path,
+            fileUrl: urlData.publicUrl,
+            uploadedAt: new Date().toISOString()
+          }
+        }
+      };
+
+      // Try to update existing application first
+      const { data: existingApps } = await supabase
+        .from('applications')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(1);
+
+      if (existingApps && existingApps.length > 0) {
+        // Update existing application
+        const existingApp = existingApps[0];
+        const updatedDocuments = {
+          ...existingApp.documents,
+          [documentType]: documentData.documents[documentType]
+        };
+
+        await supabase
+          .from('applications')
+          .update({ 
+            documents: updatedDocuments,
+            session_id: sessionId,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', existingApp.id);
+
+        console.log('📄 Updated existing application with document');
+      } else {
+        // Create new application
+        await supabase
+          .from('applications')
+          .insert({
+            user_id: userId,
+            session_id: sessionId,
+            status: 'draft',
+            documents: documentData.documents,
+            created_at: new Date().toISOString()
+          });
+
+        console.log('📄 Created new application with document');
+      }
+    } catch (dbError) {
+      console.error('Error saving document metadata to database:', dbError);
+      // Don't fail the upload if database save fails
+    }
+
     return NextResponse.json({
       success: true,
       fileName: file.name,
       filePath: data.path,
       fileUrl: urlData.publicUrl,
+      sessionId: sessionId,
       message: 'File uploaded successfully'
     });
 
