@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-export const dynamic = 'force-static';
+export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -23,29 +23,38 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Decode and validate token
-    let tokenData;
-    try {
-      const decodedToken = Buffer.from(token, 'base64url').toString();
-      tokenData = JSON.parse(decodedToken);
-    } catch (decodeError) {
-      console.log('❌ Token decode failed:', decodeError);
+    // Handle simple token format from registration API
+    console.log('🔍 Verifying simple token format for email:', email);
+    console.log('🔑 Token received:', token?.substring(0, 10) + '...');
+    
+    // For simple token verification, we'll look up the user by email and token in database
+    
+    // First, find the user by email and check if the token matches
+    const { data: user, error: userError } = await supabase
+      .from('users')
+      .select('*')
+      .eq('email', email)
+      .eq('verification_token', token)
+      .single();
+
+    if (userError || !user) {
+      console.log('❌ User not found or token mismatch:', userError);
       return NextResponse.json(
         { error: 'Invalid verification token' },
         { status: 400 }
       );
     }
 
-    // Check if token is expired
-    if (tokenData.expires && Date.now() > tokenData.expires) {
+    // Check if token is expired (if verification_expires column exists)
+    if (user.verification_expires && new Date(user.verification_expires) < new Date()) {
       return NextResponse.json(
         { error: 'Verification link has expired' },
         { status: 400 }
       );
     }
 
-    // Verify email matches
-    if (tokenData.email !== email) {
+    // Token is valid, proceed with verification
+    if (user.email !== email) {
       return NextResponse.json(
         { error: 'Email mismatch' },
         { status: 400 }
