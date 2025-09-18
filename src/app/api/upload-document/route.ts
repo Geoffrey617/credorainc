@@ -82,19 +82,22 @@ export async function POST(request: NextRequest) {
           [documentType]: documentData.documents[documentType]
         };
 
-        await supabase
+        const { error: updateError } = await supabase
           .from('applications')
           .update({ 
             documents: updatedDocuments,
-            session_id: sessionId,
             updated_at: new Date().toISOString()
           })
           .eq('id', existingApp.id);
+          
+        if (updateError) {
+          console.error('Database update error:', updateError);
+        }
 
         console.log('📄 Updated existing application with document');
       } else {
         // Create new application
-        await supabase
+        const { error: insertError } = await supabase
           .from('applications')
           .insert({
             user_id: userId,
@@ -103,6 +106,10 @@ export async function POST(request: NextRequest) {
             documents: documentData.documents,
             created_at: new Date().toISOString()
           });
+          
+        if (insertError) {
+          console.error('Database insert error:', insertError);
+        }
 
         console.log('📄 Created new application with document');
       }

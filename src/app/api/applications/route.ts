@@ -118,6 +118,10 @@ export async function GET(request: NextRequest) {
     
     if (userId) {
       query = query.eq('user_id', userId);
+      // If sessionId is provided, also filter by it for more specific results
+      if (sessionId) {
+        query = query.eq('session_id', sessionId);
+      }
     } else if (email) {
       query = query.eq('email', email);
     }
