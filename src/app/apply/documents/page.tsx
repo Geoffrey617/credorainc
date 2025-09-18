@@ -94,6 +94,63 @@ export default function DocumentsPage() {
   const [completedSteps] = useState<string[]>(['personal', 'employment', 'rental']);
   const [dragOver, setDragOver] = useState<string | null>(null);
 
+  // Separate function to load documents from database
+  const loadDocumentsFromDatabase = async () => {
+    // Get user ID from multiple sources
+    let userId = authUser?.id;
+    
+    if (!userId) {
+      // Try sessionStorage first (Google login)
+      const sessionData = sessionStorage.getItem('credora_session_temp');
+      if (sessionData) {
+        const session = JSON.parse(sessionData);
+        userId = session.user?.id || session.user?.uid;
+      }
+      
+      // Try localStorage as fallback (email login)
+      if (!userId) {
+        const localUser = localStorage.getItem('credora_user');
+        if (localUser) {
+          const user = JSON.parse(localUser);
+          userId = user.id || user.uid;
+        }
+      }
+    }
+    
+    if (userId) {
+      try {
+        console.log('📄 Loading documents for user ID:', userId);
+        const response = await fetch(`/api/applications?userId=${userId}`);
+        const result = await response.json();
+        
+        if (response.ok && result.applications && result.applications.length > 0) {
+          const latestApp = result.applications[0];
+          
+          if (latestApp.documents) {
+            const createFileObject = (docInfo: any) => {
+              if (!docInfo) return null;
+              return {
+                name: docInfo.name,
+                size: docInfo.size || 1024 * 1024,
+                type: docInfo.type || 'application/pdf'
+              } as File;
+            };
+            
+            console.log('📄 Documents found in database:', Object.keys(latestApp.documents));
+            setFormData(prev => ({
+              ...prev,
+              governmentIdFile: createFileObject(latestApp.documents.governmentId),
+              incomeVerificationFile: createFileObject(latestApp.documents.incomeVerification),
+              studentIdFile: createFileObject(latestApp.documents.studentId),
+            }));
+          }
+        }
+      } catch (error) {
+        console.error('Error loading documents from database:', error);
+      }
+    }
+  };
+
   // Load form data from database and localStorage
   useEffect(() => {
     const loadData = async () => {
@@ -109,41 +166,12 @@ export default function DocumentsPage() {
         }));
       }
       
-      // Load documents from database if user is authenticated
-      if (authUser?.id) {
-        try {
-          const response = await fetch(`/api/applications?userId=${authUser.id}`);
-          const result = await response.json();
-          
-          if (response.ok && result.applications && result.applications.length > 0) {
-            const latestApp = result.applications[0];
-            
-            if (latestApp.documents) {
-              const createFileObject = (docInfo: any) => {
-                if (!docInfo) return null;
-                return {
-                  name: docInfo.name,
-                  size: docInfo.size || 1024 * 1024,
-                  type: docInfo.type || 'application/pdf'
-                } as File;
-              };
-              
-              setFormData(prev => ({
-                ...prev,
-                governmentIdFile: createFileObject(latestApp.documents.governmentId),
-                incomeVerificationFile: createFileObject(latestApp.documents.incomeVerification),
-                studentIdFile: createFileObject(latestApp.documents.studentId),
-              }));
-            }
-          }
-        } catch (error) {
-          console.error('Error loading documents from database:', error);
-        }
-      }
+      // Load documents from database
+      await loadDocumentsFromDatabase();
     };
     
     loadData();
-  }, []);
+  }, [authUser?.id]); // Re-run when authUser becomes available
 
   const handleFileUpload = async (fileType: keyof FormData, file: File) => {
     // File size validation
@@ -290,6 +318,9 @@ export default function DocumentsPage() {
       }
 
       console.log(`Successfully uploaded ${fileType}:`, result.fileName);
+      
+      // Refresh documents from database to show the uploaded file
+      await loadDocumentsFromDatabase();
     } catch (error) {
       console.error(`Error uploading ${fileType}:`, error);
       alert('Upload failed. Please try again.');
