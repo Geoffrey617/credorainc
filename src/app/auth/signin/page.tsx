@@ -29,24 +29,41 @@ export default function SignInPage() {
     setError('');
     
     try {
-      const result = await firebaseAuth.signInWithGoogle();
+      // Use Firebase Google authentication
+      const googleResult = await firebaseAuth.signInWithGoogle();
       
-      if (result.error || !result.user) {
-        setError(result.error || 'Google sign-in failed. Please try again.');
+      if (googleResult.error || !googleResult.user) {
+        setError(googleResult.error || 'Google sign-in failed. Please try again.');
         return;
       }
+
+      console.log('✅ Google authentication successful:', googleResult.user.email);
       
-      // Store user data in localStorage for consistency
-      localStorage.setItem('credora_user', JSON.stringify(result.user));
-      localStorage.setItem('credora_session', 'firebase_session');
+      // Store Firebase user data directly in session
+      const sessionData = {
+        user: {
+          uid: googleResult.user.uid,
+          email: googleResult.user.email,
+          displayName: googleResult.user.displayName,
+          firstName: googleResult.user.displayName?.split(' ')[0] || 'Google',
+          lastName: googleResult.user.displayName?.split(' ')[1] || 'User',
+          photoURL: googleResult.user.photoURL,
+          provider: 'google',
+          emailVerified: true
+        },
+        sessionToken: `firebase_${googleResult.user.uid}`,
+        loginTime: Date.now(),
+        lastActivity: Date.now()
+      };
       
-      console.log('✅ Google sign-in successful:', result.user.email);
+      sessionStorage.setItem('credora_session_temp', JSON.stringify(sessionData));
+      console.log('🔐 Firebase Google session created');
       
       // Redirect to dashboard
       router.push('/dashboard');
     } catch (err: any) {
       console.error('❌ Google sign-in error:', err);
-      setError('Google sign-in failed. Please try again.');
+      setError(err.message || 'Google sign-in failed. Please try again.');
     } finally {
       setIsLoading(false);
     }

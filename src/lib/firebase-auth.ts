@@ -1,79 +1,92 @@
 // Firebase authentication utilities
+import { initializeApp } from 'firebase/app';
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut as firebaseSignOut, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+
+// Firebase config - replace with your actual config
+const firebaseConfig = {
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+// Google Auth Provider
+const googleProvider = new GoogleAuthProvider();
+
 export const signInWithEmail = async (email: string, password: string) => {
-  // Mock Firebase auth - replace with actual Firebase implementation
   try {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
+    const result = await signInWithEmailAndPassword(auth, email, password);
     return {
       user: {
-        uid: 'mock-uid',
-        email,
-        displayName: email.split('@')[0],
+        uid: result.user.uid,
+        email: result.user.email,
+        displayName: result.user.displayName,
+        photoURL: result.user.photoURL,
       },
       error: null,
     };
-  } catch (error) {
+  } catch (error: any) {
     return {
       user: null,
-      error: error instanceof Error ? error.message : 'Authentication failed',
+      error: error.message || 'Authentication failed',
     };
   }
 };
 
 export const signUpWithEmail = async (email: string, password: string) => {
-  // Mock Firebase auth - replace with actual Firebase implementation
   try {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
+    const result = await createUserWithEmailAndPassword(auth, email, password);
     return {
       user: {
-        uid: 'mock-uid',
-        email,
-        displayName: email.split('@')[0],
+        uid: result.user.uid,
+        email: result.user.email,
+        displayName: result.user.displayName,
+        photoURL: result.user.photoURL,
       },
       error: null,
     };
-  } catch (error) {
+  } catch (error: any) {
     return {
       user: null,
-      error: error instanceof Error ? error.message : 'Registration failed',
+      error: error.message || 'Registration failed',
     };
   }
 };
 
 export const signOut = async () => {
-  // Mock Firebase auth - replace with actual Firebase implementation
   try {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await firebaseSignOut(auth);
     return { error: null };
-  } catch (error) {
-    return { error: error instanceof Error ? error.message : 'Sign out failed' };
+  } catch (error: any) {
+    return { error: error.message || 'Sign out failed' };
   }
 };
 
 export const signInWithGoogle = async () => {
-  // Mock Google sign-in - replace with actual Firebase implementation
   try {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    const result = await signInWithPopup(auth, googleProvider);
+    const user = result.user;
     
     return {
       user: {
-        uid: 'google-mock-uid',
-        email: 'user@gmail.com',
-        displayName: 'Google User',
-        photoURL: 'https://via.placeholder.com/150',
+        uid: user.uid,
+        email: user.email,
+        displayName: user.displayName,
+        photoURL: user.photoURL,
         providerId: 'google.com'
       },
       error: null,
     };
-  } catch (error) {
+  } catch (error: any) {
     return {
       user: null,
-      error: error instanceof Error ? error.message : 'Google sign-in failed',
+      error: error.message || 'Google sign-in failed',
     };
   }
 };
