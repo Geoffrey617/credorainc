@@ -51,33 +51,44 @@ export default function ProfilePage() {
   }, [isAuthenticated, authLoading, authUser, router]);
 
   const handleSave = () => {
-    if (user) {
+    if (authUser) {
       const updatedUser = {
-        ...user,
+        ...authUser,
         ...formData,
         name: `${formData.firstName} ${formData.lastName}`.trim()
       };
       
-      // Update localStorage
-      const storageKey = localStorage.getItem('credora_user') ? 'credora_user' : 'credora_verified_user';
-      localStorage.setItem(storageKey, JSON.stringify(updatedUser));
+      // Update storage (check both possible locations)
+      const sessionData = sessionStorage.getItem('credora_session_temp');
+      if (sessionData) {
+        // Update sessionStorage session
+        const session = JSON.parse(sessionData);
+        session.user = updatedUser;
+        sessionStorage.setItem('credora_session_temp', JSON.stringify(session));
+      } else {
+        // Update localStorage
+        const storageKey = localStorage.getItem('credora_user') ? 'credora_user' : 'credora_verified_user';
+        localStorage.setItem(storageKey, JSON.stringify(updatedUser));
+      }
       
-      setUser(updatedUser);
+      // Dispatch auth change to update all components
+      window.dispatchEvent(new CustomEvent('credora-auth-change'));
+      
       setIsEditing(false);
     }
   };
 
   const handleCancel = () => {
-    if (user) {
+    if (authUser) {
       setFormData({
-        firstName: user.firstName || '',
-        lastName: user.lastName || '',
-        email: user.email || '',
-        phone: (user as any).phone || '',
-        address: (user as any).address || '',
-        city: (user as any).city || '',
-        state: (user as any).state || '',
-        zipCode: (user as any).zipCode || ''
+        firstName: (authUser as any)?.firstName || authUser.name?.split(' ')[0] || '',
+        lastName: (authUser as any)?.lastName || authUser.name?.split(' ')[1] || '',
+        email: authUser.email || '',
+        phone: (authUser as any)?.phone || '',
+        address: (authUser as any)?.address || '',
+        city: (authUser as any)?.city || '',
+        state: (authUser as any)?.state || '',
+        zipCode: (authUser as any)?.zipCode || ''
       });
     }
     setIsEditing(false);
