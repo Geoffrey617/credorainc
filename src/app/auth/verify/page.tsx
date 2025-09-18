@@ -151,18 +151,6 @@ function VerifyEmailContent() {
             </>
           )}
           
-          {/* Debug Information */}
-          {debugInfo.length > 0 && (
-            <div className="mt-8 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <h3 className="text-sm font-semibold text-blue-800 mb-2">Debug Information:</h3>
-              <div className="space-y-1">
-                {debugInfo.map((info, index) => (
-                  <p key={index} className="text-xs text-blue-700 font-mono">{info}</p>
-                ))}
-              </div>
-            </div>
-          )}
-          
           <div className="space-y-3">
             {status === 'success' && (
               <Link
