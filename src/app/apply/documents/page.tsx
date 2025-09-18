@@ -230,10 +230,10 @@ export default function DocumentsPage() {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
-                userId: currentUser.id,
-                firstName: currentUser.firstName || '',
-                lastName: currentUser.lastName || '',
-                email: currentUser.email || '',
+                userId: authUser.id,
+                firstName: authUser.firstName || authUser.name?.split(' ')[0] || '',
+                lastName: authUser.lastName || authUser.name?.split(' ')[1] || '',
+                email: authUser.email || '',
                 documents: {
                   [fileType.replace('File', '')]: {
                     name: file.name,
