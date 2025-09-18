@@ -132,10 +132,14 @@ export default function AddressAutocomplete({
       
       const data = await response.json();
       console.log('HERE API response data:', data);
+      console.log('First item detailed structure:', data.items?.[0]);
       
       const addressSuggestions = data.items
         ?.filter((item: any) => item.resultType === 'houseNumber' || item.resultType === 'street' || item.resultType === 'locality')
         .map((item: any) => {
+          console.log('🔍 Processing item:', item);
+          console.log('📍 Address data from API:', item.address);
+          
           // Parse HERE API response structure
           const addressData = item.address || {};
           
@@ -210,7 +214,7 @@ export default function AddressAutocomplete({
           const stateAbbr = addressData.stateCode || fallbackState;
           const fullStateName = stateMap[stateAbbr] || addressData.state || stateAbbr;
           
-          return {
+          const processedItem = {
             title: item.title,
             address: {
               label: item.title,
@@ -223,6 +227,9 @@ export default function AddressAutocomplete({
             },
             position: item.position || { lat: 0, lng: 0 }
           };
+          
+          console.log('✅ Final processed item:', processedItem);
+          return processedItem;
         }) || [];
       
       console.log('Processed address suggestions:', addressSuggestions);
