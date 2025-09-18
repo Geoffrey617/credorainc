@@ -38,11 +38,12 @@ const getOrCreateSessionId = (): string => {
 
 // Storage path utilities
 const getStoragePath = (userId: string, sessionId: string, documentType: string, fileName: string): string => {
-  return `applications/${userId}/${sessionId}/${documentType}/${fileName}`;
+  // Simplified path structure to avoid deep nesting issues
+  return `${sessionId}_${documentType}_${fileName}`;
 };
 
 const getStorageFolder = (userId: string, sessionId: string): string => {
-  return `applications/${userId}/${sessionId}`;
+  return `${sessionId}`;
 };
 
 // Modern application steps with enhanced descriptions
@@ -160,7 +161,7 @@ export default function DocumentsPage() {
       
       // List all files in the user's session folder
       const { data: files, error } = await supabase.storage
-        .from('documents')
+        .from('application-documents')
         .list(storageFolder);
       
       if (error) {
@@ -316,28 +317,60 @@ export default function DocumentsPage() {
         storagePath
       });
 
-      // Upload directly to Supabase Storage with session-based path
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('documents')
-        .upload(storagePath, file, {
-          cacheControl: '3600',
-          upsert: true // Overwrite if exists
+      // Try direct Storage upload first, fall back to API if needed
+      let uploadResult;
+      
+      try {
+        console.log('📤 Attempting direct storage upload to path:', storagePath);
+        
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('application-documents')
+          .upload(storagePath, file, {
+            cacheControl: '3600',
+            upsert: true
+          });
+
+        if (uploadError) {
+          throw uploadError;
+        }
+
+        // Get public URL
+        const { data: urlData } = supabase.storage
+          .from('application-documents')
+          .getPublicUrl(storagePath);
+
+        uploadResult = {
+          filePath: uploadData.path,
+          fileUrl: urlData.publicUrl,
+          fileName: file.name
+        };
+
+        console.log('✅ Direct storage upload successful:', uploadData.path);
+        
+      } catch (storageError: any) {
+        console.warn('⚠️ Direct storage upload failed, falling back to API:', storageError.message);
+        
+        // Fall back to existing API approach with session context
+        const uploadFormData = new FormData();
+        uploadFormData.append('file', file);
+        uploadFormData.append('userId', userId);
+        uploadFormData.append('sessionId', sessionId); // Include session ID in API call
+        uploadFormData.append('documentType', documentType);
+
+        const response = await fetch('/api/upload-document', {
+          method: 'POST',
+          body: uploadFormData
         });
 
-      if (uploadError) {
-        console.error('Supabase storage error:', uploadError);
-        throw new Error(uploadError.message || 'Upload failed');
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.error || 'API upload failed');
+        }
+
+        uploadResult = result;
+        console.log('✅ API upload successful:', result.fileName);
       }
-
-      // Get public URL for the uploaded file
-      const { data: urlData } = supabase.storage
-        .from('documents')
-        .getPublicUrl(storagePath);
-
-      console.log('✅ Document uploaded successfully:', {
-        path: uploadData.path,
-        publicUrl: urlData.publicUrl
-      });
       
       // Update form data with uploaded file info
       setFormData(prev => ({
@@ -395,7 +428,7 @@ export default function DocumentsPage() {
         // Find and remove the file from storage
         const storageFolder = getStorageFolder(userId, sessionId);
         const { data: files } = await supabase.storage
-          .from('documents')
+          .from('application-documents')
           .list(storageFolder);
         
         // Find the file that matches this document type
@@ -407,7 +440,7 @@ export default function DocumentsPage() {
         if (fileToRemove) {
           const fullPath = `${storageFolder}/${fileToRemove.name}`;
           const { error } = await supabase.storage
-            .from('documents')
+            .from('application-documents')
             .remove([fullPath]);
           
           if (error) {
