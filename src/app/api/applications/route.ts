@@ -118,15 +118,26 @@ export async function GET(request: NextRequest) {
     
     if (userId) {
       query = query.eq('user_id', userId);
-      // If sessionId is provided, also filter by it for more specific results
+      // Try to filter by sessionId, but don't fail if column doesn't exist
       if (sessionId) {
-        query = query.eq('session_id', sessionId);
+        try {
+          query = query.eq('session_id', sessionId);
+          console.log('🔍 Filtering by session_id:', sessionId);
+        } catch (sessionError) {
+          console.warn('⚠️ session_id column might not exist, skipping session filter');
+        }
       }
     } else if (email) {
       query = query.eq('email', email);
     }
 
+    console.log('📊 Executing applications query...');
     const { data, error } = await query.order('created_at', { ascending: false });
+    
+    console.log('📊 Query result:', { 
+      foundApplications: data?.length || 0, 
+      error: error?.message || 'none' 
+    });
 
     if (error) {
       console.error('Error fetching applications:', error);
