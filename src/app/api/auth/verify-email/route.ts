@@ -61,13 +61,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Update user as verified in database using service role (bypasses RLS)
+    // Update user as verified and clear verification token
     const { data: updateResult, error } = await supabase
       .from('users')
       .update({ 
-        email_verified: true
+        email_verified: true,
+        verification_token: null,
+        verification_expires: null,
+        verified_at: new Date().toISOString()
       })
       .eq('email', email)
+      .eq('verification_token', token)
       .select();
 
     console.log('📝 Database update result:', updateResult);

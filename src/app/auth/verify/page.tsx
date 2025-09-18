@@ -12,7 +12,6 @@ const supabase = createClient(supabaseUrl, supabaseKey)
 function VerifyEmailContent() {
   const [status, setStatus] = useState<'loading' | 'success' | 'error' | 'expired'>('loading')
   const [message, setMessage] = useState('')
-  const [debugInfo, setDebugInfo] = useState<string[]>([])
   const searchParams = useSearchParams()
   const router = useRouter()
   
@@ -29,26 +28,15 @@ function VerifyEmailContent() {
     verifyEmail()
   }, [token])
 
-  const addDebug = (info: string) => {
-    setDebugInfo(prev => [...prev, `${new Date().toLocaleTimeString()}: ${info}`]);
-  };
 
   const verifyEmail = async () => {
     try {
       setStatus('loading')
-      addDebug(`🔍 Starting verification process...`);
-      addDebug(`📧 Email from URL: ${email}`);
-      addDebug(`🔑 Token from URL: ${token?.substring(0, 20)}...`);
       
       // Handle simple verification token format from register API
-      addDebug(`🔍 Processing verification token: ${token?.substring(0, 10)}...`);
-      
-      // Use simple token verification approach (token is a simple random string)
-      // The token from registration API is a simple random string, not encoded JSON
       if (!email) {
         setStatus('error')
         setMessage('Invalid verification link - missing email parameter')
-        addDebug(`❌ No email provided in verification URL`);
         return
       }
       
@@ -57,19 +45,16 @@ function VerifyEmailContent() {
         token: token,
         expires: Date.now() + (24 * 60 * 60 * 1000) // 24 hours from now
       }
-      addDebug(`✅ Using simple token verification for email: ${email}`);
       
       // Check if token is expired
       if (tokenData.expires && Date.now() > tokenData.expires) {
         setStatus('expired')
         setMessage('This verification link has expired (24 hours)')
-        addDebug(`⏰ Token expired`);
         return
       }
       
       // Update user as verified in database via API (bypasses RLS)
       const userEmail = tokenData.email || email
-      addDebug(`🎯 Attempting to verify email: ${userEmail}`);
       
       const response = await fetch('/api/auth/verify-email', {
         method: 'POST',
@@ -78,19 +63,13 @@ function VerifyEmailContent() {
       });
 
       const result = await response.json();
-      addDebug(`📡 API response status: ${response.status}`);
       
       if (!response.ok) {
-        addDebug(`❌ API error: ${result.error}`);
         setStatus('error')
         setMessage(result.error || 'Failed to verify email. Please try again.')
         return
       }
       
-      addDebug(`✅ API success: ${result.message}`);
-      addDebug(`📝 User updated in database`)
-      
-      addDebug(`✅ Email verification successful for: ${userEmail}`);
       setStatus('success')
       setMessage('Email verified successfully!')
       
@@ -102,7 +81,7 @@ function VerifyEmailContent() {
     } catch (error) {
       console.error('Verification error:', error)
       setStatus('error')
-      setMessage('An error occurred during verification')
+      setMessage('An error occurred during verification. Please try again.')
     }
   }
 
