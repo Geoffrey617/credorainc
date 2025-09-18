@@ -144,16 +144,82 @@ export default function AddressAutocomplete({
           const streetName = addressData.street || '';
           const streetAddress = `${houseNumber} ${streetName}`.trim();
           
+          // Parse title as fallback (format: "32 Cedar St, Brooklyn, NY 11221-2602, United States")
+          const titleParts = item.title.split(',').map((part: string) => part.trim());
+          const fallbackStreet = titleParts[0] || '';
+          const fallbackCity = titleParts[1] || '';
+          const stateZipPart = titleParts[2] || ''; // "NY 11221-2602"
+          const stateZipMatch = stateZipPart.match(/^([A-Z]{2})\s+(\d{5})(?:-\d{4})?/);
+          const fallbackState = stateZipMatch ? stateZipMatch[1] : '';
+          const fallbackZip = stateZipMatch ? stateZipMatch[2] : '';
+          
+          // Map state abbreviations to full names
+          const stateMap: { [key: string]: string } = {
+            'NY': 'New York',
+            'CA': 'California',
+            'TX': 'Texas',
+            'FL': 'Florida',
+            'IL': 'Illinois',
+            'PA': 'Pennsylvania',
+            'OH': 'Ohio',
+            'GA': 'Georgia',
+            'NC': 'North Carolina',
+            'MI': 'Michigan',
+            'NJ': 'New Jersey',
+            'VA': 'Virginia',
+            'WA': 'Washington',
+            'AZ': 'Arizona',
+            'MA': 'Massachusetts',
+            'TN': 'Tennessee',
+            'IN': 'Indiana',
+            'MO': 'Missouri',
+            'MD': 'Maryland',
+            'WI': 'Wisconsin',
+            'CO': 'Colorado',
+            'MN': 'Minnesota',
+            'SC': 'South Carolina',
+            'AL': 'Alabama',
+            'LA': 'Louisiana',
+            'KY': 'Kentucky',
+            'OR': 'Oregon',
+            'OK': 'Oklahoma',
+            'CT': 'Connecticut',
+            'UT': 'Utah',
+            'IA': 'Iowa',
+            'NV': 'Nevada',
+            'AR': 'Arkansas',
+            'MS': 'Mississippi',
+            'KS': 'Kansas',
+            'NM': 'New Mexico',
+            'NE': 'Nebraska',
+            'WV': 'West Virginia',
+            'ID': 'Idaho',
+            'HI': 'Hawaii',
+            'NH': 'New Hampshire',
+            'ME': 'Maine',
+            'RI': 'Rhode Island',
+            'MT': 'Montana',
+            'DE': 'Delaware',
+            'SD': 'South Dakota',
+            'ND': 'North Dakota',
+            'AK': 'Alaska',
+            'VT': 'Vermont',
+            'WY': 'Wyoming'
+          };
+          
+          const stateAbbr = addressData.stateCode || fallbackState;
+          const fullStateName = stateMap[stateAbbr] || addressData.state || stateAbbr;
+          
           return {
             title: item.title,
             address: {
               label: item.title,
               countryCode: addressData.countryCode || 'USA',
               countryName: addressData.countryName || 'United States',
-              state: addressData.state || addressData.stateCode || '',
-              city: addressData.city || '',
-              street: streetAddress || item.title.split(',')[0] || '', // Fallback to first part of title
-              postalCode: addressData.postalCode || ''
+              state: fullStateName,
+              city: addressData.city || fallbackCity,
+              street: streetAddress || fallbackStreet,
+              postalCode: addressData.postalCode || fallbackZip
             },
             position: item.position || { lat: 0, lng: 0 }
           };
@@ -199,15 +265,7 @@ export default function AddressAutocomplete({
     setSuggestions([]);
     onSelect?.(streetAddress);
     
-    console.log('Address selected:', {
-      street: streetAddress,
-      city: suggestion.address.city,
-      state: suggestion.address.state,
-      zipCode: suggestion.address.postalCode
-    });
-    
-    // Pass structured address data to onAddressSelect
-    onAddressSelect?.({
+    const addressData = {
       street: streetAddress,
       city: suggestion.address.city,
       state: suggestion.address.state,
@@ -215,7 +273,14 @@ export default function AddressAutocomplete({
       country: suggestion.address.countryName,
       fullAddress: suggestion.address.label,
       coordinates: suggestion.position
-    });
+    };
+    
+    console.log('🏠 Address selected - Street only for input:', streetAddress);
+    console.log('📍 Full address data being passed to onAddressSelect:', addressData);
+    console.log('🔍 Original suggestion data:', suggestion);
+    
+    // Pass structured address data to onAddressSelect
+    onAddressSelect?.(addressData);
   };
 
   // Cleanup timeout on unmount
