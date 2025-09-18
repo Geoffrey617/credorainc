@@ -18,11 +18,6 @@ const nextConfig: NextConfig = {
   // Enable server-side functionality for API routes and Resend emails
   // Netlify supports Next.js server-side functionality
   
-  // Ensure API routes are treated as server functions
-  experimental: {
-    serverComponentsExternalPackages: ['resend'],
-  },
-  
   // TypeScript and ESLint configuration
   typescript: {
     ignoreBuildErrors: false,
