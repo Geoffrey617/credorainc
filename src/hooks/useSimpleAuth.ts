@@ -131,13 +131,13 @@ export function useSimpleAuth(): UseSimpleAuthReturn {
     localStorage.removeItem('credora_session');
     sessionStorage.removeItem('credora_session_temp');
     
-    // Clear any Firebase auth state
-    if (typeof window !== 'undefined' && window.firebase) {
-      try {
-        window.firebase.auth().signOut();
-      } catch (error) {
-        console.log('Firebase signout not available:', error);
-      }
+    // Clear any Firebase auth state using our Firebase auth module
+    try {
+      const { firebaseAuth } = await import('../lib/firebase-auth');
+      await firebaseAuth.signOut();
+      console.log('✅ Firebase auth cleared');
+    } catch (error) {
+      console.log('Firebase signout not available:', error);
     }
     
     console.log('✅ User logged out and all storage cleared');
