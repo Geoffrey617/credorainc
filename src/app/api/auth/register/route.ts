@@ -3,8 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 import bcrypt from 'bcryptjs'
 import { Resend } from 'resend'
 
-// Configure for static export compatibility
-export const dynamic = 'force-static'
+// Configure for server-side functionality
 export const runtime = 'nodejs'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
