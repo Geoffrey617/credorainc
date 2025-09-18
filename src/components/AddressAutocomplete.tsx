@@ -75,11 +75,8 @@ export default function AddressAutocomplete({
   const searchAddresses = async (query: string) => {
     try {
       const apiKey = process.env.NEXT_PUBLIC_HERE_API_KEY;
-      console.log('HERE API Key status:', apiKey ? 'Present' : 'Missing');
-      
       if (!apiKey) {
         console.warn('HERE API key not found in environment variables, using fallback suggestions');
-        console.log('Expected environment variable: NEXT_PUBLIC_HERE_API_KEY');
         // Fallback to mock suggestions if no API key
         setSuggestions([
           {
@@ -118,11 +115,7 @@ export default function AddressAutocomplete({
       }
 
       const url = `https://autosuggest.search.hereapi.com/v1/autosuggest?at=40.7128,-74.0060&limit=5&lang=en&q=${encodeURIComponent(query)}&apiKey=${apiKey}`;
-      console.log('Making HERE API request to:', url.replace(apiKey, 'HIDDEN_API_KEY'));
-      
       const response = await fetch(url);
-      
-      console.log('HERE API response status:', response.status);
       
       if (!response.ok) {
         const errorText = await response.text();
@@ -131,14 +124,10 @@ export default function AddressAutocomplete({
       }
       
       const data = await response.json();
-      console.log('HERE API response data:', data);
-      console.log('First item detailed structure:', data.items?.[0]);
       
       const addressSuggestions = data.items
         ?.filter((item: any) => item.resultType === 'houseNumber' || item.resultType === 'street' || item.resultType === 'locality')
         .map((item: any) => {
-          console.log('🔍 Processing item:', item);
-          console.log('📍 Address data from API:', item.address);
           
           // Parse HERE API response structure
           const addressData = item.address || {};
@@ -220,7 +209,8 @@ export default function AddressAutocomplete({
               label: item.title,
               countryCode: addressData.countryCode || 'USA',
               countryName: addressData.countryName || 'United States',
-              state: fullStateName,
+              state: stateAbbr, // Use abbreviation for form compatibility
+              stateName: fullStateName, // Keep full name for reference
               city: addressData.city || fallbackCity,
               street: streetAddress || fallbackStreet,
               postalCode: addressData.postalCode || fallbackZip
@@ -228,11 +218,8 @@ export default function AddressAutocomplete({
             position: item.position || { lat: 0, lng: 0 }
           };
           
-          console.log('✅ Final processed item:', processedItem);
           return processedItem;
         }) || [];
-      
-      console.log('Processed address suggestions:', addressSuggestions);
       setSuggestions(addressSuggestions);
     } catch (error) {
       console.error('Error fetching address suggestions:', error);
@@ -275,16 +262,20 @@ export default function AddressAutocomplete({
     const addressData = {
       street: streetAddress,
       city: suggestion.address.city,
-      state: suggestion.address.state,
+      state: suggestion.address.state, // This is now the abbreviation (e.g., "NY")
+      stateName: suggestion.address.stateName, // This is the full name (e.g., "New York")
       zipCode: suggestion.address.postalCode,
       country: suggestion.address.countryName,
       fullAddress: suggestion.address.label,
       coordinates: suggestion.position
     };
     
-    console.log('🏠 Address selected - Street only for input:', streetAddress);
-    console.log('📍 Full address data being passed to onAddressSelect:', addressData);
-    console.log('🔍 Original suggestion data:', suggestion);
+    // Address data is now properly parsed and ready to use
+    console.log('🏛️ State data being passed:', {
+      stateAbbr: suggestion.address.state,
+      stateName: suggestion.address.stateName,
+      expectedDropdownValue: suggestion.address.state
+    });
     
     // Pass structured address data to onAddressSelect
     onAddressSelect?.(addressData);
