@@ -75,8 +75,11 @@ export default function AddressAutocomplete({
   const searchAddresses = async (query: string) => {
     try {
       const apiKey = process.env.NEXT_PUBLIC_HERE_API_KEY;
+      console.log('HERE API Key status:', apiKey ? 'Present' : 'Missing');
+      
       if (!apiKey) {
-        console.warn('HERE API key not found, using fallback suggestions');
+        console.warn('HERE API key not found in environment variables, using fallback suggestions');
+        console.log('Expected environment variable: NEXT_PUBLIC_HERE_API_KEY');
         // Fallback to mock suggestions if no API key
         setSuggestions([
           {
@@ -114,23 +117,39 @@ export default function AddressAutocomplete({
         return;
       }
 
-      const response = await fetch(
-        `https://autosuggest.search.hereapi.com/v1/autosuggest?at=40.7128,-74.0060&limit=5&lang=en&q=${encodeURIComponent(query)}&apiKey=${apiKey}`
-      );
+      const url = `https://autosuggest.search.hereapi.com/v1/autosuggest?at=40.7128,-74.0060&limit=5&lang=en&q=${encodeURIComponent(query)}&apiKey=${apiKey}`;
+      console.log('Making HERE API request to:', url.replace(apiKey, 'HIDDEN_API_KEY'));
+      
+      const response = await fetch(url);
+      
+      console.log('HERE API response status:', response.status);
       
       if (!response.ok) {
-        throw new Error('HERE API request failed');
+        const errorText = await response.text();
+        console.error('HERE API error response:', errorText);
+        throw new Error(`HERE API request failed with status ${response.status}: ${errorText}`);
       }
       
       const data = await response.json();
+      console.log('HERE API response data:', data);
+      
       const addressSuggestions = data.items
-        .filter((item: any) => item.resultType === 'houseNumber' || item.resultType === 'street')
+        ?.filter((item: any) => item.resultType === 'houseNumber' || item.resultType === 'street' || item.resultType === 'locality')
         .map((item: any) => ({
           title: item.title,
-          address: item.address,
-          position: item.position
-        }));
+          address: item.address || {
+            label: item.title,
+            countryCode: item.address?.countryCode || 'USA',
+            countryName: item.address?.countryName || 'United States',
+            state: item.address?.state || '',
+            city: item.address?.city || '',
+            street: item.address?.street || '',
+            postalCode: item.address?.postalCode || ''
+          },
+          position: item.position || { lat: 0, lng: 0 }
+        })) || [];
       
+      console.log('Processed address suggestions:', addressSuggestions);
       setSuggestions(addressSuggestions);
     } catch (error) {
       console.error('Error fetching address suggestions:', error);
