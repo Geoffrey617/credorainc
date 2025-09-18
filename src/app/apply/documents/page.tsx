@@ -288,60 +288,28 @@ export default function DocumentsPage() {
         storagePath
       });
 
-      // Try direct Storage upload first, fall back to API if needed
-      let uploadResult;
+      // Upload via API (primary method - bypasses RLS issues)
+      console.log('📤 Uploading via API with session context');
       
-      try {
-        console.log('📤 Attempting direct storage upload to path:', storagePath);
-        
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('application-documents')
-          .upload(storagePath, file, {
-            cacheControl: '3600',
-            upsert: true
-          });
+      const uploadFormData = new FormData();
+      uploadFormData.append('file', file);
+      uploadFormData.append('userId', userId);
+      uploadFormData.append('sessionId', sessionId);
+      uploadFormData.append('documentType', documentType);
 
-        if (uploadError) {
-          throw uploadError;
-        }
+      const response = await fetch('/api/upload-document', {
+        method: 'POST',
+        body: uploadFormData
+      });
 
-        // Get public URL
-        const { data: urlData } = supabase.storage
-          .from('application-documents')
-          .getPublicUrl(storagePath);
+      const result = await response.json();
 
-        uploadResult = {
-          filePath: uploadData.path,
-          fileUrl: urlData.publicUrl,
-          fileName: file.name
-        };
-
-        console.log('✅ Direct storage upload successful:', uploadData.path);
-        
-      } catch (storageError: any) {
-        console.warn('⚠️ Direct storage upload failed, falling back to API:', storageError.message);
-        
-        // Fall back to existing API approach with session context
-        const uploadFormData = new FormData();
-        uploadFormData.append('file', file);
-        uploadFormData.append('userId', userId);
-        uploadFormData.append('sessionId', sessionId); // Include session ID in API call
-        uploadFormData.append('documentType', documentType);
-
-        const response = await fetch('/api/upload-document', {
-          method: 'POST',
-          body: uploadFormData
-        });
-
-        const result = await response.json();
-
-        if (!response.ok) {
-          throw new Error(result.error || 'API upload failed');
-        }
-
-        uploadResult = result;
-        console.log('✅ API upload successful:', result.fileName);
+      if (!response.ok) {
+        console.error('🚨 API upload failed:', result);
+        throw new Error(result.error || 'Upload failed');
       }
+
+      console.log('✅ API upload successful:', result.fileName);
       
       // Update form data with uploaded file info
       setFormData(prev => ({
