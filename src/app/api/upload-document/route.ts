@@ -10,12 +10,22 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 export async function POST(request: NextRequest) {
+  console.log('🚀 Upload document API called');
+  
   try {
     const formData = await request.formData();
     const file = formData.get('file') as File;
     const userId = formData.get('userId') as string;
     const sessionId = formData.get('sessionId') as string;
     const documentType = formData.get('documentType') as string;
+    
+    console.log('📝 Received parameters:', { 
+      fileName: file?.name, 
+      userId, 
+      sessionId, 
+      documentType,
+      fileSize: file?.size 
+    });
     
     if (!file || !userId || !documentType || !sessionId) {
       return NextResponse.json(
