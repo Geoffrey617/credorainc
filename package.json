@@ -49,8 +49,8 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
     "@types/node": "^20",
-    "eslint": "^8.57.1",
-    "eslint-config-next": "15.4.6",
+    "eslint": "^9.35.0",
+    "eslint-config-next": "^15.4.6",
     "prettier": "^3.4.2",
     "prettier-plugin-tailwindcss": "^0.6.9",
     "typescript": "^5"

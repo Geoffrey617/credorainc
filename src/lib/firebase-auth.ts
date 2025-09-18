@@ -13,9 +13,9 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase only on client side
-let app;
-let auth;
-let googleProvider;
+let app: any;
+let auth: any;
+let googleProvider: any;
 
 if (typeof window !== 'undefined') {
   // Client-side initialization
