@@ -1,25 +1,37 @@
 // Firebase authentication utilities
-import { initializeApp } from 'firebase/app';
+import { initializeApp, getApps } from 'firebase/app';
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut as firebaseSignOut, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 
 // Firebase config - replace with your actual config
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || 'demo-key',
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || 'demo-project.firebaseapp.com',
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'demo-project',
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || 'demo-project.appspot.com',
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '123456789',
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || '1:123456789:web:abcdef'
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
+// Initialize Firebase only on client side
+let app;
+let auth;
+let googleProvider;
 
-// Google Auth Provider
-const googleProvider = new GoogleAuthProvider();
+if (typeof window !== 'undefined') {
+  // Client-side initialization
+  app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+  auth = getAuth(app);
+  googleProvider = new GoogleAuthProvider();
+}
 
 export const signInWithEmail = async (email: string, password: string) => {
+  if (typeof window === 'undefined' || !auth) {
+    return {
+      user: null,
+      error: 'Firebase not available on server side',
+    };
+  }
+  
   try {
     const result = await signInWithEmailAndPassword(auth, email, password);
     return {
@@ -40,6 +52,13 @@ export const signInWithEmail = async (email: string, password: string) => {
 };
 
 export const signUpWithEmail = async (email: string, password: string) => {
+  if (typeof window === 'undefined' || !auth) {
+    return {
+      user: null,
+      error: 'Firebase not available on server side',
+    };
+  }
+  
   try {
     const result = await createUserWithEmailAndPassword(auth, email, password);
     return {
@@ -60,6 +79,10 @@ export const signUpWithEmail = async (email: string, password: string) => {
 };
 
 export const signOut = async () => {
+  if (typeof window === 'undefined' || !auth) {
+    return { error: 'Firebase not available on server side' };
+  }
+  
   try {
     await firebaseSignOut(auth);
     return { error: null };
@@ -69,6 +92,13 @@ export const signOut = async () => {
 };
 
 export const signInWithGoogle = async () => {
+  if (typeof window === 'undefined' || !auth || !googleProvider) {
+    return {
+      user: null,
+      error: 'Firebase not available on server side',
+    };
+  }
+  
   try {
     const result = await signInWithPopup(auth, googleProvider);
     const user = result.user;

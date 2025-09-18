@@ -14,6 +14,11 @@ export default function SignInPage() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
   const [showPassword, setShowPassword] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -25,6 +30,11 @@ export default function SignInPage() {
   };
 
   const handleSocialSignIn = async () => {
+    if (!isClient) {
+      setError('Please wait for the page to load completely.');
+      return;
+    }
+    
     setIsLoading(true);
     setError('');
     
