@@ -111,26 +111,24 @@ export default function SignUpPage() {
     }
 
     try {
-      // Register user via API
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          email: formData.email,
-          password: formData.password,
-          userType: 'tenant' // Default to tenant, landlords have separate signup
-        }),
-      });
+      // Use client-side Supabase authentication for static export compatibility
+      const { signUpWithEmail } = await import('../../../lib/firebase-auth');
+      const result = await signUpWithEmail(formData.email, formData.password);
 
-      const result = await response.json();
-
-      if (!response.ok) {
+      if (result.error || !result.user) {
         throw new Error(result.error || 'Account creation failed');
       }
+
+      // Store user data in localStorage
+      const userData = {
+        ...result.user,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        userType: 'tenant'
+      };
+      
+      localStorage.setItem('credora_user', JSON.stringify(userData));
+      localStorage.setItem('credora_session', 'firebase_session');
 
       console.log('✅ User registered successfully:', result.user?.email);
       
