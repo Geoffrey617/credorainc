@@ -86,12 +86,19 @@ export async function POST(request: NextRequest) {
           .from('applications')
           .update({ 
             documents: updatedDocuments,
+            session_id: sessionId,
             updated_at: new Date().toISOString()
           })
           .eq('id', existingApp.id);
           
         if (updateError) {
-          console.error('Database update error:', updateError);
+          console.error('🚨 Database update error details:', {
+            message: updateError.message,
+            details: updateError.details,
+            hint: updateError.hint,
+            code: updateError.code
+          });
+          throw new Error(`Database update failed: ${updateError.message}`);
         }
 
         console.log('📄 Updated existing application with document');
@@ -108,7 +115,13 @@ export async function POST(request: NextRequest) {
           });
           
         if (insertError) {
-          console.error('Database insert error:', insertError);
+          console.error('🚨 Database insert error details:', {
+            message: insertError.message,
+            details: insertError.details,
+            hint: insertError.hint,
+            code: insertError.code
+          });
+          throw new Error(`Database insert failed: ${insertError.message}`);
         }
 
         console.log('📄 Created new application with document');
