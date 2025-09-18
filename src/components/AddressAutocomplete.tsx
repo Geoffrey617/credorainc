@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 interface AddressAutocompleteProps {
   value?: string;
@@ -8,6 +8,25 @@ interface AddressAutocompleteProps {
   placeholder?: string;
   className?: string;
   error?: string;
+}
+
+interface HereSuggestion {
+  title: string;
+  address: {
+    label: string;
+    countryCode: string;
+    countryName: string;
+    state: string;
+    county: string;
+    city: string;
+    district: string;
+    street: string;
+    postalCode: string;
+  };
+  position: {
+    lat: number;
+    lng: number;
+  };
 }
 
 export default function AddressAutocomplete({ 
@@ -20,7 +39,9 @@ export default function AddressAutocomplete({
   error
 }: AddressAutocompleteProps) {
   const [internalValue, setInternalValue] = useState('');
-  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [suggestions, setSuggestions] = useState<HereSuggestion[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const debounceRef = useRef<NodeJS.Timeout>();
 
   // Use external value if provided, otherwise use internal state
   const value = externalValue !== undefined ? externalValue : internalValue;
@@ -34,29 +55,140 @@ export default function AddressAutocomplete({
       setInternalValue(inputValue);
     }
     
-    // Simple mock suggestions - in real app would use Google Places API
+    // Clear previous debounce timeout
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+    }
+    
+    // Debounce API calls
     if (inputValue.length > 2) {
-      setSuggestions([
-        `${inputValue} Street, New York, NY`,
-        `${inputValue} Avenue, Los Angeles, CA`,
-        `${inputValue} Boulevard, Chicago, IL`
-      ]);
+      setIsLoading(true);
+      debounceRef.current = setTimeout(() => {
+        searchAddresses(inputValue);
+      }, 300);
     } else {
       setSuggestions([]);
+      setIsLoading(false);
     }
   };
 
-  const handleSelect = (address: string) => {
+  const searchAddresses = async (query: string) => {
+    try {
+      const apiKey = process.env.NEXT_PUBLIC_HERE_API_KEY;
+      if (!apiKey) {
+        console.warn('HERE API key not found, using fallback suggestions');
+        // Fallback to mock suggestions if no API key
+        setSuggestions([
+          {
+            title: `${query} Street, New York, NY`,
+            address: {
+              label: `${query} Street, New York, NY 10001, United States`,
+              countryCode: 'USA',
+              countryName: 'United States',
+              state: 'New York',
+              county: 'New York County',
+              city: 'New York',
+              district: 'Manhattan',
+              street: `${query} Street`,
+              postalCode: '10001'
+            },
+            position: { lat: 40.7128, lng: -74.0060 }
+          },
+          {
+            title: `${query} Avenue, Los Angeles, CA`,
+            address: {
+              label: `${query} Avenue, Los Angeles, CA 90210, United States`,
+              countryCode: 'USA',
+              countryName: 'United States',
+              state: 'California',
+              county: 'Los Angeles County',
+              city: 'Los Angeles',
+              district: 'Beverly Hills',
+              street: `${query} Avenue`,
+              postalCode: '90210'
+            },
+            position: { lat: 34.0522, lng: -118.2437 }
+          }
+        ]);
+        setIsLoading(false);
+        return;
+      }
+
+      const response = await fetch(
+        `https://autosuggest.search.hereapi.com/v1/autosuggest?at=40.7128,-74.0060&limit=5&lang=en&q=${encodeURIComponent(query)}&apiKey=${apiKey}`
+      );
+      
+      if (!response.ok) {
+        throw new Error('HERE API request failed');
+      }
+      
+      const data = await response.json();
+      const addressSuggestions = data.items
+        .filter((item: any) => item.resultType === 'houseNumber' || item.resultType === 'street')
+        .map((item: any) => ({
+          title: item.title,
+          address: item.address,
+          position: item.position
+        }));
+      
+      setSuggestions(addressSuggestions);
+    } catch (error) {
+      console.error('Error fetching address suggestions:', error);
+      // Fallback to mock suggestions on error
+      setSuggestions([
+        {
+          title: `${query} Street, New York, NY`,
+          address: {
+            label: `${query} Street, New York, NY 10001, United States`,
+            countryCode: 'USA',
+            countryName: 'United States',
+            state: 'New York',
+            county: 'New York County',
+            city: 'New York',
+            district: 'Manhattan',
+            street: `${query} Street`,
+            postalCode: '10001'
+          },
+          position: { lat: 40.7128, lng: -74.0060 }
+        }
+      ]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSelect = (suggestion: HereSuggestion) => {
+    const addressText = suggestion.title;
+    
     if (externalValue !== undefined) {
-      onChange?.(address);
+      onChange?.(addressText);
     } else {
-      setInternalValue(address);
+      setInternalValue(addressText);
     }
     
     setSuggestions([]);
-    onSelect?.(address);
-    onAddressSelect?.({ street: address });
+    onSelect?.(addressText);
+    
+    // Pass structured address data to onAddressSelect
+    onAddressSelect?.({
+      street: suggestion.address.street || addressText,
+      city: suggestion.address.city,
+      state: suggestion.address.state,
+      zipCode: suggestion.address.postalCode,
+      country: suggestion.address.countryName,
+      fullAddress: suggestion.address.label,
+      coordinates: suggestion.position
+    });
   };
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
+      }
+    };
+  }, []);
 
   return (
     <div className={`relative ${className}`}>
@@ -65,8 +197,8 @@ export default function AddressAutocomplete({
         value={value}
         onChange={handleInputChange}
         placeholder={placeholder}
-        className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-          error ? 'border-red-300 focus:ring-red-500' : 'border-gray-300'
+        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-slate-900 bg-white placeholder-slate-500 ${
+          error ? 'border-red-300 focus:ring-red-500' : 'border-slate-300'
         }`}
       />
       
@@ -74,15 +206,24 @@ export default function AddressAutocomplete({
         <p className="mt-1 text-sm text-red-600">{error}</p>
       )}
       
+      {isLoading && (
+        <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
+        </div>
+      )}
+      
       {suggestions.length > 0 && (
-        <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg">
+        <div className="absolute z-50 w-full mt-1 bg-white border border-slate-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
           {suggestions.map((suggestion, index) => (
             <button
               key={index}
               onClick={() => handleSelect(suggestion)}
-              className="w-full px-4 py-2 text-left hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+              className="w-full px-4 py-3 text-left hover:bg-slate-50 focus:bg-slate-50 focus:outline-none border-b border-slate-100 last:border-b-0 text-slate-900"
             >
-              {suggestion}
+              <div className="font-medium">{suggestion.title}</div>
+              {suggestion.address.label !== suggestion.title && (
+                <div className="text-sm text-slate-500 mt-1">{suggestion.address.label}</div>
+              )}
             </button>
           ))}
         </div>
