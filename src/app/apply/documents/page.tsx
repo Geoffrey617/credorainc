@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSimpleAuth } from '../../../hooks/useSimpleAuth';
 import { 
   ChevronRightIcon, 
   CheckCircleIcon, 
@@ -79,6 +80,7 @@ interface FormData {
 
 export default function DocumentsPage() {
   const router = useRouter();
+  const { user: authUser, isAuthenticated, isLoading: authLoading } = useSimpleAuth();
   const [formData, setFormData] = useState<FormData>({
     employmentStatus: '',
     citizenshipStatus: '',
@@ -107,13 +109,10 @@ export default function DocumentsPage() {
         }));
       }
       
-      // Load documents from database
-      const userData = localStorage.getItem('credora_user');
-      const user = userData ? JSON.parse(userData) : null;
-      
-      if (user?.id) {
+      // Load documents from database if user is authenticated
+      if (authUser?.id) {
         try {
-          const response = await fetch(`/api/applications?userId=${user.id}`);
+          const response = await fetch(`/api/applications?userId=${authUser.id}`);
           const result = await response.json();
           
           if (response.ok && result.applications && result.applications.length > 0) {
@@ -170,11 +169,8 @@ export default function DocumentsPage() {
     setErrors(prev => ({ ...prev, [fileType]: '' }));
 
     try {
-      // Get user ID from localStorage
-      const userData = localStorage.getItem('credora_user');
-      const user = userData ? JSON.parse(userData) : null;
-      
-      if (!user?.id) {
+      // Check authentication
+      if (!authUser?.id) {
         alert('Please sign in to upload documents');
         return;
       }
@@ -182,7 +178,7 @@ export default function DocumentsPage() {
       // Upload to Supabase via API
       const uploadFormData = new FormData();
       uploadFormData.append('file', file);
-      uploadFormData.append('userId', user.id);
+      uploadFormData.append('userId', authUser.id);
       uploadFormData.append('documentType', fileType.replace('File', ''));
 
       const response = await fetch('/api/upload-document', {
@@ -203,12 +199,9 @@ export default function DocumentsPage() {
       }));
 
       // Save document info to database
-      const userDataString = localStorage.getItem('credora_user');
-      const currentUser = userDataString ? JSON.parse(userDataString) : null;
-      
-      if (currentUser?.id) {
+      if (authUser?.id) {
         const documentData = {
-          userId: currentUser.id,
+          userId: authUser.id,
           documents: {
             [fileType.replace('File', '')]: {
               name: file.name,
@@ -277,13 +270,10 @@ export default function DocumentsPage() {
     }));
     
     // Remove from database
-    const userDataString = localStorage.getItem('credora_user');
-    const currentUser = userDataString ? JSON.parse(userDataString) : null;
-    
-    if (currentUser?.id) {
+    if (authUser?.id) {
       try {
         const documentData = {
-          userId: currentUser.id,
+          userId: authUser.id,
           documents: {
             [fileType.replace('File', '')]: null // Set to null to remove
           }
@@ -385,6 +375,33 @@ export default function DocumentsPage() {
   const prevStep = () => {
     router.push('/apply/rental');
   };
+
+  // Authentication guards
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (!authLoading && !isAuthenticated) {
+        console.log('🚫 Not authenticated after timeout, redirecting to sign in');
+        router.push('/auth/signin');
+      }
+    }, 500); // 500ms delay to allow auth state to stabilize
+
+    return () => clearTimeout(timeoutId);
+  }, [isAuthenticated, authLoading, router]);
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-slate-700 mx-auto"></div>
+          <p className="mt-4 text-slate-600">Loading documents...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!authUser) {
+    return null; // Will redirect to sign in
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-100 to-slate-200 pt-8">
