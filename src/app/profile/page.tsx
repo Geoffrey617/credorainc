@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSimpleAuth } from '../../hooks/useSimpleAuth';
 
 interface User {
   email: string;
@@ -12,8 +13,7 @@ interface User {
 
 export default function ProfilePage() {
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { user: authUser, isAuthenticated, isLoading: authLoading } = useSimpleAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     firstName: '',
@@ -27,26 +27,28 @@ export default function ProfilePage() {
   });
 
   useEffect(() => {
-    // Check if user is signed in
-    const userData = localStorage.getItem('credora_user') || localStorage.getItem('credora_verified_user');
-    if (userData) {
-      const parsedUser = JSON.parse(userData);
-      setUser(parsedUser);
-      setFormData({
-        firstName: parsedUser.firstName || '',
-        lastName: parsedUser.lastName || '',
-        email: parsedUser.email || '',
-        phone: parsedUser.phone || '',
-        address: parsedUser.address || '',
-        city: parsedUser.city || '',
-        state: parsedUser.state || '',
-        zipCode: parsedUser.zipCode || ''
-      });
-    } else {
-      router.push('/auth/signin');
-    }
-    setIsLoading(false);
-  }, [router]);
+    // Add a small delay to prevent race conditions
+    const timeoutId = setTimeout(() => {
+      if (!authLoading && !isAuthenticated) {
+        console.log('🚫 Not authenticated after timeout, redirecting to sign in');
+        router.push('/auth/signin');
+      } else if (authUser) {
+        // Load user data into form
+        setFormData({
+          firstName: (authUser as any)?.firstName || authUser.name?.split(' ')[0] || '',
+          lastName: (authUser as any)?.lastName || authUser.name?.split(' ')[1] || '',
+          email: authUser.email || '',
+          phone: (authUser as any)?.phone || '',
+          address: (authUser as any)?.address || '',
+          city: (authUser as any)?.city || '',
+          state: (authUser as any)?.state || '',
+          zipCode: (authUser as any)?.zipCode || ''
+        });
+      }
+    }, 500); // 500ms delay to allow auth state to stabilize
+
+    return () => clearTimeout(timeoutId);
+  }, [isAuthenticated, authLoading, authUser, router]);
 
   const handleSave = () => {
     if (user) {
@@ -81,7 +83,7 @@ export default function ProfilePage() {
     setIsEditing(false);
   };
 
-  if (isLoading) {
+  if (authLoading) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center">
@@ -92,7 +94,7 @@ export default function ProfilePage() {
     );
   }
 
-  if (!user) {
+  if (!authUser) {
     return null; // Will redirect to sign in
   }
 

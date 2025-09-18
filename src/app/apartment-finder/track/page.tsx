@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useSimpleAuth } from '../../../hooks/useSimpleAuth';
 
 interface User {
   email: string;
@@ -43,24 +44,22 @@ interface ApartmentFinderRequest {
 
 export default function ApartmentFinderTrackPage() {
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { user: authUser, isAuthenticated, isLoading: authLoading } = useSimpleAuth();
   const [requests, setRequests] = useState<ApartmentFinderRequest[]>([]);
 
   useEffect(() => {
-    // Check if user is signed in
-    const userData = localStorage.getItem('credora_user');
-    const verifiedUserData = localStorage.getItem('credora_verified_user');
-    
-    if (userData || verifiedUserData) {
-      const user = JSON.parse(userData || verifiedUserData || '{}');
-      setUser(user);
-      loadRequests(user.email);
-    } else {
-      router.push('/auth/signin');
-    }
-    setIsLoading(false);
-  }, [router]);
+    // Add a small delay to prevent race conditions
+    const timeoutId = setTimeout(() => {
+      if (!authLoading && !isAuthenticated) {
+        console.log('🚫 Not authenticated after timeout, redirecting to sign in');
+        router.push('/auth/signin');
+      } else if (authUser?.email) {
+        loadRequests(authUser.email);
+      }
+    }, 500); // 500ms delay to allow auth state to stabilize
+
+    return () => clearTimeout(timeoutId);
+  }, [isAuthenticated, authLoading, authUser, router]);
 
   const loadRequests = async (userEmail: string) => {
     try {
@@ -156,7 +155,7 @@ export default function ApartmentFinderTrackPage() {
     return `$${budget.min.toLocaleString()} - $${budget.max.toLocaleString()}`;
   };
 
-  if (isLoading) {
+  if (authLoading) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center">
@@ -167,7 +166,7 @@ export default function ApartmentFinderTrackPage() {
     );
   }
 
-  if (!user) {
+  if (!authUser) {
     return null;
   }
 

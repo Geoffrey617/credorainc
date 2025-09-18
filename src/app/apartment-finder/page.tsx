@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSimpleAuth } from '../../hooks/useSimpleAuth';
 import Link from 'next/link';
 
 interface User {
@@ -35,8 +36,7 @@ interface ApartmentFinderRequest {
 
 export default function ApartmentFinderPage() {
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { user: authUser, isAuthenticated, isLoading: authLoading } = useSimpleAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
@@ -79,18 +79,16 @@ export default function ApartmentFinderPage() {
   });
 
   useEffect(() => {
-    // Check if user is signed in
-    const userData = localStorage.getItem('credora_user');
-    const verifiedUserData = localStorage.getItem('credora_verified_user');
-    
-    if (userData || verifiedUserData) {
-      const user = JSON.parse(userData || verifiedUserData || '{}');
-      setUser(user);
-    } else {
-      router.push('/auth/signin');
-    }
-    setIsLoading(false);
-  }, [router]);
+    // Add a small delay to prevent race conditions
+    const timeoutId = setTimeout(() => {
+      if (!authLoading && !isAuthenticated) {
+        console.log('🚫 Not authenticated after timeout, redirecting to sign in');
+        router.push('/auth/signin');
+      }
+    }, 500); // 500ms delay to allow auth state to stabilize
+
+    return () => clearTimeout(timeoutId);
+  }, [isAuthenticated, authLoading, router]);
 
   const handleLocationChange = (index: number, value: string) => {
     const newLocations = [...formData.preferredLocations];
@@ -161,7 +159,7 @@ export default function ApartmentFinderPage() {
     }
   };
 
-  if (isLoading) {
+  if (authLoading) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center">
@@ -172,7 +170,7 @@ export default function ApartmentFinderPage() {
     );
   }
 
-  if (!user) {
+  if (!authUser) {
     return null;
   }
 
