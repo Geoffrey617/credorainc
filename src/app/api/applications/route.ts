@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-export const dynamic = 'force-static';
+export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -103,6 +103,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('userId');
     const email = searchParams.get('email');
+    const sessionId = searchParams.get('sessionId');
     
     if (!userId && !email) {
       return NextResponse.json(
@@ -111,7 +112,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    console.log('🔍 Fetching applications for:', { userId, email });
+    console.log('🔍 Fetching applications for:', { userId, email, sessionId });
 
     let query = supabase.from('applications').select('*');
     

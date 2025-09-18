@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-export const dynamic = 'force-static';
+export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -14,18 +14,19 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData();
     const file = formData.get('file') as File;
     const userId = formData.get('userId') as string;
+    const sessionId = formData.get('sessionId') as string;
     const documentType = formData.get('documentType') as string;
     
-    if (!file || !userId || !documentType) {
+    if (!file || !userId || !documentType || !sessionId) {
       return NextResponse.json(
-        { error: 'File, userId, and documentType are required' },
+        { error: 'File, userId, sessionId, and documentType are required' },
         { status: 400 }
       );
     }
 
-    // Create unique filename
+    // Create session-based filename for consistency
     const fileExtension = file.name.split('.').pop();
-    const fileName = `${userId}/${documentType}_${Date.now()}.${fileExtension}`;
+    const fileName = `${sessionId}_${documentType}_${file.name}`;
 
     // Upload to Supabase Storage
     const { data, error } = await supabase.storage

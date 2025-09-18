@@ -124,8 +124,8 @@ export default function DocumentsPage() {
   const [dragOver, setDragOver] = useState<string | null>(null);
   const [uploadedDocuments, setUploadedDocuments] = useState<{[key: string]: any}>({});
 
-  // Load documents directly from Supabase Storage using session ID
-  const loadDocumentsFromStorage = async () => {
+  // Load documents from database (since API uploads save to database)
+  const loadDocumentsFromDatabase = async () => {
     // Get user ID from multiple sources
     let userId = authUser?.id;
     
@@ -152,67 +152,38 @@ export default function DocumentsPage() {
       return;
     }
     
-    // Get or create session ID for consistent pathing
+    // Get session ID for context
     const sessionId = getOrCreateSessionId();
-    const storageFolder = getStorageFolder(userId, sessionId);
     
     try {
-      console.log('📂 Loading documents from storage path:', storageFolder);
+      console.log('📂 Loading documents from database for user:', userId, 'session:', sessionId);
       
-      // List all files in the user's session folder
-      const { data: files, error } = await supabase.storage
-        .from('application-documents')
-        .list(storageFolder);
+      // Load from database where API uploads are saved
+      const response = await fetch(`/api/applications?userId=${userId}&sessionId=${sessionId}`);
+      const result = await response.json();
       
-      if (error) {
-        console.error('Storage error:', error);
-        return;
-      }
-      
-      if (!files || files.length === 0) {
-        console.log('📄 No documents found in storage for session:', sessionId);
-        return;
-      }
-      
-      console.log('📄 Files found in storage:', files.map(f => f.name));
-      
-      // Process files and categorize by document type
-      const documents: {[key: string]: any} = {};
-      
-      for (const file of files) {
-        // Determine document type from file path/name
-        if (file.name.includes('governmentId') || file.name.includes('government')) {
-          documents.governmentId = {
-            name: file.name,
-            size: file.metadata?.size || 0,
-            type: file.metadata?.mimetype || 'application/pdf',
-            storagePath: `${storageFolder}/${file.name}`,
-            uploadedAt: file.created_at
-          };
-        } else if (file.name.includes('incomeVerification') || file.name.includes('income')) {
-          documents.incomeVerification = {
-            name: file.name,
-            size: file.metadata?.size || 0,
-            type: file.metadata?.mimetype || 'application/pdf',
-            storagePath: `${storageFolder}/${file.name}`,
-            uploadedAt: file.created_at
-          };
-        } else if (file.name.includes('studentId') || file.name.includes('student')) {
-          documents.studentId = {
-            name: file.name,
-            size: file.metadata?.size || 0,
-            type: file.metadata?.mimetype || 'application/pdf',
-            storagePath: `${storageFolder}/${file.name}`,
-            uploadedAt: file.created_at
-          };
+      if (response.ok && result.applications && result.applications.length > 0) {
+        const latestApp = result.applications[0];
+        
+        if (latestApp.documents) {
+          console.log('📄 Documents found in database:', Object.keys(latestApp.documents));
+          console.log('📄 Document details:', latestApp.documents);
+          
+          // Store uploaded document info
+          setUploadedDocuments({
+            governmentId: latestApp.documents.governmentId,
+            incomeVerification: latestApp.documents.incomeVerification,
+            studentId: latestApp.documents.studentId
+          });
+        } else {
+          console.log('📄 No documents found in database application');
         }
+      } else {
+        console.log('📄 No applications found for user:', userId);
       }
-      
-      console.log('📄 Processed documents from storage:', Object.keys(documents));
-      setUploadedDocuments(documents);
       
     } catch (error) {
-      console.error('Error loading documents from storage:', error);
+      console.error('Error loading documents from database:', error);
     }
   };
 
@@ -231,8 +202,8 @@ export default function DocumentsPage() {
         }));
       }
       
-      // Load documents from Supabase Storage using session ID
-      await loadDocumentsFromStorage();
+      // Load documents from database using session ID
+      await loadDocumentsFromDatabase();
     };
     
     loadData();
@@ -380,8 +351,8 @@ export default function DocumentsPage() {
 
       console.log(`✅ Successfully uploaded ${fileType}:`, file.name);
       
-      // Refresh documents from storage to show the uploaded file
-      await loadDocumentsFromStorage();
+      // Refresh documents from database to show the uploaded file
+      await loadDocumentsFromDatabase();
     } catch (error) {
       console.error(`Error uploading ${fileType}:`, error);
       alert('Upload failed. Please try again.');
@@ -450,8 +421,8 @@ export default function DocumentsPage() {
           }
         }
         
-        // Refresh documents from storage
-        await loadDocumentsFromStorage();
+        // Refresh documents from database
+        await loadDocumentsFromDatabase();
       } catch (error) {
         console.error('Error removing document from storage:', error);
       }
