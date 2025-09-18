@@ -169,16 +169,55 @@ export default function DocumentsPage() {
     setErrors(prev => ({ ...prev, [fileType]: '' }));
 
     try {
-      // Check authentication
-      if (!authUser?.id) {
+      // Get user ID directly from storage if authUser is not ready
+      let userId = authUser?.id;
+      
+      if (!userId) {
+        // Try sessionStorage first (Google login)
+        const sessionData = sessionStorage.getItem('credora_session_temp');
+        if (sessionData) {
+          const session = JSON.parse(sessionData);
+          userId = session.user?.id || session.user?.uid;
+        }
+        
+        // Try localStorage as fallback (email login)
+        if (!userId) {
+          const localUser = localStorage.getItem('credora_user');
+          if (localUser) {
+            const user = JSON.parse(localUser);
+            userId = user.id || user.uid;
+          }
+        }
+      }
+      
+      if (!userId) {
         alert('Please sign in to upload documents');
+        router.push('/auth/signin');
         return;
       }
+      
+      // Get user data for API calls
+      let userData = authUser;
+      if (!userData) {
+        const sessionData = sessionStorage.getItem('credora_session_temp');
+        if (sessionData) {
+          const session = JSON.parse(sessionData);
+          userData = session.user;
+        } else {
+          const localUser = localStorage.getItem('credora_user');
+          if (localUser) {
+            userData = JSON.parse(localUser);
+          }
+        }
+      }
+
+      console.log('📤 Uploading document with user ID:', userId);
+      console.log('👤 User data for API:', userData?.email);
 
       // Upload to Supabase via API
       const uploadFormData = new FormData();
       uploadFormData.append('file', file);
-      uploadFormData.append('userId', authUser.id);
+      uploadFormData.append('userId', userId);
       uploadFormData.append('documentType', fileType.replace('File', ''));
 
       const response = await fetch('/api/upload-document', {
@@ -199,9 +238,8 @@ export default function DocumentsPage() {
       }));
 
       // Save document info to database
-      if (authUser?.id) {
-        const documentData = {
-          userId: authUser.id,
+      const documentData = {
+        userId: userId,
           documents: {
             [fileType.replace('File', '')]: {
               name: file.name,
@@ -230,10 +268,10 @@ export default function DocumentsPage() {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
-                userId: authUser.id,
-                firstName: authUser.firstName || authUser.name?.split(' ')[0] || '',
-                lastName: authUser.lastName || authUser.name?.split(' ')[1] || '',
-                email: authUser.email || '',
+                userId: userId,
+                firstName: userData?.firstName || userData?.name?.split(' ')[0] || '',
+                lastName: userData?.lastName || userData?.name?.split(' ')[1] || '',
+                email: userData?.email || '',
                 documents: {
                   [fileType.replace('File', '')]: {
                     name: file.name,
@@ -270,10 +308,31 @@ export default function DocumentsPage() {
     }));
     
     // Remove from database
-    if (authUser?.id) {
+    // Get user ID directly from storage if authUser is not ready
+    let userId = authUser?.id;
+    
+    if (!userId) {
+      // Try sessionStorage first (Google login)
+      const sessionData = sessionStorage.getItem('credora_session_temp');
+      if (sessionData) {
+        const session = JSON.parse(sessionData);
+        userId = session.user?.id || session.user?.uid;
+      }
+      
+      // Try localStorage as fallback (email login)  
+      if (!userId) {
+        const localUser = localStorage.getItem('credora_user');
+        if (localUser) {
+          const user = JSON.parse(localUser);
+          userId = user.id || user.uid;
+        }
+      }
+    }
+    
+    if (userId) {
       try {
         const documentData = {
-          userId: authUser.id,
+          userId: userId,
           documents: {
             [fileType.replace('File', '')]: null // Set to null to remove
           }
