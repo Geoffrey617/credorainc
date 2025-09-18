@@ -252,42 +252,41 @@ export default function DocumentsPage() {
         }
       };
 
-        // Save to database via applications API
-        try {
-          // First try to update existing application
-          const updateResponse = await fetch('/api/applications', {
-            method: 'PUT',
+      // Save to database via applications API
+      try {
+        // First try to update existing application
+        const updateResponse = await fetch('/api/applications', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(documentData)
+        });
+        
+        // If no application exists, create one
+        if (!updateResponse.ok) {
+          console.log('No existing application, creating new one');
+          await fetch('/api/applications', {
+            method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(documentData)
-          });
-          
-          // If no application exists, create one
-          if (!updateResponse.ok) {
-            console.log('No existing application, creating new one');
-            await fetch('/api/applications', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                userId: userId,
-                firstName: userData?.firstName || userData?.name?.split(' ')[0] || '',
-                lastName: userData?.lastName || userData?.name?.split(' ')[1] || '',
-                email: userData?.email || '',
-                documents: {
-                  [fileType.replace('File', '')]: {
-                    name: file.name,
-                    size: file.size,
-                    type: file.type,
-                    filePath: result.filePath,
-                    fileUrl: result.fileUrl,
-                    uploadedAt: new Date().toISOString()
-                  }
+            body: JSON.stringify({
+              userId: userId,
+              firstName: userData?.firstName || userData?.name?.split(' ')[0] || '',
+              lastName: userData?.lastName || userData?.name?.split(' ')[1] || '',
+              email: userData?.email || '',
+              documents: {
+                [fileType.replace('File', '')]: {
+                  name: file.name,
+                  size: file.size,
+                  type: file.type,
+                  filePath: result.filePath,
+                  fileUrl: result.fileUrl,
+                  uploadedAt: new Date().toISOString()
                 }
-              })
-            });
-          }
-        } catch (apiError) {
-          console.error('API error:', apiError);
+              }
+            })
+          });
         }
+      } catch (apiError) {
+        console.error('API error:', apiError);
       }
 
       console.log(`Successfully uploaded ${fileType}:`, result.fileName);
