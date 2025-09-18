@@ -135,19 +135,29 @@ export default function AddressAutocomplete({
       
       const addressSuggestions = data.items
         ?.filter((item: any) => item.resultType === 'houseNumber' || item.resultType === 'street' || item.resultType === 'locality')
-        .map((item: any) => ({
-          title: item.title,
-          address: item.address || {
-            label: item.title,
-            countryCode: item.address?.countryCode || 'USA',
-            countryName: item.address?.countryName || 'United States',
-            state: item.address?.state || '',
-            city: item.address?.city || '',
-            street: item.address?.street || '',
-            postalCode: item.address?.postalCode || ''
-          },
-          position: item.position || { lat: 0, lng: 0 }
-        })) || [];
+        .map((item: any) => {
+          // Parse HERE API response structure
+          const addressData = item.address || {};
+          
+          // Extract street address (house number + street name)
+          const houseNumber = addressData.houseNumber || '';
+          const streetName = addressData.street || '';
+          const streetAddress = `${houseNumber} ${streetName}`.trim();
+          
+          return {
+            title: item.title,
+            address: {
+              label: item.title,
+              countryCode: addressData.countryCode || 'USA',
+              countryName: addressData.countryName || 'United States',
+              state: addressData.state || addressData.stateCode || '',
+              city: addressData.city || '',
+              street: streetAddress || item.title.split(',')[0] || '', // Fallback to first part of title
+              postalCode: addressData.postalCode || ''
+            },
+            position: item.position || { lat: 0, lng: 0 }
+          };
+        }) || [];
       
       console.log('Processed address suggestions:', addressSuggestions);
       setSuggestions(addressSuggestions);
@@ -177,20 +187,28 @@ export default function AddressAutocomplete({
   };
 
   const handleSelect = (suggestion: HereSuggestion) => {
-    const addressText = suggestion.title;
+    // Use only the street address for the input field, not the full formatted address
+    const streetAddress = suggestion.address.street || suggestion.title.split(',')[0] || suggestion.title;
     
     if (externalValue !== undefined) {
-      onChange?.(addressText);
+      onChange?.(streetAddress);
     } else {
-      setInternalValue(addressText);
+      setInternalValue(streetAddress);
     }
     
     setSuggestions([]);
-    onSelect?.(addressText);
+    onSelect?.(streetAddress);
+    
+    console.log('Address selected:', {
+      street: streetAddress,
+      city: suggestion.address.city,
+      state: suggestion.address.state,
+      zipCode: suggestion.address.postalCode
+    });
     
     // Pass structured address data to onAddressSelect
     onAddressSelect?.({
-      street: suggestion.address.street || addressText,
+      street: streetAddress,
       city: suggestion.address.city,
       state: suggestion.address.state,
       zipCode: suggestion.address.postalCode,
