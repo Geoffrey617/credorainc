@@ -38,21 +38,39 @@ export async function POST(request: NextRequest) {
     const fileExtension = file.name.split('.').pop();
     const fileName = `${sessionId}_${documentType}_${file.name}`;
 
-    // Upload to Supabase Storage
+    console.log('📤 Starting storage upload to bucket: application-documents');
+    console.log('📁 Upload path:', fileName);
+
+    // Upload to Supabase Storage using service role (should bypass RLS)
     const { data, error } = await supabase.storage
       .from('application-documents')
       .upload(fileName, file, {
         cacheControl: '3600',
-        upsert: false
+        upsert: true // Allow overwrite to handle duplicates
       });
 
     if (error) {
-      console.error('Error uploading file:', error);
+      console.error('🚨 Storage upload error details:', {
+        message: error.message,
+        statusCode: error.statusCode,
+        error: error
+      });
+      
+      // Provide specific error guidance
+      if (error.message?.includes('row-level security')) {
+        console.error('🔒 RLS Policy blocking upload - Storage bucket needs policy update');
+      }
+      if (error.message?.includes('Bucket not found')) {
+        console.error('📦 Bucket not found - verify bucket name: application-documents');
+      }
+      
       return NextResponse.json(
-        { error: 'Failed to upload file' },
+        { error: `Storage upload failed: ${error.message}` },
         { status: 500 }
       );
     }
+    
+    console.log('✅ Storage upload successful:', data.path);
 
     // Get public URL
     const { data: urlData } = supabase.storage
