@@ -93,6 +93,7 @@ export default function DocumentsPage() {
   const [uploading, setUploading] = useState<{[key: string]: boolean}>({});
   const [completedSteps] = useState<string[]>(['personal', 'employment', 'rental']);
   const [dragOver, setDragOver] = useState<string | null>(null);
+  const [uploadedDocuments, setUploadedDocuments] = useState<{[key: string]: any}>({});
 
   // Separate function to load documents from database
   const loadDocumentsFromDatabase = async () => {
@@ -127,22 +128,15 @@ export default function DocumentsPage() {
           const latestApp = result.applications[0];
           
           if (latestApp.documents) {
-            const createFileObject = (docInfo: any) => {
-              if (!docInfo) return null;
-              return {
-                name: docInfo.name,
-                size: docInfo.size || 1024 * 1024,
-                type: docInfo.type || 'application/pdf'
-              } as File;
-            };
-            
             console.log('📄 Documents found in database:', Object.keys(latestApp.documents));
-            setFormData(prev => ({
-              ...prev,
-              governmentIdFile: createFileObject(latestApp.documents.governmentId),
-              incomeVerificationFile: createFileObject(latestApp.documents.incomeVerification),
-              studentIdFile: createFileObject(latestApp.documents.studentId),
-            }));
+            console.log('📄 Document details:', latestApp.documents);
+            
+            // Store uploaded document info separately
+            setUploadedDocuments({
+              governmentId: latestApp.documents.governmentId,
+              incomeVerification: latestApp.documents.incomeVerification,
+              studentId: latestApp.documents.studentId
+            });
           }
         }
       } catch (error) {
@@ -430,11 +424,16 @@ export default function DocumentsPage() {
   const validateDocuments = () => {
     const newErrors: {[key: string]: string} = {};
     
-    if (!formData.governmentIdFile) newErrors.governmentIdFile = 'Government ID is required';
-    if (!formData.incomeVerificationFile) newErrors.incomeVerificationFile = 'Income verification is required';
+    if (!formData.governmentIdFile && !uploadedDocuments.governmentId) {
+      newErrors.governmentIdFile = 'Government ID is required';
+    }
+    if (!formData.incomeVerificationFile && !uploadedDocuments.incomeVerification) {
+      newErrors.incomeVerificationFile = 'Income verification is required';
+    }
     
     // Student ID is required for students or international students
-    if ((formData.employmentStatus === 'student' || formData.citizenshipStatus === 'international_student') && !formData.studentIdFile) {
+    if ((formData.employmentStatus === 'student' || formData.citizenshipStatus === 'international_student') && 
+        !formData.studentIdFile && !uploadedDocuments.studentId) {
       newErrors.studentIdFile = 'Student ID is required';
     }
     
@@ -450,9 +449,9 @@ export default function DocumentsPage() {
       const updatedData = { 
         ...existingData, 
         documents: {
-          governmentId: formData.governmentIdFile?.name || '',
-          incomeVerification: formData.incomeVerificationFile?.name || '',
-          studentId: formData.studentIdFile?.name || ''
+          governmentId: formData.governmentIdFile?.name || uploadedDocuments.governmentId?.name || '',
+          incomeVerification: formData.incomeVerificationFile?.name || uploadedDocuments.incomeVerification?.name || '',
+          studentId: formData.studentIdFile?.name || uploadedDocuments.studentId?.name || ''
         }
       };
       localStorage.setItem('credora_application_form', JSON.stringify(updatedData));
@@ -538,7 +537,7 @@ export default function DocumentsPage() {
                     border-2 border-dashed rounded-xl p-8 text-center transition-all duration-200
                     ${dragOver === 'governmentId' 
                       ? 'border-gray-400 bg-gray-100' 
-                      : formData.governmentIdFile 
+                      : (formData.governmentIdFile || uploadedDocuments.governmentId)
                         ? 'border-green-300 bg-green-50'
                         : 'border-gray-300 hover:border-gray-400'
                     }
@@ -554,13 +553,22 @@ export default function DocumentsPage() {
                       </div>
                       <p className="text-slate-600 font-medium text-center">Uploading...</p>
                     </div>
-                  ) : formData.governmentIdFile ? (
+                  ) : formData.governmentIdFile || uploadedDocuments.governmentId ? (
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
                         <DocumentTextIcon className="w-8 h-8 text-green-600 mr-3" />
                         <div className="text-left">
-                          <p className="font-medium text-gray-900">{formData.governmentIdFile.name}</p>
-                          <p className="text-sm text-gray-500">{(formData.governmentIdFile.size / 1024 / 1024).toFixed(2)} MB</p>
+                          <p className="font-medium text-gray-900">
+                            {formData.governmentIdFile?.name || uploadedDocuments.governmentId?.name || 'Uploaded Document'}
+                          </p>
+                          <p className="text-sm text-gray-500">
+                            {formData.governmentIdFile 
+                              ? `${(formData.governmentIdFile.size / 1024 / 1024).toFixed(2)} MB`
+                              : uploadedDocuments.governmentId?.size 
+                                ? `${(uploadedDocuments.governmentId.size / 1024 / 1024).toFixed(2)} MB`
+                                : 'Uploaded'
+                            }
+                          </p>
                         </div>
                       </div>
                       <button
@@ -608,7 +616,7 @@ export default function DocumentsPage() {
                       border-2 border-dashed rounded-xl p-8 text-center transition-all duration-200
                       ${dragOver === 'studentId' 
                         ? 'border-gray-400 bg-gray-100' 
-                        : formData.studentIdFile 
+                        : (formData.studentIdFile || uploadedDocuments.studentId)
                           ? 'border-green-300 bg-green-50'
                           : 'border-gray-300 hover:border-gray-400'
                       }
@@ -624,13 +632,22 @@ export default function DocumentsPage() {
                         </div>
                         <p className="text-slate-600 font-medium text-center">Uploading...</p>
                       </div>
-                    ) : formData.studentIdFile ? (
+                    ) : formData.studentIdFile || uploadedDocuments.studentId ? (
                       <div className="flex items-center justify-between">
                         <div className="flex items-center">
                           <DocumentTextIcon className="w-8 h-8 text-green-600 mr-3" />
                           <div className="text-left">
-                            <p className="font-medium text-gray-900">{formData.studentIdFile.name}</p>
-                            <p className="text-sm text-gray-500">{(formData.studentIdFile.size / 1024 / 1024).toFixed(2)} MB</p>
+                            <p className="font-medium text-gray-900">
+                              {formData.studentIdFile?.name || uploadedDocuments.studentId?.name || 'Uploaded Document'}
+                            </p>
+                            <p className="text-sm text-gray-500">
+                              {formData.studentIdFile 
+                                ? `${(formData.studentIdFile.size / 1024 / 1024).toFixed(2)} MB`
+                                : uploadedDocuments.studentId?.size 
+                                  ? `${(uploadedDocuments.studentId.size / 1024 / 1024).toFixed(2)} MB`
+                                  : 'Uploaded'
+                              }
+                            </p>
                           </div>
                         </div>
                         <button
@@ -678,7 +695,7 @@ export default function DocumentsPage() {
                     border-2 border-dashed rounded-xl p-8 text-center transition-all duration-200
                     ${dragOver === 'incomeVerification' 
                       ? 'border-gray-400 bg-gray-100' 
-                      : formData.incomeVerificationFile 
+                      : (formData.incomeVerificationFile || uploadedDocuments.incomeVerification)
                         ? 'border-green-300 bg-green-50'
                         : 'border-gray-300 hover:border-gray-400'
                     }
@@ -694,13 +711,22 @@ export default function DocumentsPage() {
                       </div>
                       <p className="text-slate-600 font-medium text-center">Uploading...</p>
                     </div>
-                  ) : formData.incomeVerificationFile ? (
+                  ) : formData.incomeVerificationFile || uploadedDocuments.incomeVerification ? (
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
                         <DocumentTextIcon className="w-8 h-8 text-green-600 mr-3" />
                         <div className="text-left">
-                          <p className="font-medium text-gray-900">{formData.incomeVerificationFile.name}</p>
-                          <p className="text-sm text-gray-500">{(formData.incomeVerificationFile.size / 1024 / 1024).toFixed(2)} MB</p>
+                          <p className="font-medium text-gray-900">
+                            {formData.incomeVerificationFile?.name || uploadedDocuments.incomeVerification?.name || 'Uploaded Document'}
+                          </p>
+                          <p className="text-sm text-gray-500">
+                            {formData.incomeVerificationFile 
+                              ? `${(formData.incomeVerificationFile.size / 1024 / 1024).toFixed(2)} MB`
+                              : uploadedDocuments.incomeVerification?.size 
+                                ? `${(uploadedDocuments.incomeVerification.size / 1024 / 1024).toFixed(2)} MB`
+                                : 'Uploaded'
+                            }
+                          </p>
                         </div>
                       </div>
                       <button
