@@ -119,7 +119,7 @@ export function useSimpleAuth(): UseSimpleAuthReturn {
     }
   };
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
     console.log('🚪 Starting logout process...');
     
     // Clear user state
