@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSimpleAuth } from '../../../hooks/useSimpleAuth';
-import { secureDocumentUpload } from '../../../lib/onedrive-config';
+import { uploadSecureDocument } from '../../../lib/filestack-config';
 import { 
   ChevronRightIcon, 
   CheckCircleIcon, 
@@ -176,29 +176,34 @@ export default function DocumentsPage() {
         return;
       }
 
-      console.log('🛡️ Starting secure upload with OneDrive + ClamAV');
+      console.log('🛡️ Starting secure upload with Filestack virus scanning');
       
-      // Upload with OneDrive + ClamAV virus scanning (isolated from database)
-      const result = await secureDocumentUpload(
+      // Upload with Filestack (includes virus scanning and security checks)
+      const result = await uploadSecureDocument(
         file,
         fileType.replace('File', ''),
-        authUser.id,
-        (stage) => {
-          console.log(`📤 Upload stage: ${stage}`);
-          // You can add progress UI updates here if needed
+        (percentage) => {
+          console.log(`📤 Upload progress: ${percentage}%`);
+        },
+        (secureResult) => {
+          console.log('✅ Secure upload completed:', secureResult.filename);
+        },
+        (error) => {
+          console.error('🚨 Security error:', error.message);
         }
       );
       
-      // Update form data with OneDrive file info
+      // Update form data with Filestack secure file info
       setFormData(prev => ({
         ...prev,
         [fileType]: {
-          name: result.name,
-          oneDriveId: result.id,
+          name: result.filename,
+          handle: result.handle,
           url: result.url,
+          size: result.size,
+          type: result.mimetype,
           secure: true,
-          virusScanned: true,
-          clean: result.clean
+          virusScanned: true
         } as any
       }));
 
@@ -207,7 +212,7 @@ export default function DocumentsPage() {
         const documentData = {
           userId: authUser.id,
           document_file_ids: {
-            [fileType.replace('File', '')]: result.id // ONLY store OneDrive ID
+            [fileType.replace('File', '')]: result.handle // ONLY store Filestack handle
           },
           document_status: {
             [fileType.replace('File', '')]: 'uploaded' // Simple status tracking
@@ -252,7 +257,7 @@ export default function DocumentsPage() {
         }
       }
 
-      console.log(`✅ ${fileType} uploaded securely to OneDrive with ClamAV scanning:`, result.name);
+      console.log(`✅ ${fileType} uploaded securely to Filestack with virus scanning:`, result.filename);
     } catch (error: any) {
       console.error(`🚨 Secure upload failed for ${fileType}:`, error);
       
