@@ -36,31 +36,12 @@ export const uploadSecureDocument = async (
       documentType
     });
 
-    // Configure upload with security policies
-    const uploadOptions = {
-      accept: ['.pdf', '.jpg', '.jpeg', '.png', '.doc', '.docx'],
-      maxSize: documentType === 'incomeVerification' ? 100 * 1024 * 1024 : 10 * 1024 * 1024,
-      onProgress: (evt: any) => {
-        const percentage = Math.round((evt.totalPercent || 0));
-        console.log(`📤 Secure upload progress: ${percentage}%`);
-        onProgress?.(percentage);
-      },
-      onError: (error: any) => {
-        console.error('🚨 Upload error:', error);
-        onError?.(error);
-      }
-    };
-
-    // Upload with virus scanning and security checks
-    const result = await filestackClient.upload(file, uploadOptions);
+    // Simple direct upload - let Filestack handle the rest
+    console.log('🔄 Attempting Filestack upload...');
     
-    console.log('✅ Filestack upload successful with virus scanning:', {
-      handle: result.handle,
-      filename: result.filename,
-      url: result.url,
-      size: result.size,
-      mimetype: result.mimetype
-    });
+    const result = await filestackClient.upload(file);
+    
+    console.log('✅ Filestack upload successful:', result);
 
     // Return standardized result
     const secureResult = {
