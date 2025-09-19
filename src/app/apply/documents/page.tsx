@@ -235,19 +235,15 @@ export default function DocumentsPage() {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
-                userId: currentUser.id,
-                firstName: currentUser.firstName || '',
-                lastName: currentUser.lastName || '',
-                email: currentUser.email || '',
-                documents: {
-                  [fileType.replace('File', '')]: {
-                    name: file.name,
-                    size: file.size,
-                    type: file.type,
-                    filePath: result.filePath,
-                    fileUrl: result.fileUrl,
-                    uploadedAt: new Date().toISOString()
-                  }
+                userId: authUser.id,
+                firstName: authUser.firstName || authUser.name?.split(' ')[0] || '',
+                lastName: authUser.lastName || authUser.name?.split(' ')[1] || '',
+                email: authUser.email || '',
+                document_file_ids: {
+                  [fileType.replace('File', '')]: result.handle // Store Filestack handle
+                },
+                document_status: {
+                  [fileType.replace('File', '')]: 'uploaded'
                 }
               })
             });
