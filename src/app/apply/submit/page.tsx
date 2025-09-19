@@ -236,7 +236,7 @@ export default function SubmitPage() {
 
           const merchantSession = await response.json();
           session.completeMerchantValidation(merchantSession);
-        } catch (error) {
+        } catch (error: any) {
           console.error('🚨 Apple Pay merchant validation error:', error);
           session.abort();
           alert('Apple Pay setup failed. Please use card payment.');
@@ -277,10 +277,10 @@ export default function SubmitPage() {
           } else {
             throw new Error(paymentResult.error || 'Payment failed');
           }
-        } catch (error) {
+        } catch (error: any) {
           console.error('🚨 Apple Pay payment error:', error);
           session.completePayment(ApplePaySession.STATUS_FAILURE);
-          alert(`Payment failed: ${error.message}`);
+          alert(`Payment failed: ${error.message || error.toString()}`);
           setIsProcessing(false);
         }
       };
@@ -294,9 +294,9 @@ export default function SubmitPage() {
       // Start the Apple Pay session
       session.begin();
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('🚨 Apple Pay initialization error:', error);
-      alert(`Apple Pay failed: ${error.message}`);
+      alert(`Apple Pay failed: ${error.message || error.toString()}`);
       setIsProcessing(false);
     }
   };
