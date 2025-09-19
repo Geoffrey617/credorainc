@@ -41,16 +41,8 @@ function MobileApplePayContent() {
 
     // Auto-start Apple Pay if available
     if (typeof window !== 'undefined' && (window as any).ApplePaySession) {
-      // Check if this is a development environment
-      const isDevelopment = window.location.hostname === 'localhost' || 
-                           window.location.hostname.includes('netlify') ||
-                           window.location.hostname.includes('vercel');
-      
-      if (isDevelopment) {
-        setError('Apple Pay requires production environment with proper merchant certificates for Touch ID/Face ID authentication. Please use regular card payment for testing.');
-      } else {
-        startApplePay();
-      }
+      console.log('🍎 Apple Pay available, starting session...');
+      startApplePay();
     } else {
       setError('Apple Pay is not available on this device');
     }
