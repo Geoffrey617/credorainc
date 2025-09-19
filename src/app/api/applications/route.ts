@@ -169,9 +169,7 @@ export async function GET(request: NextRequest) {
     console.error('Error details:', {
       message: error.message,
       stack: error.stack,
-      name: error.name,
-      userId,
-      email
+      name: error.name
     });
     return NextResponse.json(
       { error: 'Internal server error', details: error.message },
@@ -256,8 +254,7 @@ export async function PUT(request: NextRequest) {
     console.error('Error details:', {
       message: error.message,
       stack: error.stack,
-      name: error.name,
-      userId
+      name: error.name
     });
     return NextResponse.json(
       { error: 'Internal server error', details: error.message },
