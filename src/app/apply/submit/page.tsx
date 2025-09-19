@@ -443,198 +443,26 @@ export default function SubmitPage() {
 
               {/* Payment Form */}
               <div className="lg:col-span-2">
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  {/* Stripe Apple Pay Button - Only show on Safari desktop */}
-                  {isSafariDesktop && (
-                    <StripeApplePayButton
-                      amount={STRIPE_CONFIG.applicationFee} // 5500 cents = $55.00
-                      customerEmail={formData.email}
-                      customerName={`${formData.firstName} ${formData.lastName}`}
-                      onSuccess={() => {
-                        console.log('✅ Stripe Apple Pay payment successful!');
-                        // Clear form data and redirect to success
-                        localStorage.removeItem('credora_application_form');
-                        router.push('/apply/success');
-                      }}
-                      onError={(error) => {
-                        console.error('🚨 Stripe Apple Pay error:', error);
-                        alert(`Apple Pay failed: ${error}`);
-                      }}
-                      disabled={isProcessing}
-                    />
-                  )}
+                <div className="space-y-6">
+                  {/* Stripe Payment Element - Handles Apple Pay + Cards */}
+                  <StripeApplePayButton
+                    amount={STRIPE_CONFIG.applicationFee} // 5500 cents = $55.00
+                    customerEmail={formData.email}
+                    customerName={`${formData.firstName} ${formData.lastName}`}
+                    onSuccess={() => {
+                      console.log('✅ Stripe payment successful!');
+                      // Clear form data and redirect to success
+                      localStorage.removeItem('credora_application_form');
+                      router.push('/apply/success');
+                    }}
+                    onError={(error) => {
+                      console.error('🚨 Stripe payment error:', error);
+                      alert(`Payment failed: ${error}`);
+                    }}
+                    disabled={isProcessing}
+                  />
 
-                  {/* Card Information */}
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">{isSafariDesktop ? 'Card Information' : 'Payment Information'}</h3>
-                    
-                    <div className="space-y-4">
-                      <div className="space-y-2">
-                        <label htmlFor="cardholderName" className="block text-sm font-semibold text-gray-700">
-                          Cardholder Name *
-                        </label>
-                        <input
-                          type="text"
-                          id="cardholderName"
-                          name="cardholderName"
-                          value={paymentData.cardholderName}
-                          onChange={handleInputChange}
-                          className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-gray-500 focus:ring-2 focus:ring-gray-500 focus:ring-opacity-20 transition-all duration-200 bg-white hover:border-gray-400 text-gray-900 placeholder-gray-500 font-sans"
-                          placeholder="John Doe"
-                          required
-                        />
-                      </div>
 
-                      <div className="space-y-2">
-                        <label htmlFor="cardNumber" className="block text-sm font-semibold text-gray-700 mb-2">
-                          Card Number *
-                        </label>
-                        <div className="relative">
-                          <input
-                            type="text"
-                            id="cardNumber"
-                            name="cardNumber"
-                            value={paymentData.cardNumber}
-                            onChange={handleInputChange}
-                            className="w-full px-4 py-3 pr-32 border-2 border-gray-300 rounded-xl focus:border-gray-500 focus:ring-2 focus:ring-gray-500 focus:ring-opacity-20 transition-all duration-200 bg-white hover:border-gray-400 text-gray-900 placeholder-gray-500 font-sans"
-                            placeholder="1234 5678 9012 3456"
-                            required
-                          />
-                          {/* Card Provider Logos - Inside Input */}
-                          <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-1">
-                            {detectedCardType.logoPath ? (
-                              /* Show detected card logo */
-                              <img
-                                src={detectedCardType.logoPath}
-                                alt={`${detectedCardType.type} logo`}
-                                className="h-6 w-auto object-contain transition-opacity duration-200"
-                                onError={(e) => {
-                                  e.currentTarget.style.display = 'none';
-                                }}
-                              />
-                            ) : (
-                              /* Show accepted cards when no card detected */
-                              <>
-                                <img src="/assets/logos/visa.png" alt="Visa" className="h-5 w-auto object-contain opacity-90" onError={(e) => e.currentTarget.style.display = 'none'} />
-                                <img src="/assets/logos/mastercard.png" alt="Mastercard" className="h-5 w-auto object-contain opacity-90" onError={(e) => e.currentTarget.style.display = 'none'} />
-                                <img src="/assets/logos/amex.png" alt="American Express" className="h-5 w-auto object-contain opacity-90" onError={(e) => e.currentTarget.style.display = 'none'} />
-                                <img src="/assets/logos/discover.png" alt="Discover" className="h-5 w-auto object-contain opacity-90" onError={(e) => e.currentTarget.style.display = 'none'} />
-                              </>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <label htmlFor="expiryDate" className="block text-sm font-semibold text-gray-700">
-                            Expiry Date *
-                          </label>
-                          <input
-                            type="text"
-                            id="expiryDate"
-                            name="expiryDate"
-                            value={paymentData.expiryDate}
-                            onChange={handleInputChange}
-                            className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-gray-500 focus:ring-2 focus:ring-gray-500 focus:ring-opacity-20 transition-all duration-200 bg-white hover:border-gray-400 text-gray-900 placeholder-gray-500 font-sans"
-                            placeholder="MM/YY"
-                            required
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <label htmlFor="cvv" className="block text-sm font-semibold text-gray-700">
-                            {detectedCardType.type === 'amex' ? 'CVC (4 digits) *' : 'CVV (3 digits) *'}
-                          </label>
-                          <input
-                            type="text"
-                            id="cvv"
-                            name="cvv"
-                            value={paymentData.cvv}
-                            onChange={handleInputChange}
-                            className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-gray-500 focus:ring-2 focus:ring-gray-500 focus:ring-opacity-20 transition-all duration-200 bg-white hover:border-gray-400 text-gray-900 placeholder-gray-500 font-sans"
-                            placeholder={detectedCardType.type === 'amex' ? '1234' : '123'}
-                            maxLength={detectedCardType.type === 'amex' ? 4 : 3}
-                            required
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Billing Address */}
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">Billing Address</h3>
-                    
-                    <div className="space-y-4">
-                      <div className="space-y-2">
-                        <label htmlFor="billingAddress" className="block text-sm font-semibold text-gray-700">
-                          Street Address *
-                        </label>
-                        <AddressAutocomplete
-                          value={paymentData.billingAddress}
-                          onChange={(value) => setPaymentData(prev => ({ ...prev, billingAddress: value }))}
-                          onAddressSelect={handleBillingAddressSelect}
-                          placeholder="Start typing your billing address..."
-                          className="border-2 border-gray-300 rounded-xl focus:border-gray-500 focus:ring-2 focus:ring-gray-500 focus:ring-opacity-20 transition-all duration-200 bg-white hover:border-gray-400 text-gray-900 placeholder-gray-500 font-sans"
-                        />
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <label htmlFor="billingCity" className="block text-sm font-semibold text-gray-700">
-                            City *
-                          </label>
-                          <input
-                            type="text"
-                            id="billingCity"
-                            name="billingCity"
-                            value={paymentData.billingCity}
-                            onChange={handleInputChange}
-                            className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-gray-500 focus:ring-2 focus:ring-gray-500 focus:ring-opacity-20 transition-all duration-200 bg-white hover:border-gray-400 text-gray-900 placeholder-gray-500 font-sans"
-                            placeholder="New York"
-                            required
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <label htmlFor="billingState" className="block text-sm font-semibold text-gray-700">
-                            State *
-                          </label>
-                          <select
-                            id="billingState"
-                            name="billingState"
-                            value={paymentData.billingState}
-                            onChange={handleInputChange}
-                            className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-gray-500 focus:ring-2 focus:ring-gray-500 focus:ring-opacity-20 transition-all duration-200 bg-white hover:border-gray-400 text-gray-900 font-sans"
-                            required
-                          >
-                            <option value="">Select State</option>
-                            {getSortedUSStates().map((state) => (
-                              <option key={state.abbreviation} value={state.abbreviation}>
-                                {state.name}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                      </div>
-
-                      <div className="space-y-2">
-                        <label htmlFor="billingZipCode" className="block text-sm font-semibold text-gray-700">
-                          ZIP Code *
-                        </label>
-                        <input
-                          type="text"
-                          id="billingZipCode"
-                          name="billingZipCode"
-                          value={paymentData.billingZipCode}
-                          onChange={handleInputChange}
-                          className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-gray-500 focus:ring-2 focus:ring-gray-500 focus:ring-opacity-20 transition-all duration-200 bg-white hover:border-gray-400 text-gray-900 placeholder-gray-500 font-sans"
-                          placeholder="10001"
-                          maxLength={10}
-                          required
-                        />
-                      </div>
-                    </div>
-                  </div>
 
                   {/* Terms */}
                   <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
@@ -647,7 +475,7 @@ export default function SubmitPage() {
                       </div>
                     </label>
                   </div>
-                </form>
+                </div>
               </div>
             </div>
 
@@ -664,32 +492,8 @@ export default function SubmitPage() {
                 </button>
               </div>
               
-              <div className="flex items-center space-x-4">
-                <button
-                  type="submit"
-                  onClick={handleSubmit}
-                  disabled={!isFormValid() || isProcessing}
-                  className={`
-                    flex items-center space-x-2 px-8 py-3 rounded-xl font-semibold text-white transition-all duration-200 transform hover:scale-105
-                    ${
-                      isFormValid() && !isProcessing
-                        ? 'bg-gradient-to-r from-gray-700 to-gray-800 shadow-lg shadow-gray-200 hover:shadow-gray-300'
-                        : 'bg-gray-400 cursor-not-allowed'
-                    }
-                  `}
-                >
-                  {isProcessing ? (
-                    <>
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                      Processing Payment...
-                    </>
-                  ) : (
-                    <>
-                      <CreditCardIcon className="w-5 h-5" />
-                      <span>Submit</span>
-                    </>
-                  )}
-                </button>
+              <div className="text-sm text-gray-600">
+                <p>Complete the payment form above to finish your application.</p>
               </div>
             </div>
           </div>

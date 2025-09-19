@@ -16,10 +16,7 @@ interface StripeApplePayButtonProps {
   disabled?: boolean;
 }
 
-function ApplePayButtonContent({ 
-  amount, 
-  customerEmail, 
-  customerName, 
+function StripePaymentContent({ 
   onSuccess, 
   onError,
   disabled = false
@@ -28,42 +25,20 @@ function ApplePayButtonContent({
   const elements = useElements();
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const handleApplePayClick = async () => {
-    if (!stripe || !elements || disabled) {
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    
+    if (!stripe || !elements || disabled || isProcessing) {
       return;
     }
 
-    console.log('🍎 Stripe Apple Pay button clicked');
+    console.log('💳 Stripe payment form submitted');
     setIsProcessing(true);
 
     try {
-      // Create payment intent for Apple Pay
-      const response = await fetch('/api/create-payment-intent', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          amount: amount / 100, // Convert cents to dollars for API
-          currency: 'usd',
-          customerEmail,
-          customerName,
-          service: 'Cosigner Application Fee',
-          description: 'Credora Cosigner Application Fee',
-          automatic_payment_methods: {
-            enabled: true
-          }
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to create payment intent');
-      }
-
-      const { clientSecret } = await response.json();
-
-      // Confirm payment with Apple Pay
+      // Confirm payment with Stripe Elements
       const { error, paymentIntent } = await stripe.confirmPayment({
         elements,
-        clientSecret,
         confirmParams: {
           return_url: `${window.location.origin}/apply/success`,
         },
@@ -71,10 +46,10 @@ function ApplePayButtonContent({
       });
 
       if (error) {
-        console.error('🚨 Stripe Apple Pay error:', error);
-        onError(error.message || 'Apple Pay payment failed');
+        console.error('🚨 Stripe payment error:', error);
+        onError(error.message || 'Payment failed');
       } else if (paymentIntent && paymentIntent.status === 'succeeded') {
-        console.log('✅ Apple Pay payment successful!');
+        console.log('✅ Stripe payment successful!');
         onSuccess();
       } else {
         console.log('⚠️ Payment requires additional action');
@@ -82,42 +57,51 @@ function ApplePayButtonContent({
       }
 
     } catch (error: any) {
-      console.error('🚨 Apple Pay processing error:', error);
-      onError(error.message || 'Apple Pay failed');
+      console.error('🚨 Payment processing error:', error);
+      onError(error.message || 'Payment failed');
     } finally {
       setIsProcessing(false);
     }
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <h3 className="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">
-        Choose Payment Method
+        Payment Information
       </h3>
       
-      {/* Stripe Apple Pay Element */}
-      <div className="mb-4">
-        <PaymentElement 
-          options={{
-            layout: {
-              type: 'accordion',
-              defaultCollapsed: false,
-              radios: false,
-              spacedAccordionItems: false
-            }
-          }}
-        />
-      </div>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Stripe Payment Element - Handles Apple Pay + Cards automatically */}
+        <div>
+          <PaymentElement 
+            options={{
+              layout: {
+                type: 'tabs',
+                defaultCollapsed: false
+              }
+            }}
+          />
+        </div>
 
-      {/* Or Divider */}
-      <div className="relative my-6">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-gray-300"></div>
-        </div>
-        <div className="relative flex justify-center text-sm">
-          <span className="px-4 bg-white text-gray-500">or pay with card</span>
-        </div>
-      </div>
+        {/* Submit Button */}
+        <button
+          type="submit"
+          disabled={!stripe || disabled || isProcessing}
+          className="w-full bg-gray-900 text-white px-6 py-4 rounded-xl font-semibold hover:bg-gray-800 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+        >
+          {isProcessing ? (
+            <>
+              <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Processing Payment...
+            </>
+          ) : (
+            'Complete Application - $55.00'
+          )}
+        </button>
+      </form>
     </div>
   );
 }
@@ -154,8 +138,11 @@ export default function StripeApplePayButton(props: StripeApplePayButtonProps) {
   if (!clientSecret) {
     return (
       <div className="space-y-4">
+        <h3 className="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">
+          Payment Information
+        </h3>
         <div className="animate-pulse">
-          <div className="h-12 bg-gray-200 rounded-xl"></div>
+          <div className="h-32 bg-gray-200 rounded-xl"></div>
         </div>
       </div>
     );
@@ -169,13 +156,39 @@ export default function StripeApplePayButton(props: StripeApplePayButtonProps) {
         appearance: {
           theme: 'stripe',
           variables: {
-            colorPrimary: '#000000',
-            fontFamily: 'system-ui, sans-serif'
+            colorPrimary: '#374151', // Gray-700 to match your design
+            colorBackground: '#ffffff',
+            colorText: '#1f2937', // Gray-800
+            colorDanger: '#ef4444', // Red-500
+            borderRadius: '12px', // Rounded-xl
+            fontFamily: 'system-ui, -apple-system, sans-serif'
+          },
+          rules: {
+            '.Input': {
+              border: '2px solid #d1d5db', // border-gray-300
+              padding: '12px 16px',
+              fontSize: '16px',
+              backgroundColor: '#ffffff',
+              transition: 'all 0.2s ease-in-out'
+            },
+            '.Input:hover': {
+              borderColor: '#9ca3af' // border-gray-400
+            },
+            '.Input:focus': {
+              borderColor: '#374151', // border-gray-700
+              boxShadow: '0 0 0 2px rgba(55, 65, 81, 0.2)' // ring-gray-700 ring-opacity-20
+            },
+            '.Label': {
+              color: '#374151', // text-gray-700
+              fontSize: '14px',
+              fontWeight: '600',
+              marginBottom: '8px'
+            }
           }
         }
       }}
     >
-      <ApplePayButtonContent {...props} />
+      <StripePaymentContent {...props} />
     </Elements>
   );
 }
