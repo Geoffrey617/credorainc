@@ -19,6 +19,7 @@ import { detectCardType, formatCardNumber } from '../../../utils/card-detection'
 import { getSortedUSStates } from '../../../utils/us-states';
 import { STRIPE_CONFIG } from '../../../utils/stripe-payment';
 import AddressAutocomplete from '../../../components/AddressAutocomplete';
+import StripeApplePayButton from '../../../components/StripeApplePayButton';
 
 // Modern application steps with enhanced descriptions
 const steps = [
@@ -110,9 +111,6 @@ export default function SubmitPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [detectedCardType, setDetectedCardType] = useState<{ type: string | null; logoPath: string | null }>({ type: null, logoPath: null });
   const [isSafariDesktop, setIsSafariDesktop] = useState(false);
-  const [showQRModal, setShowQRModal] = useState(false);
-  const [qrCodeUrl, setQrCodeUrl] = useState('');
-  const [paymentId, setPaymentId] = useState('');
 
   // Load form data from localStorage and detect Safari desktop
   useEffect(() => {
@@ -196,77 +194,6 @@ export default function SubmitPage() {
     }
   };
 
-  const handleApplePay = async () => {
-    console.log('🍎 Apple Pay button clicked - generating QR code');
-    
-    try {
-      // Generate unique payment ID
-      const newPaymentId = `apple_pay_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      setPaymentId(newPaymentId);
-      
-      // Create mobile Apple Pay URL
-      const mobilePaymentUrl = `${window.location.origin}/apple-pay/mobile?paymentId=${newPaymentId}&amount=55.00&customerEmail=${encodeURIComponent(formData.email)}&customerName=${encodeURIComponent(`${formData.firstName} ${formData.lastName}`)}&service=Cosigner%20Application%20Fee`;
-      
-      // Generate QR code using QR Server API
-      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&format=png&data=${encodeURIComponent(mobilePaymentUrl)}`;
-      setQrCodeUrl(qrUrl);
-      
-      console.log('📱 Generated mobile Apple Pay URL:', mobilePaymentUrl);
-      console.log('📄 Generated QR code URL:', qrUrl);
-      
-      // Show QR code modal
-      setShowQRModal(true);
-      
-      // Start polling for payment completion
-      startPaymentPolling(newPaymentId);
-      
-    } catch (error: any) {
-      console.error('🚨 QR code generation error:', error);
-      alert(`Failed to generate Apple Pay QR code: ${error.message || error.toString()}`);
-    }
-  };
-
-  // Poll for payment completion from mobile device
-  const startPaymentPolling = (paymentId: string) => {
-    console.log('🔄 Starting payment status polling for:', paymentId);
-    
-    const pollInterval = setInterval(async () => {
-      try {
-        const response = await fetch(`/api/apple-pay/payment-status?paymentId=${paymentId}`);
-        const result = await response.json();
-        
-        if (result.status === 'completed') {
-          console.log('✅ Payment completed on mobile device');
-          clearInterval(pollInterval);
-          setShowQRModal(false);
-          setIsProcessing(false);
-          
-          // Clear form data and redirect to success
-          localStorage.removeItem('credora_application_form');
-          router.push('/apply/success');
-          
-        } else if (result.status === 'failed') {
-          console.log('❌ Payment failed on mobile device');
-          clearInterval(pollInterval);
-          setShowQRModal(false);
-          setIsProcessing(false);
-          alert('Payment failed. Please try again.');
-        }
-        // If status is 'pending', continue polling
-        
-      } catch (error) {
-        console.error('Error polling payment status:', error);
-      }
-    }, 2000); // Poll every 2 seconds
-    
-    // Stop polling after 5 minutes
-    setTimeout(() => {
-      clearInterval(pollInterval);
-      setShowQRModal(false);
-      setIsProcessing(false);
-      console.log('⏰ Payment polling timeout');
-    }, 5 * 60 * 1000);
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -517,35 +444,24 @@ export default function SubmitPage() {
               {/* Payment Form */}
               <div className="lg:col-span-2">
                 <form onSubmit={handleSubmit} className="space-y-6">
-                  {/* Apple Pay Button - Only show on Safari desktop */}
+                  {/* Stripe Apple Pay Button - Only show on Safari desktop */}
                   {isSafariDesktop && (
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">Choose Payment Method</h3>
-                      
-                      <div className="mb-4">
-                        <button 
-                          type="button"
-                          onClick={handleApplePay}
-                          disabled={isProcessing}
-                          className="w-full bg-black text-white px-6 py-4 rounded-xl font-medium hover:bg-gray-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-                        >
-                          <svg className="w-6 h-6 mr-3" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
-                          </svg>
-                          {isProcessing ? 'Processing...' : 'Pay with Apple Pay'}
-                        </button>
-                      </div>
-
-                      {/* Or Divider */}
-                      <div className="relative my-6">
-                        <div className="absolute inset-0 flex items-center">
-                          <div className="w-full border-t border-gray-300"></div>
-                        </div>
-                        <div className="relative flex justify-center text-sm">
-                          <span className="px-4 bg-white text-gray-500">or pay with card</span>
-                        </div>
-                      </div>
-                    </div>
+                    <StripeApplePayButton
+                      amount={STRIPE_CONFIG.applicationFee} // 5500 cents = $55.00
+                      customerEmail={formData.email}
+                      customerName={`${formData.firstName} ${formData.lastName}`}
+                      onSuccess={() => {
+                        console.log('✅ Stripe Apple Pay payment successful!');
+                        // Clear form data and redirect to success
+                        localStorage.removeItem('credora_application_form');
+                        router.push('/apply/success');
+                      }}
+                      onError={(error) => {
+                        console.error('🚨 Stripe Apple Pay error:', error);
+                        alert(`Apple Pay failed: ${error}`);
+                      }}
+                      disabled={isProcessing}
+                    />
                   )}
 
                   {/* Card Information */}
@@ -779,72 +695,6 @@ export default function SubmitPage() {
           </div>
         </div>
       </div>
-
-      {/* Apple Pay QR Code Modal */}
-      {showQRModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-8 max-w-md w-full mx-4 text-center">
-            <div className="mb-6">
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Pay with Apple Pay</h3>
-              <p className="text-gray-600">Scan with your iPhone camera to complete payment</p>
-            </div>
-            
-            <div className="mb-6">
-              <div className="bg-gray-50 p-4 rounded-lg inline-block">
-                <img 
-                  src={qrCodeUrl} 
-                  alt="Apple Pay QR Code" 
-                  className="w-64 h-64"
-                  onError={() => {
-                    console.error('Failed to load QR code');
-                    alert('Failed to generate QR code. Please use card payment.');
-                    setShowQRModal(false);
-                  }}
-                />
-              </div>
-            </div>
-            
-            <div className="mb-6 space-y-2">
-              <p className="text-lg font-semibold text-gray-900">Amount: $55.00</p>
-              <p className="text-sm text-gray-600">Credora Cosigner Application Fee</p>
-            </div>
-            
-            <div className="mb-6 text-left space-y-2 text-sm text-gray-600">
-              <p><strong>Instructions:</strong></p>
-              <p>1. Point your iPhone camera at the QR code</p>
-              <p>2. Tap the notification to open Apple Pay</p>
-              <p>3. Authenticate with Touch ID or Face ID</p>
-              <p>4. Complete payment on your iPhone</p>
-            </div>
-            
-            <div className="flex space-x-4">
-              <button
-                onClick={() => {
-                  setShowQRModal(false);
-                  setIsProcessing(false);
-                }}
-                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => {
-                  // Regenerate QR code
-                  handleApplePay();
-                }}
-                className="flex-1 px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
-              >
-                Refresh QR Code
-              </button>
-            </div>
-            
-            <div className="mt-4 text-xs text-gray-500">
-              <p>Waiting for payment completion...</p>
-              <p>This will close automatically when payment is complete</p>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
