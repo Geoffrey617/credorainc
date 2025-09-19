@@ -147,6 +147,7 @@ export default function DocumentsPage() {
             
             const createFileFromHandle = (handle: string, docType: string, docInfo?: any) => {
               if (!handle) return null;
+              console.log(`🔍 Loading file from handle for ${docType}:`, docInfo);
               return {
                 name: docInfo?.filename || `${docType}.pdf`, // Use stored filename or default
                 handle: handle,
@@ -258,11 +259,11 @@ export default function DocumentsPage() {
       setFormData(prev => ({
         ...prev,
         [fileType]: {
-          name: result.filename,
+          name: file.name, // Use original file name, not Filestack filename
           handle: result.handle,
           url: result.url,
-          size: result.size,
-          type: result.mimetype,
+          size: file.size, // Use original file size
+          type: file.type, // Use original file type
           secure: true,
           virusScanned: true
         } as any
@@ -281,9 +282,9 @@ export default function DocumentsPage() {
           documents: {
             [fileType.replace('File', '')]: {
               handle: result.handle,
-              filename: result.filename,
-              size: result.size || file.size, // Store actual file size
-              mimetype: result.mimetype || file.type,
+              filename: file.name, // Store original filename
+              size: file.size, // Store original file size
+              mimetype: file.type, // Store original file type
               uploadedAt: new Date().toISOString()
             }
           }
@@ -332,9 +333,9 @@ export default function DocumentsPage() {
               documents: {
                 [fileType.replace('File', '')]: {
                   handle: result.handle,
-                  filename: result.filename,
-                  size: result.size || file.size, // Store actual file size
-                  mimetype: result.mimetype || file.type,
+                  filename: file.name, // Store original filename
+                  size: file.size, // Store original file size
+                  mimetype: file.type, // Store original file type
                   uploadedAt: new Date().toISOString()
                 }
               }
