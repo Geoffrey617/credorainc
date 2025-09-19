@@ -81,6 +81,9 @@ function ApplicationSuccessContent() {
 
       if (response.ok) {
         setEmailSent(true);
+        // Clear form data AFTER email is sent successfully
+        localStorage.removeItem('credora_application_form');
+        console.log('✅ Confirmation email sent and form data cleared');
       }
     } catch (error) {
       console.error('Error sending confirmation email:', error);

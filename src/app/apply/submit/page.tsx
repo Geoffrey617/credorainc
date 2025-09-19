@@ -194,6 +194,105 @@ export default function SubmitPage() {
     }
   };
 
+  const saveApplicationToDatabase = async () => {
+    try {
+      console.log('💾 Saving application to database...');
+      
+      const savedFormData = JSON.parse(localStorage.getItem('credora_application_form') || '{}');
+      
+      // Get user info
+      const userData = localStorage.getItem('credora_user');
+      const user = userData ? JSON.parse(userData) : null;
+      
+      // Save complete application to Supabase database
+      if (user?.id) {
+        const completeApplicationData = {
+          userId: user.id,
+          firstName: savedFormData.firstName || formData.firstName,
+          lastName: savedFormData.lastName || formData.lastName,
+          email: savedFormData.email || formData.email,
+          status: 'submitted',
+          paymentStatus: 'paid',
+          monthlyRent: savedFormData.monthlyRent,
+          personal_info: {
+            firstName: savedFormData.firstName,
+            lastName: savedFormData.lastName,
+            email: savedFormData.email,
+            phone: savedFormData.phone,
+            dateOfBirth: savedFormData.dateOfBirth,
+            citizenshipStatus: savedFormData.citizenshipStatus,
+            internationalStudentType: savedFormData.internationalStudentType,
+            ssn: savedFormData.ssn,
+            currentAddress: savedFormData.currentAddress,
+            currentCity: savedFormData.currentCity,
+            currentState: savedFormData.currentState,
+            currentZip: savedFormData.currentZip
+          },
+          employment_info: {
+            employmentStatus: savedFormData.employmentStatus,
+            employerName: savedFormData.employerName,
+            jobTitle: savedFormData.jobTitle,
+            lengthOfEmployment: savedFormData.lengthOfEmployment,
+            annualIncome: savedFormData.annualIncome,
+            businessName: savedFormData.businessName,
+            businessType: savedFormData.businessType,
+            yearsInBusiness: savedFormData.yearsInBusiness,
+            selfEmployedIncome: savedFormData.selfEmployedIncome,
+            retirementIncome: savedFormData.retirementIncome,
+            pensionSource: savedFormData.pensionSource,
+            socialSecurityIncome: savedFormData.socialSecurityIncome,
+            disabilityDuration: savedFormData.disabilityDuration,
+            disabilityType: savedFormData.disabilityType,
+            disabilityBenefits: savedFormData.disabilityBenefits,
+            schoolName: savedFormData.schoolName,
+            studentType: savedFormData.studentType,
+            academicYear: savedFormData.academicYear
+          },
+          rental_info: {
+            desiredAddress: savedFormData.desiredAddress,
+            desiredCity: savedFormData.desiredCity,
+            desiredState: savedFormData.desiredState,
+            zipCode: savedFormData.zipCode,
+            monthlyRent: savedFormData.monthlyRent,
+            moveInDate: savedFormData.moveInDate,
+            landlordName: savedFormData.landlordName,
+            landlordPhone: savedFormData.landlordPhone,
+            propertyWebsite: savedFormData.propertyWebsite
+          },
+          documents: savedFormData.documents || {},
+          document_file_ids: savedFormData.document_file_ids || {},
+          document_status: savedFormData.document_status || {}
+        };
+
+        // Save to database
+        const dbResponse = await fetch('/api/applications', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(completeApplicationData)
+        });
+
+        if (dbResponse.ok) {
+          const result = await dbResponse.json();
+          console.log('✅ Application saved to database:', result.applicationId);
+          
+          // Store application ID for reference
+          const updatedFormData = { ...savedFormData, applicationId: result.applicationId };
+          localStorage.setItem('credora_application_form', JSON.stringify(updatedFormData));
+        } else {
+          const error = await dbResponse.text();
+          console.error('❌ Failed to save application to database:', error);
+          throw new Error('Failed to save application to database');
+        }
+      } else {
+        console.error('❌ No user ID found - cannot save application');
+        throw new Error('No user authentication found');
+      }
+    } catch (error) {
+      console.error('❌ Error saving application to database:', error);
+      // Don't throw error - allow success page to show even if DB save fails
+      // The user has already paid, so we don't want to break their experience
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -449,10 +548,13 @@ export default function SubmitPage() {
                     amount={STRIPE_CONFIG.applicationFee} // 5500 cents = $55.00
                     customerEmail={formData.email}
                     customerName={`${formData.firstName} ${formData.lastName}`}
-                    onSuccess={() => {
+                    onSuccess={async () => {
                       console.log('✅ Stripe payment successful!');
-                      // Clear form data and redirect to success
-                      localStorage.removeItem('credora_application_form');
+                      
+                      // Save application to database before redirecting
+                      await saveApplicationToDatabase();
+                      
+                      // Don't clear localStorage yet - success page needs it for email
                       router.push('/apply/success');
                     }}
                     onError={(error) => {
