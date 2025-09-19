@@ -464,17 +464,6 @@ export default function SubmitPage() {
 
 
 
-                  {/* Terms */}
-                  <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
-                    <label className="flex items-start space-x-3">
-                      <input type="checkbox" className="mt-1" required />
-                      <div className="text-sm text-gray-700">
-                        I agree to the <a href="/terms" className="text-gray-600 hover:text-gray-700 underline">Terms of Service</a> and 
-                        <a href="/privacy" className="text-gray-600 hover:text-gray-700 underline ml-1">Privacy Policy</a>. 
-                        I authorize Credora to process my application and charge the application fee.
-                      </div>
-                    </label>
-                  </div>
                 </div>
               </div>
             </div>
@@ -492,9 +481,7 @@ export default function SubmitPage() {
                 </button>
               </div>
               
-              <div className="text-sm text-gray-600">
-                <p>Complete the payment form above to finish your application.</p>
-              </div>
+              <div></div>
             </div>
           </div>
         </div>

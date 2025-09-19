@@ -83,6 +83,18 @@ function StripePaymentContent({
           />
         </div>
 
+        {/* Terms Agreement */}
+        <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
+          <label className="flex items-start space-x-3">
+            <input type="checkbox" className="mt-1" required />
+            <div className="text-sm text-gray-700">
+              I agree to the <a href="/terms" className="text-gray-600 hover:text-gray-700 underline">Terms of Service</a> and 
+              <a href="/privacy" className="text-gray-600 hover:text-gray-700 underline ml-1">Privacy Policy</a>. 
+              I authorize Credora to process my application and charge the application fee.
+            </div>
+          </label>
+        </div>
+
         {/* Submit Button */}
         <button
           type="submit"
@@ -98,7 +110,7 @@ function StripePaymentContent({
               Processing Payment...
             </>
           ) : (
-            'Complete Application - $55.00'
+            'Submit'
           )}
         </button>
       </form>
@@ -119,8 +131,10 @@ export default function StripeApplePayButton(props: StripeApplePayButtonProps) {
           body: JSON.stringify({
             amount: props.amount / 100, // Convert cents to dollars
             currency: 'usd',
+            payment_method_types: ['card', 'apple_pay', 'cashapp', 'amazon_pay'],
             automatic_payment_methods: {
-              enabled: true
+              enabled: true,
+              allow_redirects: 'never'
             }
           })
         });
