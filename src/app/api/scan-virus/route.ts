@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { google } from 'googleapis';
 import { execSync } from 'child_process';
 import fs from 'fs/promises';
 import path from 'path';
@@ -7,46 +6,35 @@ import path from 'path';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-// Initialize Google Drive API
-const oauth2Client = new google.auth.OAuth2(
-  process.env.GOOGLE_DRIVE_CLIENT_ID,
-  process.env.GOOGLE_DRIVE_CLIENT_SECRET
-);
-
-// Set credentials (you'll need to handle OAuth flow)
-oauth2Client.setCredentials({
-  access_token: process.env.GOOGLE_DRIVE_ACCESS_TOKEN,
-  refresh_token: process.env.GOOGLE_DRIVE_REFRESH_TOKEN
-});
-
-const drive = google.drive({ version: 'v3', auth: oauth2Client });
-
 export async function POST(request: NextRequest) {
   try {
-    const { fileId, fileName } = await request.json();
+    const { fileId, fileName, downloadUrl } = await request.json();
     
     console.log('🔍 Starting ClamAV virus scan for:', fileName);
     
-    if (!fileId || !fileName) {
+    if (!fileId || !fileName || !downloadUrl) {
       return NextResponse.json(
-        { error: 'File ID and name are required' },
+        { error: 'File ID, name, and download URL are required' },
         { status: 400 }
       );
     }
 
-    // Download file from Google Drive for scanning
-    console.log('📥 Downloading file from Google Drive for scanning...');
-    const response = await drive.files.get({
-      fileId: fileId,
-      alt: 'media'
-    });
+    // Download file from OneDrive for scanning
+    console.log('📥 Downloading file from OneDrive for scanning...');
+    const response = await fetch(downloadUrl);
+    
+    if (!response.ok) {
+      throw new Error('Failed to download file from OneDrive');
+    }
+    
+    const fileBuffer = await response.arrayBuffer();
 
     // Create temporary file for scanning
     const tempDir = '/tmp';
     const tempFilePath = path.join(tempDir, `scan_${Date.now()}_${fileName}`);
     
     // Write file data to temporary location
-    await fs.writeFile(tempFilePath, response.data as any);
+    await fs.writeFile(tempFilePath, Buffer.from(fileBuffer));
     console.log('💾 File written to temp location for scanning:', tempFilePath);
 
     let scanResult;
@@ -79,13 +67,8 @@ export async function POST(request: NextRequest) {
         
         console.log('🦠 VIRUS DETECTED by ClamAV:', fileName);
         
-        // Delete infected file from Google Drive immediately
-        try {
-          await drive.files.delete({ fileId });
-          console.log('🗑️ Infected file deleted from Google Drive');
-        } catch (deleteError) {
-          console.error('Error deleting infected file:', deleteError);
-        }
+        // Note: OneDrive file deletion will be handled by the client-side code
+        // since we're using personal account authentication
         
       } else {
         // Scan error

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSimpleAuth } from '../../../hooks/useSimpleAuth';
-import { secureDocumentUpload } from '../../../lib/google-drive-config';
+import { secureDocumentUpload } from '../../../lib/onedrive-config';
 import { 
   ChevronRightIcon, 
   CheckCircleIcon, 
@@ -176,9 +176,9 @@ export default function DocumentsPage() {
         return;
       }
 
-      console.log('🛡️ Starting secure upload with Google Drive + ClamAV');
+      console.log('🛡️ Starting secure upload with OneDrive + ClamAV');
       
-      // Upload with Google Drive + ClamAV virus scanning (isolated from database)
+      // Upload with OneDrive + ClamAV virus scanning (isolated from database)
       const result = await secureDocumentUpload(
         file,
         fileType.replace('File', ''),
@@ -189,12 +189,12 @@ export default function DocumentsPage() {
         }
       );
       
-      // Update form data with Google Drive file info
+      // Update form data with OneDrive file info
       setFormData(prev => ({
         ...prev,
         [fileType]: {
           name: result.name,
-          googleDriveId: result.id,
+          oneDriveId: result.id,
           url: result.url,
           secure: true,
           virusScanned: true,
@@ -207,7 +207,7 @@ export default function DocumentsPage() {
         const documentData = {
           userId: authUser.id,
           document_file_ids: {
-            [fileType.replace('File', '')]: result.id // ONLY store Google Drive ID
+            [fileType.replace('File', '')]: result.id // ONLY store OneDrive ID
           },
           document_status: {
             [fileType.replace('File', '')]: 'uploaded' // Simple status tracking
@@ -252,7 +252,7 @@ export default function DocumentsPage() {
         }
       }
 
-      console.log(`✅ ${fileType} uploaded securely to Google Drive with ClamAV scanning:`, result.name);
+      console.log(`✅ ${fileType} uploaded securely to OneDrive with ClamAV scanning:`, result.name);
     } catch (error: any) {
       console.error(`🚨 Secure upload failed for ${fileType}:`, error);
       
