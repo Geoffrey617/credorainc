@@ -131,10 +131,8 @@ export default function StripePaymentElement(props: StripePaymentElementProps) {
           body: JSON.stringify({
             amount: props.amount / 100, // Convert cents to dollars
             currency: 'usd',
-            payment_method_types: ['card', 'apple_pay', 'cashapp', 'amazon_pay'],
             automatic_payment_methods: {
-              enabled: true,
-              allow_redirects: 'never'
+              enabled: true
             }
           })
         });
