@@ -218,7 +218,7 @@ export default function SubmitPage() {
       const session = new ApplePaySession(3, paymentRequest);
 
       // Handle merchant validation
-      session.onvalidatemerchant = async (event) => {
+      session.onvalidatemerchant = async (event: any) => {
         console.log('🍎 Validating merchant for Apple Pay');
         try {
           const response = await fetch('/api/apple-pay/validate-merchant', {
@@ -245,7 +245,7 @@ export default function SubmitPage() {
       };
 
       // Handle payment authorization
-      session.onpaymentauthorized = async (event) => {
+      session.onpaymentauthorized = async (event: any) => {
         console.log('🍎 Processing Apple Pay payment');
         try {
           const response = await fetch('/api/apple-pay/process-payment', {
@@ -286,7 +286,7 @@ export default function SubmitPage() {
       };
 
       // Handle session cancellation
-      session.oncancel = () => {
+      session.oncancel = (event: any) => {
         console.log('🍎 Apple Pay session cancelled by user');
         setIsProcessing(false);
       };
