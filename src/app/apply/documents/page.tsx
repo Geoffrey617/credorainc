@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSimpleAuth } from '../../../hooks/useSimpleAuth';
-import { createClient } from '@supabase/supabase-js';
+import { uploadSecureDocument } from '../../../lib/filestack-config';
 import { 
   ChevronRightIcon, 
   CheckCircleIcon, 
@@ -17,34 +17,6 @@ import {
   CloudArrowUpIcon,
   XMarkIcon
 } from '@heroicons/react/24/outline';
-
-// Initialize Supabase client for Storage operations
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
-
-// Session ID management utilities
-const getOrCreateSessionId = (): string => {
-  let sessionId = localStorage.getItem('credora_application_session');
-  if (!sessionId) {
-    sessionId = `app_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    localStorage.setItem('credora_application_session', sessionId);
-    console.log('🆔 Created new application session:', sessionId);
-  } else {
-    console.log('🆔 Using existing application session:', sessionId);
-  }
-  return sessionId;
-};
-
-// Storage path utilities
-const getStoragePath = (userId: string, sessionId: string, documentType: string, fileName: string): string => {
-  // Simplified path structure to avoid deep nesting issues
-  return `${sessionId}_${documentType}_${fileName}`;
-};
-
-const getStorageFolder = (userId: string, sessionId: string): string => {
-  return `${sessionId}`;
-};
 
 // Modern application steps with enhanced descriptions
 const steps = [
@@ -122,70 +94,6 @@ export default function DocumentsPage() {
   const [uploading, setUploading] = useState<{[key: string]: boolean}>({});
   const [completedSteps] = useState<string[]>(['personal', 'employment', 'rental']);
   const [dragOver, setDragOver] = useState<string | null>(null);
-  const [uploadedDocuments, setUploadedDocuments] = useState<{[key: string]: any}>({});
-
-  // Load documents from database (since API uploads save to database)
-  const loadDocumentsFromDatabase = async () => {
-    // Get user ID from multiple sources
-    let userId = authUser?.id;
-    
-    if (!userId) {
-      // Try sessionStorage first (Google login)
-      const sessionData = sessionStorage.getItem('credora_session_temp');
-      if (sessionData) {
-        const session = JSON.parse(sessionData);
-        userId = session.user?.id || session.user?.uid;
-      }
-      
-      // Try localStorage as fallback (email login)
-      if (!userId) {
-        const localUser = localStorage.getItem('credora_user');
-        if (localUser) {
-          const user = JSON.parse(localUser);
-          userId = user.id || user.uid;
-        }
-      }
-    }
-    
-    if (!userId) {
-      console.log('📄 No user ID available for document loading');
-      return;
-    }
-    
-    // Get session ID for context
-    const sessionId = getOrCreateSessionId();
-    
-    try {
-      console.log('📂 Loading documents from database for user:', userId, 'session:', sessionId);
-      
-      // Load from database where API uploads are saved
-      const response = await fetch(`/api/applications?userId=${userId}&sessionId=${sessionId}`);
-      const result = await response.json();
-      
-      if (response.ok && result.applications && result.applications.length > 0) {
-        const latestApp = result.applications[0];
-        
-        if (latestApp.documents) {
-          console.log('📄 Documents found in database:', Object.keys(latestApp.documents));
-          console.log('📄 Document details:', latestApp.documents);
-          
-          // Store uploaded document info
-          setUploadedDocuments({
-            governmentId: latestApp.documents.governmentId,
-            incomeVerification: latestApp.documents.incomeVerification,
-            studentId: latestApp.documents.studentId
-          });
-        } else {
-          console.log('📄 No documents found in database application');
-        }
-      } else {
-        console.log('📄 No applications found for user:', userId);
-      }
-      
-    } catch (error) {
-      console.error('Error loading documents from database:', error);
-    }
-  };
 
   // Load form data from database and localStorage
   useEffect(() => {
@@ -202,12 +110,41 @@ export default function DocumentsPage() {
         }));
       }
       
-      // Load documents from database using session ID
-      await loadDocumentsFromDatabase();
+      // Load documents from database if user is authenticated
+      if (authUser?.id) {
+        try {
+          const response = await fetch(`/api/applications?userId=${authUser.id}`);
+          const result = await response.json();
+          
+          if (response.ok && result.applications && result.applications.length > 0) {
+            const latestApp = result.applications[0];
+            
+            if (latestApp.documents) {
+              const createFileObject = (docInfo: any) => {
+                if (!docInfo) return null;
+                return {
+                  name: docInfo.name,
+                  size: docInfo.size || 1024 * 1024,
+                  type: docInfo.type || 'application/pdf'
+                } as File;
+              };
+              
+              setFormData(prev => ({
+                ...prev,
+                governmentIdFile: createFileObject(latestApp.documents.governmentId),
+                incomeVerificationFile: createFileObject(latestApp.documents.incomeVerification),
+                studentIdFile: createFileObject(latestApp.documents.studentId),
+              }));
+            }
+          }
+        } catch (error) {
+          console.error('Error loading documents from database:', error);
+        }
+      }
     };
     
     loadData();
-  }, [authUser?.id]); // Re-run when authUser becomes available
+  }, []);
 
   const handleFileUpload = async (fileType: keyof FormData, file: File) => {
     // File size validation
@@ -233,69 +170,17 @@ export default function DocumentsPage() {
     setErrors(prev => ({ ...prev, [fileType]: '' }));
 
     try {
-      // Get user ID directly from storage if authUser is not ready
-      let userId = authUser?.id;
-      
-      if (!userId) {
-        // Try sessionStorage first (Google login)
-        const sessionData = sessionStorage.getItem('credora_session_temp');
-        if (sessionData) {
-          const session = JSON.parse(sessionData);
-          userId = session.user?.id || session.user?.uid;
-        }
-        
-        // Try localStorage as fallback (email login)
-        if (!userId) {
-          const localUser = localStorage.getItem('credora_user');
-          if (localUser) {
-            const user = JSON.parse(localUser);
-            userId = user.id || user.uid;
-          }
-        }
-      }
-      
-      if (!userId) {
+      // Check authentication
+      if (!authUser?.id) {
         alert('Please sign in to upload documents');
-        router.push('/auth/signin');
         return;
       }
-      
-      // Get user data for API calls
-      let userData = authUser;
-      if (!userData) {
-        const sessionData = sessionStorage.getItem('credora_session_temp');
-        if (sessionData) {
-          const session = JSON.parse(sessionData);
-          userData = session.user;
-        } else {
-          const localUser = localStorage.getItem('credora_user');
-          if (localUser) {
-            userData = JSON.parse(localUser);
-          }
-        }
-      }
 
-      // Get session ID for consistent pathing
-      const sessionId = getOrCreateSessionId();
-      const documentType = fileType.replace('File', '');
-      const storagePath = getStoragePath(userId, sessionId, documentType, file.name);
-      
-      console.log('📤 Uploading document:', {
-        userId,
-        sessionId,
-        documentType,
-        fileName: file.name,
-        storagePath
-      });
-
-      // Upload via API (primary method - bypasses RLS issues)
-      console.log('📤 Uploading via API with session context');
-      
+      // Upload to Supabase via API
       const uploadFormData = new FormData();
       uploadFormData.append('file', file);
-      uploadFormData.append('userId', userId);
-      uploadFormData.append('sessionId', sessionId);
-      uploadFormData.append('documentType', documentType);
+      uploadFormData.append('userId', authUser.id);
+      uploadFormData.append('documentType', fileType.replace('File', ''));
 
       const response = await fetch('/api/upload-document', {
         method: 'POST',
@@ -305,11 +190,8 @@ export default function DocumentsPage() {
       const result = await response.json();
 
       if (!response.ok) {
-        console.error('🚨 API upload failed:', result);
         throw new Error(result.error || 'Upload failed');
       }
-
-      console.log('✅ API upload successful:', result.fileName);
       
       // Update form data with uploaded file info
       setFormData(prev => ({
@@ -317,10 +199,61 @@ export default function DocumentsPage() {
         [fileType]: file
       }));
 
-      console.log(`✅ Successfully uploaded ${fileType}:`, file.name);
-      
-      // Refresh documents from database to show the uploaded file
-      await loadDocumentsFromDatabase();
+      // Save document info to database
+      if (authUser?.id) {
+        const documentData = {
+          userId: authUser.id,
+          documents: {
+            [fileType.replace('File', '')]: {
+              name: file.name,
+              size: file.size,
+              type: file.type,
+              filePath: result.filePath,
+              fileUrl: result.fileUrl,
+              uploadedAt: new Date().toISOString()
+            }
+          }
+        };
+
+        // Save to database via applications API
+        try {
+          // First try to update existing application
+          const updateResponse = await fetch('/api/applications', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(documentData)
+          });
+          
+          // If no application exists, create one
+          if (!updateResponse.ok) {
+            console.log('No existing application, creating new one');
+            await fetch('/api/applications', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                userId: currentUser.id,
+                firstName: currentUser.firstName || '',
+                lastName: currentUser.lastName || '',
+                email: currentUser.email || '',
+                documents: {
+                  [fileType.replace('File', '')]: {
+                    name: file.name,
+                    size: file.size,
+                    type: file.type,
+                    filePath: result.filePath,
+                    fileUrl: result.fileUrl,
+                    uploadedAt: new Date().toISOString()
+                  }
+                }
+              })
+            });
+          }
+        } catch (apiError) {
+          console.error('API error:', apiError);
+        }
+      }
+
+      console.log(`Successfully uploaded ${fileType}:`, result.fileName);
     } catch (error) {
       console.error(`Error uploading ${fileType}:`, error);
       alert('Upload failed. Please try again.');
@@ -337,62 +270,23 @@ export default function DocumentsPage() {
       [fileType]: null
     }));
     
-    // Remove from Supabase Storage using session-based path
-    // Get user ID from multiple sources
-    let userId = authUser?.id;
-    
-    if (!userId) {
-      // Try sessionStorage first (Google login)
-      const sessionData = sessionStorage.getItem('credora_session_temp');
-      if (sessionData) {
-        const session = JSON.parse(sessionData);
-        userId = session.user?.id || session.user?.uid;
-      }
-      
-      // Try localStorage as fallback (email login)  
-      if (!userId) {
-        const localUser = localStorage.getItem('credora_user');
-        if (localUser) {
-          const user = JSON.parse(localUser);
-          userId = user.id || user.uid;
-        }
-      }
-    }
-    
-    if (userId) {
-      const sessionId = getOrCreateSessionId();
-      const documentType = fileType.replace('File', '');
-      
+    // Remove from database
+    if (authUser?.id) {
       try {
-        // Find and remove the file from storage
-        const storageFolder = getStorageFolder(userId, sessionId);
-        const { data: files } = await supabase.storage
-          .from('application-documents')
-          .list(storageFolder);
-        
-        // Find the file that matches this document type
-        const fileToRemove = files?.find(f => 
-          f.name.includes(documentType) || 
-          f.name.includes(documentType.toLowerCase())
-        );
-        
-        if (fileToRemove) {
-          const fullPath = `${storageFolder}/${fileToRemove.name}`;
-          const { error } = await supabase.storage
-            .from('application-documents')
-            .remove([fullPath]);
-          
-          if (error) {
-            console.error('Error removing file from storage:', error);
-          } else {
-            console.log('✅ File removed from storage:', fullPath);
+        const documentData = {
+          userId: authUser.id,
+          documents: {
+            [fileType.replace('File', '')]: null // Set to null to remove
           }
-        }
-        
-        // Refresh documents from database
-        await loadDocumentsFromDatabase();
+        };
+
+        await fetch('/api/applications', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(documentData)
+        });
       } catch (error) {
-        console.error('Error removing document from storage:', error);
+        console.error('Error removing document from database:', error);
       }
     }
     
@@ -448,16 +342,11 @@ export default function DocumentsPage() {
   const validateDocuments = () => {
     const newErrors: {[key: string]: string} = {};
     
-    if (!formData.governmentIdFile && !uploadedDocuments.governmentId) {
-      newErrors.governmentIdFile = 'Government ID is required';
-    }
-    if (!formData.incomeVerificationFile && !uploadedDocuments.incomeVerification) {
-      newErrors.incomeVerificationFile = 'Income verification is required';
-    }
+    if (!formData.governmentIdFile) newErrors.governmentIdFile = 'Government ID is required';
+    if (!formData.incomeVerificationFile) newErrors.incomeVerificationFile = 'Income verification is required';
     
     // Student ID is required for students or international students
-    if ((formData.employmentStatus === 'student' || formData.citizenshipStatus === 'international_student') && 
-        !formData.studentIdFile && !uploadedDocuments.studentId) {
+    if ((formData.employmentStatus === 'student' || formData.citizenshipStatus === 'international_student') && !formData.studentIdFile) {
       newErrors.studentIdFile = 'Student ID is required';
     }
     
@@ -473,9 +362,9 @@ export default function DocumentsPage() {
       const updatedData = { 
         ...existingData, 
         documents: {
-          governmentId: formData.governmentIdFile?.name || uploadedDocuments.governmentId?.name || '',
-          incomeVerification: formData.incomeVerificationFile?.name || uploadedDocuments.incomeVerification?.name || '',
-          studentId: formData.studentIdFile?.name || uploadedDocuments.studentId?.name || ''
+          governmentId: formData.governmentIdFile?.name || '',
+          incomeVerification: formData.incomeVerificationFile?.name || '',
+          studentId: formData.studentIdFile?.name || ''
         }
       };
       localStorage.setItem('credora_application_form', JSON.stringify(updatedData));
@@ -561,7 +450,7 @@ export default function DocumentsPage() {
                     border-2 border-dashed rounded-xl p-8 text-center transition-all duration-200
                     ${dragOver === 'governmentId' 
                       ? 'border-gray-400 bg-gray-100' 
-                      : (formData.governmentIdFile || uploadedDocuments.governmentId)
+                      : formData.governmentIdFile 
                         ? 'border-green-300 bg-green-50'
                         : 'border-gray-300 hover:border-gray-400'
                     }
@@ -577,22 +466,13 @@ export default function DocumentsPage() {
                       </div>
                       <p className="text-slate-600 font-medium text-center">Uploading...</p>
                     </div>
-                  ) : formData.governmentIdFile || uploadedDocuments.governmentId ? (
+                  ) : formData.governmentIdFile ? (
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
                         <DocumentTextIcon className="w-8 h-8 text-green-600 mr-3" />
                         <div className="text-left">
-                          <p className="font-medium text-gray-900">
-                            {formData.governmentIdFile?.name || uploadedDocuments.governmentId?.name || 'Uploaded Document'}
-                          </p>
-                          <p className="text-sm text-gray-500">
-                            {formData.governmentIdFile 
-                              ? `${(formData.governmentIdFile.size / 1024 / 1024).toFixed(2)} MB`
-                              : uploadedDocuments.governmentId?.size 
-                                ? `${(uploadedDocuments.governmentId.size / 1024 / 1024).toFixed(2)} MB`
-                                : 'Uploaded'
-                            }
-                          </p>
+                          <p className="font-medium text-gray-900">{formData.governmentIdFile.name}</p>
+                          <p className="text-sm text-gray-500">{(formData.governmentIdFile.size / 1024 / 1024).toFixed(2)} MB</p>
                         </div>
                       </div>
                       <button
@@ -640,7 +520,7 @@ export default function DocumentsPage() {
                       border-2 border-dashed rounded-xl p-8 text-center transition-all duration-200
                       ${dragOver === 'studentId' 
                         ? 'border-gray-400 bg-gray-100' 
-                        : (formData.studentIdFile || uploadedDocuments.studentId)
+                        : formData.studentIdFile 
                           ? 'border-green-300 bg-green-50'
                           : 'border-gray-300 hover:border-gray-400'
                       }
@@ -656,22 +536,13 @@ export default function DocumentsPage() {
                         </div>
                         <p className="text-slate-600 font-medium text-center">Uploading...</p>
                       </div>
-                    ) : formData.studentIdFile || uploadedDocuments.studentId ? (
+                    ) : formData.studentIdFile ? (
                       <div className="flex items-center justify-between">
                         <div className="flex items-center">
                           <DocumentTextIcon className="w-8 h-8 text-green-600 mr-3" />
                           <div className="text-left">
-                            <p className="font-medium text-gray-900">
-                              {formData.studentIdFile?.name || uploadedDocuments.studentId?.name || 'Uploaded Document'}
-                            </p>
-                            <p className="text-sm text-gray-500">
-                              {formData.studentIdFile 
-                                ? `${(formData.studentIdFile.size / 1024 / 1024).toFixed(2)} MB`
-                                : uploadedDocuments.studentId?.size 
-                                  ? `${(uploadedDocuments.studentId.size / 1024 / 1024).toFixed(2)} MB`
-                                  : 'Uploaded'
-                              }
-                            </p>
+                            <p className="font-medium text-gray-900">{formData.studentIdFile.name}</p>
+                            <p className="text-sm text-gray-500">{(formData.studentIdFile.size / 1024 / 1024).toFixed(2)} MB</p>
                           </div>
                         </div>
                         <button
@@ -719,7 +590,7 @@ export default function DocumentsPage() {
                     border-2 border-dashed rounded-xl p-8 text-center transition-all duration-200
                     ${dragOver === 'incomeVerification' 
                       ? 'border-gray-400 bg-gray-100' 
-                      : (formData.incomeVerificationFile || uploadedDocuments.incomeVerification)
+                      : formData.incomeVerificationFile 
                         ? 'border-green-300 bg-green-50'
                         : 'border-gray-300 hover:border-gray-400'
                     }
@@ -735,22 +606,13 @@ export default function DocumentsPage() {
                       </div>
                       <p className="text-slate-600 font-medium text-center">Uploading...</p>
                     </div>
-                  ) : formData.incomeVerificationFile || uploadedDocuments.incomeVerification ? (
+                  ) : formData.incomeVerificationFile ? (
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
                         <DocumentTextIcon className="w-8 h-8 text-green-600 mr-3" />
                         <div className="text-left">
-                          <p className="font-medium text-gray-900">
-                            {formData.incomeVerificationFile?.name || uploadedDocuments.incomeVerification?.name || 'Uploaded Document'}
-                          </p>
-                          <p className="text-sm text-gray-500">
-                            {formData.incomeVerificationFile 
-                              ? `${(formData.incomeVerificationFile.size / 1024 / 1024).toFixed(2)} MB`
-                              : uploadedDocuments.incomeVerification?.size 
-                                ? `${(uploadedDocuments.incomeVerification.size / 1024 / 1024).toFixed(2)} MB`
-                                : 'Uploaded'
-                            }
-                          </p>
+                          <p className="font-medium text-gray-900">{formData.incomeVerificationFile.name}</p>
+                          <p className="text-sm text-gray-500">{(formData.incomeVerificationFile.size / 1024 / 1024).toFixed(2)} MB</p>
                         </div>
                       </div>
                       <button

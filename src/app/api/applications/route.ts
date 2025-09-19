@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-static';
 export const runtime = 'nodejs';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -103,7 +103,6 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('userId');
     const email = searchParams.get('email');
-    const sessionId = searchParams.get('sessionId');
     
     if (!userId && !email) {
       return NextResponse.json(
@@ -112,32 +111,17 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    console.log('🔍 Fetching applications for:', { userId, email, sessionId });
+    console.log('🔍 Fetching applications for:', { userId, email });
 
     let query = supabase.from('applications').select('*');
     
     if (userId) {
       query = query.eq('user_id', userId);
-      // Try to filter by sessionId, but don't fail if column doesn't exist
-      if (sessionId) {
-        try {
-          query = query.eq('session_id', sessionId);
-          console.log('🔍 Filtering by session_id:', sessionId);
-        } catch (sessionError) {
-          console.warn('⚠️ session_id column might not exist, skipping session filter');
-        }
-      }
     } else if (email) {
       query = query.eq('email', email);
     }
 
-    console.log('📊 Executing applications query...');
     const { data, error } = await query.order('created_at', { ascending: false });
-    
-    console.log('📊 Query result:', { 
-      foundApplications: data?.length || 0, 
-      error: error?.message || 'none' 
-    });
 
     if (error) {
       console.error('Error fetching applications:', error);

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-static';
 export const runtime = 'nodejs';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -10,172 +10,49 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 export async function POST(request: NextRequest) {
-  console.log('🚀 Upload document API called');
-  
   try {
     const formData = await request.formData();
     const file = formData.get('file') as File;
     const userId = formData.get('userId') as string;
-    const sessionId = formData.get('sessionId') as string;
     const documentType = formData.get('documentType') as string;
     
-    console.log('📝 Received parameters:', { 
-      fileName: file?.name, 
-      userId, 
-      sessionId, 
-      documentType,
-      fileSize: file?.size 
-    });
-    
-    if (!file || !userId || !documentType || !sessionId) {
+    if (!file || !userId || !documentType) {
       return NextResponse.json(
-        { error: 'File, userId, sessionId, and documentType are required' },
+        { error: 'File, userId, and documentType are required' },
         { status: 400 }
       );
     }
 
-    // Create session-based filename for consistency
+    // Create unique filename
     const fileExtension = file.name.split('.').pop();
-    const fileName = `${sessionId}_${documentType}_${file.name}`;
+    const fileName = `${userId}/${documentType}_${Date.now()}.${fileExtension}`;
 
-    console.log('📤 Starting storage upload to bucket: application-documents');
-    console.log('📁 Upload path:', fileName);
-
-    // Upload to Supabase Storage using service role (should bypass RLS)
+    // Upload to Supabase Storage
     const { data, error } = await supabase.storage
       .from('application-documents')
       .upload(fileName, file, {
         cacheControl: '3600',
-        upsert: true // Allow overwrite to handle duplicates
+        upsert: false
       });
 
     if (error) {
-      console.error('🚨 Storage upload error details:', {
-        message: error.message,
-        error: error
-      });
-      
-      // Provide specific error guidance
-      if (error.message?.includes('row-level security')) {
-        console.error('🔒 RLS Policy blocking upload - Storage bucket needs policy update');
-      }
-      if (error.message?.includes('Bucket not found')) {
-        console.error('📦 Bucket not found - verify bucket name: application-documents');
-      }
-      
+      console.error('Error uploading file:', error);
       return NextResponse.json(
-        { error: `Storage upload failed: ${error.message}` },
+        { error: 'Failed to upload file' },
         { status: 500 }
       );
     }
-    
-    console.log('✅ Storage upload successful:', data.path);
 
     // Get public URL
     const { data: urlData } = supabase.storage
       .from('application-documents')
       .getPublicUrl(fileName);
 
-    // Save document metadata to database
-    try {
-      console.log('💾 Starting database save for:', { userId, sessionId, documentType, fileName: file.name });
-      
-      const documentData = {
-        userId: userId,
-        sessionId: sessionId,
-        documents: {
-          [documentType]: {
-            name: file.name,
-            size: file.size,
-            type: file.type,
-            filePath: data.path,
-            fileUrl: urlData.publicUrl,
-            uploadedAt: new Date().toISOString()
-          }
-        }
-      };
-
-      console.log('📋 Document data to save:', documentData);
-
-      // Try to update existing application first
-      console.log('🔍 Looking for existing applications for user:', userId);
-      const { data: existingApps, error: fetchError } = await supabase
-        .from('applications')
-        .select('*')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false })
-        .limit(1);
-        
-      if (fetchError) {
-        console.error('🚨 Error fetching existing applications:', fetchError);
-        throw new Error(`Failed to fetch applications: ${fetchError.message}`);
-      }
-      
-      console.log('📊 Found existing applications:', existingApps?.length || 0);
-
-      if (existingApps && existingApps.length > 0) {
-        // Update existing application
-        const existingApp = existingApps[0];
-        const updatedDocuments = {
-          ...existingApp.documents,
-          [documentType]: documentData.documents[documentType]
-        };
-
-        const { error: updateError } = await supabase
-          .from('applications')
-          .update({ 
-            documents: updatedDocuments,
-            session_id: sessionId,
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', existingApp.id);
-          
-        if (updateError) {
-          console.error('🚨 Database update error details:', {
-            message: updateError.message,
-            details: updateError.details,
-            hint: updateError.hint,
-            code: updateError.code
-          });
-          throw new Error(`Database update failed: ${updateError.message}`);
-        }
-
-        console.log('📄 Updated existing application with document');
-      } else {
-        // Create new application
-        const { error: insertError } = await supabase
-          .from('applications')
-          .insert({
-            user_id: userId,
-            session_id: sessionId,
-            status: 'draft',
-            documents: documentData.documents,
-            created_at: new Date().toISOString()
-          });
-          
-        if (insertError) {
-          console.error('🚨 Database insert error details:', {
-            message: insertError.message,
-            details: insertError.details,
-            hint: insertError.hint,
-            code: insertError.code
-          });
-          throw new Error(`Database insert failed: ${insertError.message}`);
-        }
-
-        console.log('📄 Created new application with document');
-      }
-    } catch (dbError) {
-      console.error('Error saving document metadata to database:', dbError);
-      // Don't fail the upload if database save fails
-    }
-
     return NextResponse.json({
       success: true,
       fileName: file.name,
       filePath: data.path,
       fileUrl: urlData.publicUrl,
-      sessionId: sessionId,
       message: 'File uploaded successfully'
     });
 
