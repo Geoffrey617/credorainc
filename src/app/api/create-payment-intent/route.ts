@@ -10,7 +10,18 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_dummy', {
 
 export async function POST(request: NextRequest) {
   try {
-    const { amount, currency = 'usd', customerEmail, customerName, service, description, cardDetails, billingAddress } = await request.json();
+    const { 
+      amount, 
+      currency = 'usd', 
+      customerEmail, 
+      customerName, 
+      service, 
+      description, 
+      cardDetails, 
+      billingAddress,
+      payment_method_types,
+      automatic_payment_methods
+    } = await request.json();
 
     // If card details are provided, process payment server-side
     if (cardDetails) {
@@ -62,19 +73,30 @@ export async function POST(request: NextRequest) {
       });
     } else {
       // Create payment intent for client-side processing (original behavior)
-      const paymentIntent = await stripe.paymentIntents.create({
+      const paymentIntentData: any = {
         amount: Math.round(amount * 100), // Convert to cents
         currency,
-        automatic_payment_methods: {
-          enabled: true,
-        },
         metadata: {
           customerEmail,
           customerName,
           service: service || 'Cosigner Application Fee'
         },
         description: description || `Credora Cosigner Application Fee - ${customerEmail}`,
-      });
+      };
+
+      // Add payment method configuration
+      if (payment_method_types && payment_method_types.length > 0) {
+        paymentIntentData.payment_method_types = payment_method_types;
+      } else if (automatic_payment_methods) {
+        paymentIntentData.automatic_payment_methods = automatic_payment_methods;
+      } else {
+        paymentIntentData.automatic_payment_methods = {
+          enabled: true,
+        };
+      }
+
+      console.log('💳 Creating payment intent with config:', paymentIntentData);
+      const paymentIntent = await stripe.paymentIntents.create(paymentIntentData);
 
       return NextResponse.json({
         success: true,

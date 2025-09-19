@@ -19,7 +19,7 @@ import { detectCardType, formatCardNumber } from '../../../utils/card-detection'
 import { getSortedUSStates } from '../../../utils/us-states';
 import { STRIPE_CONFIG } from '../../../utils/stripe-payment';
 import AddressAutocomplete from '../../../components/AddressAutocomplete';
-import StripeApplePayButton from '../../../components/StripeApplePayButton';
+import StripePaymentElement from '../../../components/StripePaymentElement';
 
 // Modern application steps with enhanced descriptions
 const steps = [
@@ -405,7 +405,7 @@ export default function SubmitPage() {
         <div className="bg-white rounded-xl shadow-lg p-8">
           <div className="mb-8">
             <h2 className="text-2xl font-semibold text-slate-800 mb-2">Payment & Submit</h2>
-            <p className="text-slate-600">Complete your application with the $55 application fee.</p>
+            <p className="text-slate-600">Complete your application.</p>
           </div>
           <div className="space-y-6">
 
@@ -445,7 +445,7 @@ export default function SubmitPage() {
               <div className="lg:col-span-2">
                 <div className="space-y-6">
                   {/* Stripe Payment Element - Handles Apple Pay + Cards */}
-                  <StripeApplePayButton
+                  <StripePaymentElement
                     amount={STRIPE_CONFIG.applicationFee} // 5500 cents = $55.00
                     customerEmail={formData.email}
                     customerName={`${formData.firstName} ${formData.lastName}`}

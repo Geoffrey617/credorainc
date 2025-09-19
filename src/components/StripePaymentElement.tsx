@@ -7,7 +7,7 @@ import { Elements, useStripe, useElements, PaymentElement } from '@stripe/react-
 // Initialize Stripe
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
-interface StripeApplePayButtonProps {
+interface StripePaymentElementProps {
   amount: number; // Amount in cents (5500 for $55.00)
   customerEmail: string;
   customerName: string;
@@ -20,7 +20,7 @@ function StripePaymentContent({
   onSuccess, 
   onError,
   disabled = false
-}: StripeApplePayButtonProps) {
+}: StripePaymentElementProps) {
   const stripe = useStripe();
   const elements = useElements();
   const [isProcessing, setIsProcessing] = useState(false);
@@ -118,7 +118,7 @@ function StripePaymentContent({
   );
 }
 
-export default function StripeApplePayButton(props: StripeApplePayButtonProps) {
+export default function StripePaymentElement(props: StripePaymentElementProps) {
   const [clientSecret, setClientSecret] = useState<string>('');
 
   useEffect(() => {
