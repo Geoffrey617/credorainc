@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-export const dynamic = 'force-static';
+export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -12,6 +12,8 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey);
 export async function POST(request: NextRequest) {
   try {
     const applicationData = await request.json();
+    
+    console.log('📝 POST request data:', applicationData);
     
     // Extract user ID from the request (you might get this from auth)
     const { userId, ...formData } = applicationData;
@@ -70,18 +72,28 @@ export async function POST(request: NextRequest) {
           landlordPhone: formData.landlordPhone,
           propertyWebsite: formData.propertyWebsite
         },
-        documents: formData.documents || {}
+        documents: formData.documents || {},
+        document_file_ids: formData.document_file_ids || {},
+        document_status: formData.document_status || {}
       })
       .select()
       .single();
 
     if (error) {
-      console.error('Error saving application:', error);
+      console.error('❌ Error saving application:', error);
+      console.error('📋 Application data that failed:', {
+        user_id: userId,
+        first_name: formData.firstName,
+        last_name: formData.lastName,
+        email: formData.email
+      });
       return NextResponse.json(
-        { error: 'Failed to save application' },
+        { error: 'Failed to save application', details: error.message },
         { status: 500 }
       );
     }
+    
+    console.log('✅ Application saved successfully:', data.id);
 
     return NextResponse.json({ 
       success: true, 
@@ -144,7 +156,9 @@ export async function GET(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const { userId, documents, ...updateData } = await request.json();
+    const { userId, documents, document_file_ids, document_status, ...updateData } = await request.json();
+    
+    console.log('📝 PUT request data:', { userId, document_file_ids, document_status });
     
     // Find the user's most recent application
     const { data: existingApps, error: fetchError } = await supabase
@@ -155,6 +169,7 @@ export async function PUT(request: NextRequest) {
       .limit(1);
     
     if (fetchError || !existingApps || existingApps.length === 0) {
+      console.log('📭 No existing application found, will need to create new one');
       return NextResponse.json(
         { error: 'No application found to update' },
         { status: 404 }
@@ -162,19 +177,36 @@ export async function PUT(request: NextRequest) {
     }
     
     const existingApp = existingApps[0];
+    console.log('📋 Found existing application:', existingApp.id);
     
-    // Merge documents with existing documents
+    // Merge documents and file IDs with existing data
     const updatedDocuments = {
       ...existingApp.documents,
       ...documents
     };
     
+    const updatedFileIds = {
+      ...existingApp.document_file_ids,
+      ...document_file_ids
+    };
+    
+    const updatedStatus = {
+      ...existingApp.document_status,
+      ...document_status
+    };
+    
+    const updatePayload = {
+      documents: updatedDocuments,
+      document_file_ids: updatedFileIds,
+      document_status: updatedStatus,
+      ...updateData
+    };
+    
+    console.log('🔄 Updating application with:', updatePayload);
+    
     const { data, error } = await supabase
       .from('applications')
-      .update({
-        documents: updatedDocuments,
-        ...updateData
-      })
+      .update(updatePayload)
       .eq('id', existingApp.id)
       .select()
       .single();
