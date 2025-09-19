@@ -177,8 +177,8 @@ export default function RentalInfoPage() {
       const updatedData = { ...existingData, ...formData };
       localStorage.setItem('credora_application_form', JSON.stringify(updatedData));
       
-      // Navigate directly to review page (documents moved to post-submission)
-      router.push('/apply/review');
+      // Navigate to documents page (proper application flow)
+      router.push('/apply/documents');
     }
   };
 
