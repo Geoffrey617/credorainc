@@ -181,6 +181,123 @@ export default function SubmitPage() {
     }
   };
 
+  const handleApplePay = async () => {
+    console.log('🍎 Apple Pay button clicked');
+    
+    if (!window.ApplePaySession) {
+      alert('Apple Pay is not supported on this device or browser.');
+      return;
+    }
+
+    if (!ApplePaySession.canMakePayments()) {
+      alert('Apple Pay is not set up on this device.');
+      return;
+    }
+
+    setIsProcessing(true);
+
+    try {
+      // Define the payment request
+      const paymentRequest = {
+        countryCode: 'US',
+        currencyCode: 'USD',
+        supportedNetworks: ['visa', 'masterCard', 'amex', 'discover'],
+        merchantCapabilities: ['supports3DS'],
+        total: {
+          label: 'Credora Cosigner Application Fee',
+          amount: STRIPE_CONFIG.applicationFee.toString()
+        }
+      };
+
+      console.log('🍎 Creating Apple Pay session with request:', paymentRequest);
+
+      // Create Apple Pay session
+      const session = new ApplePaySession(3, paymentRequest);
+
+      // Handle merchant validation
+      session.onvalidatemerchant = async (event) => {
+        console.log('🍎 Validating merchant for Apple Pay');
+        try {
+          const response = await fetch('/api/apple-pay/validate-merchant', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              validationURL: event.validationURL,
+              domainName: window.location.hostname
+            })
+          });
+
+          if (!response.ok) {
+            throw new Error('Merchant validation failed');
+          }
+
+          const merchantSession = await response.json();
+          session.completeMerchantValidation(merchantSession);
+        } catch (error) {
+          console.error('🚨 Apple Pay merchant validation error:', error);
+          session.abort();
+          alert('Apple Pay setup failed. Please use card payment.');
+          setIsProcessing(false);
+        }
+      };
+
+      // Handle payment authorization
+      session.onpaymentauthorized = async (event) => {
+        console.log('🍎 Processing Apple Pay payment');
+        try {
+          const response = await fetch('/api/apple-pay/process-payment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              paymentToken: event.payment.token,
+              amount: STRIPE_CONFIG.applicationFee,
+              currency: STRIPE_CONFIG.currency,
+              customerEmail: formData.email,
+              customerName: `${formData.firstName} ${formData.lastName}`,
+              service: 'Cosigner Application Fee',
+              description: 'Credora Cosigner Application Fee'
+            })
+          });
+
+          if (!response.ok) {
+            throw new Error('Payment processing failed');
+          }
+
+          const paymentResult = await response.json();
+
+          if (paymentResult.success) {
+            session.completePayment(ApplePaySession.STATUS_SUCCESS);
+            
+            // Clear form data and redirect to success
+            localStorage.removeItem('credora_application_form');
+            router.push('/apply/success');
+          } else {
+            throw new Error(paymentResult.error || 'Payment failed');
+          }
+        } catch (error) {
+          console.error('🚨 Apple Pay payment error:', error);
+          session.completePayment(ApplePaySession.STATUS_FAILURE);
+          alert(`Payment failed: ${error.message}`);
+          setIsProcessing(false);
+        }
+      };
+
+      // Handle session cancellation
+      session.oncancel = () => {
+        console.log('🍎 Apple Pay session cancelled by user');
+        setIsProcessing(false);
+      };
+
+      // Start the Apple Pay session
+      session.begin();
+
+    } catch (error) {
+      console.error('🚨 Apple Pay initialization error:', error);
+      alert(`Apple Pay failed: ${error.message}`);
+      setIsProcessing(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isFormValid()) return;
@@ -438,7 +555,7 @@ export default function SubmitPage() {
                       <div className="mb-4">
                         <button 
                           type="button"
-                          onClick={handleSubmit}
+                          onClick={handleApplePay}
                           disabled={isProcessing}
                           className="w-full bg-black text-white px-6 py-4 rounded-xl font-medium hover:bg-gray-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                         >
