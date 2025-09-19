@@ -353,9 +353,9 @@ export default function DocumentsPage() {
             const putSuccess = await updateResponse.json();
             console.log('✅ PUT successful:', putSuccess);
           }
-        } catch (apiError) {
+        } catch (apiError: any) {
           console.error('❌ API request failed:', apiError);
-          alert(`API Request Failed: ${apiError.message}`);
+          alert(`API Request Failed: ${apiError.message || apiError.toString()}`);
         }
       }
 
