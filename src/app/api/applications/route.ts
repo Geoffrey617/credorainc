@@ -101,10 +101,17 @@ export async function POST(request: NextRequest) {
       message: 'Application saved successfully' 
     });
 
-  } catch (error) {
-    console.error('Error in application API:', error);
+  } catch (error: any) {
+    console.error('❌ CRITICAL ERROR in POST applications API:', error);
+    console.error('Error details:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name,
+      supabaseUrl: !!supabaseUrl,
+      supabaseKey: !!supabaseServiceKey
+    });
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Internal server error', details: error.message },
       { status: 500 }
     );
   }
@@ -112,6 +119,18 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
+    // Basic environment check
+    if (!supabaseUrl || !supabaseServiceKey) {
+      console.error('❌ Missing Supabase environment variables:', {
+        hasUrl: !!supabaseUrl,
+        hasKey: !!supabaseServiceKey
+      });
+      return NextResponse.json(
+        { error: 'Server configuration error' },
+        { status: 500 }
+      );
+    }
+    
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('userId');
     const email = searchParams.get('email');
@@ -145,10 +164,17 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ applications: data });
 
-  } catch (error) {
-    console.error('Error in application API:', error);
+  } catch (error: any) {
+    console.error('❌ CRITICAL ERROR in GET applications API:', error);
+    console.error('Error details:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name,
+      userId,
+      email
+    });
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Internal server error', details: error.message },
       { status: 500 }
     );
   }
@@ -225,10 +251,16 @@ export async function PUT(request: NextRequest) {
       message: 'Application updated successfully' 
     });
 
-  } catch (error) {
-    console.error('Error in application API:', error);
+  } catch (error: any) {
+    console.error('❌ CRITICAL ERROR in PUT applications API:', error);
+    console.error('Error details:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name,
+      userId
+    });
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Internal server error', details: error.message },
       { status: 500 }
     );
   }
