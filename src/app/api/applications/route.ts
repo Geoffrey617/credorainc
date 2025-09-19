@@ -181,18 +181,18 @@ export async function PUT(request: NextRequest) {
     
     // Merge documents and file IDs with existing data
     const updatedDocuments = {
-      ...existingApp.documents,
-      ...documents
+      ...(existingApp.documents || {}),
+      ...(documents || {})
     };
     
     const updatedFileIds = {
-      ...existingApp.document_file_ids,
-      ...document_file_ids
+      ...(existingApp.document_file_ids || {}),
+      ...(document_file_ids || {})
     };
     
     const updatedStatus = {
-      ...existingApp.document_status,
-      ...document_status
+      ...(existingApp.document_status || {}),
+      ...(document_status || {})
     };
     
     const updatePayload = {

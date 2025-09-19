@@ -118,24 +118,46 @@ export default function DocumentsPage() {
           
           if (response.ok && result.applications && result.applications.length > 0) {
             const latestApp = result.applications[0];
+            console.log('📋 Loading existing application data:', latestApp);
             
-            if (latestApp.documents) {
-              const createFileObject = (docInfo: any) => {
-                if (!docInfo) return null;
-                return {
-                  name: docInfo.name,
-                  size: docInfo.size || 1024 * 1024,
-                  type: docInfo.type || 'application/pdf'
-                } as File;
-              };
-              
-              setFormData(prev => ({
-                ...prev,
-                governmentIdFile: createFileObject(latestApp.documents.governmentId),
-                incomeVerificationFile: createFileObject(latestApp.documents.incomeVerification),
-                studentIdFile: createFileObject(latestApp.documents.studentId),
-              }));
-            }
+            // Load from document_file_ids (new structure) or fallback to documents (legacy)
+            const fileIds = latestApp.document_file_ids || {};
+            const legacyDocs = latestApp.documents || {};
+            
+            const createFileFromHandle = (handle: string, docType: string) => {
+              if (!handle) return null;
+              return {
+                name: `${docType}.pdf`, // Default name
+                handle: handle,
+                url: `https://cdn.filestackcontent.com/${handle}`,
+                size: 1024 * 1024, // Default size
+                type: 'application/pdf',
+                secure: true,
+                virusScanned: true
+              } as any;
+            };
+            
+            const createFileObject = (docInfo: any) => {
+              if (!docInfo) return null;
+              return {
+                name: docInfo.name,
+                size: docInfo.size || 1024 * 1024,
+                type: docInfo.type || 'application/pdf'
+              } as File;
+            };
+            
+            setFormData(prev => ({
+              ...prev,
+              governmentIdFile: fileIds.governmentId ? 
+                createFileFromHandle(fileIds.governmentId, 'Government ID') : 
+                createFileObject(legacyDocs.governmentId),
+              incomeVerificationFile: fileIds.incomeVerification ? 
+                createFileFromHandle(fileIds.incomeVerification, 'Income Verification') : 
+                createFileObject(legacyDocs.incomeVerification),
+              studentIdFile: fileIds.studentId ? 
+                createFileFromHandle(fileIds.studentId, 'Student ID') : 
+                createFileObject(legacyDocs.studentId),
+            }));
           }
         } catch (error) {
           console.error('Error loading documents from database:', error);
