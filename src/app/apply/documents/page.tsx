@@ -145,14 +145,14 @@ export default function DocumentsPage() {
             const fileIds = latestApp.document_file_ids || {};
             const legacyDocs = latestApp.documents || {};
             
-            const createFileFromHandle = (handle: string, docType: string) => {
+            const createFileFromHandle = (handle: string, docType: string, docInfo?: any) => {
               if (!handle) return null;
               return {
-                name: `${docType}.pdf`, // Default name
+                name: docInfo?.filename || `${docType}.pdf`, // Use stored filename or default
                 handle: handle,
                 url: `https://cdn.filestackcontent.com/${handle}`,
-                size: 1024 * 1024, // Default size
-                type: 'application/pdf',
+                size: docInfo?.size || 1024 * 1024, // Use actual stored size or default
+                type: docInfo?.mimetype || 'application/pdf',
                 secure: true,
                 virusScanned: true
               } as any;
@@ -170,13 +170,13 @@ export default function DocumentsPage() {
             setFormData(prev => ({
               ...prev,
               governmentIdFile: fileIds.governmentId ? 
-                createFileFromHandle(fileIds.governmentId, 'Government ID') : 
+                createFileFromHandle(fileIds.governmentId, 'Government ID', legacyDocs.governmentId) : 
                 createFileObject(legacyDocs.governmentId),
               incomeVerificationFile: fileIds.incomeVerification ? 
-                createFileFromHandle(fileIds.incomeVerification, 'Income Verification') : 
+                createFileFromHandle(fileIds.incomeVerification, 'Income Verification', legacyDocs.incomeVerification) : 
                 createFileObject(legacyDocs.incomeVerification),
               studentIdFile: fileIds.studentId ? 
-                createFileFromHandle(fileIds.studentId, 'Student ID') : 
+                createFileFromHandle(fileIds.studentId, 'Student ID', legacyDocs.studentId) : 
                 createFileObject(legacyDocs.studentId),
             }));
           }
@@ -277,6 +277,15 @@ export default function DocumentsPage() {
           },
           document_status: {
             [fileType.replace('File', '')]: 'uploaded' // Simple status tracking
+          },
+          documents: {
+            [fileType.replace('File', '')]: {
+              handle: result.handle,
+              filename: result.filename,
+              size: result.size || file.size, // Store actual file size
+              mimetype: result.mimetype || file.type,
+              uploadedAt: new Date().toISOString()
+            }
           }
         };
 
@@ -319,6 +328,15 @@ export default function DocumentsPage() {
               },
               document_status: {
                 [fileType.replace('File', '')]: 'uploaded'
+              },
+              documents: {
+                [fileType.replace('File', '')]: {
+                  handle: result.handle,
+                  filename: result.filename,
+                  size: result.size || file.size, // Store actual file size
+                  mimetype: result.mimetype || file.type,
+                  uploadedAt: new Date().toISOString()
+                }
               }
             };
             
