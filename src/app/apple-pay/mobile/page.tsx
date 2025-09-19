@@ -41,7 +41,16 @@ function MobileApplePayContent() {
 
     // Auto-start Apple Pay if available
     if (typeof window !== 'undefined' && (window as any).ApplePaySession) {
-      startApplePay();
+      // Check if this is a development environment
+      const isDevelopment = window.location.hostname === 'localhost' || 
+                           window.location.hostname.includes('netlify') ||
+                           window.location.hostname.includes('vercel');
+      
+      if (isDevelopment) {
+        setError('Apple Pay requires production environment with proper merchant certificates for Touch ID/Face ID authentication. Please use regular card payment for testing.');
+      } else {
+        startApplePay();
+      }
     } else {
       setError('Apple Pay is not available on this device');
     }
@@ -60,18 +69,16 @@ function MobileApplePayContent() {
         return;
       }
 
-      // Define the payment request for mobile
+      // Define the payment request for mobile with minimal requirements
       const paymentRequest = {
         countryCode: 'US',
         currencyCode: 'USD',
         supportedNetworks: ['visa', 'masterCard', 'amex', 'discover'],
-        merchantCapabilities: ['supports3DS', 'supportsEMV', 'supportsCredit', 'supportsDebit'],
+        merchantCapabilities: ['supports3DS'],
         total: {
           label: 'Credora Cosigner Application Fee',
-          amount: paymentData.amount.toFixed(2),
-          type: 'final'
-        },
-        requiredBillingContactFields: ['postalAddress'],
+          amount: paymentData.amount.toFixed(2)
+        }
       };
 
       console.log('🍎 Starting mobile Apple Pay session:', paymentRequest);
@@ -81,34 +88,51 @@ function MobileApplePayContent() {
 
       // Handle merchant validation
       session.onvalidatemerchant = async (event: any) => {
-        console.log('🍎 Mobile merchant validation');
+        console.log('🍎 Mobile merchant validation started');
+        console.log('🔍 Validation URL:', event.validationURL);
+        console.log('🌐 Domain:', window.location.hostname);
+        
         try {
+          const validationPayload = {
+            validationURL: event.validationURL,
+            domainName: window.location.hostname
+          };
+          
+          console.log('📤 Sending validation request:', validationPayload);
+          
           const response = await fetch('/api/apple-pay/validate-merchant', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              validationURL: event.validationURL,
-              domainName: window.location.hostname
-            })
+            body: JSON.stringify(validationPayload)
           });
 
+          console.log('📥 Validation response status:', response.status);
+
           if (!response.ok) {
-            throw new Error('Merchant validation failed');
+            const errorText = await response.text();
+            console.error('❌ Validation response error:', errorText);
+            throw new Error(`Merchant validation failed: ${response.status} - ${errorText}`);
           }
 
           const merchantSession = await response.json();
+          console.log('✅ Merchant session received:', merchantSession);
+          
           session.completeMerchantValidation(merchantSession);
+          console.log('🎯 Merchant validation completed - should trigger Touch ID now');
+          
         } catch (error: any) {
           console.error('🚨 Mobile merchant validation error:', error);
           session.abort();
-          setError('Apple Pay setup failed');
+          setError(`Apple Pay setup failed: ${error.message}`);
           setIsProcessing(false);
         }
       };
 
       // Handle payment authorization
       session.onpaymentauthorized = async (event: any) => {
+        console.log('🎉 TOUCH ID/FACE ID AUTHENTICATION SUCCESSFUL!');
         console.log('🍎 Processing mobile Apple Pay payment');
+        console.log('💳 Payment token received:', event.payment.token);
         try {
           const response = await fetch('/api/apple-pay/process-payment', {
             method: 'POST',
@@ -173,20 +197,30 @@ function MobileApplePayContent() {
 
       // Handle session cancellation
       session.oncancel = async (event: any) => {
-        console.log('🍎 Mobile Apple Pay cancelled by user');
+        console.log('🚫 Apple Pay session cancelled');
+        console.log('❓ Cancellation reason:', event);
+        console.log('⚠️ This could be due to:');
+        console.log('  - User cancelled manually');
+        console.log('  - Merchant validation failed');
+        console.log('  - Apple Pay not properly set up');
+        console.log('  - Invalid payment request');
         
         // Update payment status to cancelled
-        await fetch('/api/apple-pay/update-payment-status', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            paymentId: paymentData.paymentId,
-            status: 'cancelled'
-          })
-        });
+        try {
+          await fetch('/api/apple-pay/update-payment-status', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              paymentId: paymentData.paymentId,
+              status: 'cancelled'
+            })
+          });
+        } catch (error) {
+          console.error('Error updating cancelled status:', error);
+        }
         
         setIsProcessing(false);
-        alert('Payment cancelled. You can close this page.');
+        setError('Payment was cancelled. This could be due to Apple Pay setup issues or merchant validation failure.');
       };
 
       // Start the Apple Pay session
