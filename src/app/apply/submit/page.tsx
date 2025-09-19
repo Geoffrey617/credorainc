@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import '../../../types/apple-pay';
 import { 
   ChevronRightIcon, 
   CheckCircleIcon, 
@@ -20,6 +19,13 @@ import { detectCardType, formatCardNumber } from '../../../utils/card-detection'
 import { getSortedUSStates } from '../../../utils/us-states';
 import { STRIPE_CONFIG } from '../../../utils/stripe-payment';
 import AddressAutocomplete from '../../../components/AddressAutocomplete';
+
+// Apple Pay type declarations for browser-only usage
+declare global {
+  interface Window {
+    ApplePaySession?: any;
+  }
+}
 
 // Modern application steps with enhanced descriptions
 const steps = [
