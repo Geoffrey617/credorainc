@@ -48,7 +48,9 @@ function ApplePayButtonContent({
           customerName,
           service: 'Cosigner Application Fee',
           description: 'Credora Cosigner Application Fee',
-          paymentMethodTypes: ['apple_pay']
+          automatic_payment_methods: {
+            enabled: true
+          }
         })
       });
 
@@ -97,7 +99,6 @@ function ApplePayButtonContent({
       <div className="mb-4">
         <PaymentElement 
           options={{
-            paymentMethodTypes: ['apple_pay'],
             layout: {
               type: 'accordion',
               defaultCollapsed: false,
@@ -152,7 +153,9 @@ export default function StripeApplePayButton(props: StripeApplePayButtonProps) {
           body: JSON.stringify({
             amount: props.amount / 100, // Convert cents to dollars
             currency: 'usd',
-            paymentMethodTypes: ['apple_pay', 'card']
+            automatic_payment_methods: {
+              enabled: true
+            }
           })
         });
 
