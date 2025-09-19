@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSimpleAuth } from '../../../hooks/useSimpleAuth';
-import { uploadSecureDocument } from '../../../lib/filestack-config';
+import { secureDocumentUpload } from '../../../lib/google-drive-config';
 import { 
   ChevronRightIcon, 
   CheckCircleIcon, 
@@ -176,42 +176,41 @@ export default function DocumentsPage() {
         return;
       }
 
-      // Upload to Supabase via API
-      const uploadFormData = new FormData();
-      uploadFormData.append('file', file);
-      uploadFormData.append('userId', authUser.id);
-      uploadFormData.append('documentType', fileType.replace('File', ''));
-
-      const response = await fetch('/api/upload-document', {
-        method: 'POST',
-        body: uploadFormData
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || 'Upload failed');
-      }
+      console.log('🛡️ Starting secure upload with Google Drive + ClamAV');
       
-      // Update form data with uploaded file info
+      // Upload with Google Drive + ClamAV virus scanning (isolated from database)
+      const result = await secureDocumentUpload(
+        file,
+        fileType.replace('File', ''),
+        authUser.id,
+        (stage) => {
+          console.log(`📤 Upload stage: ${stage}`);
+          // You can add progress UI updates here if needed
+        }
+      );
+      
+      // Update form data with Google Drive file info
       setFormData(prev => ({
         ...prev,
-        [fileType]: file
+        [fileType]: {
+          name: result.name,
+          googleDriveId: result.id,
+          url: result.url,
+          secure: true,
+          virusScanned: true,
+          clean: result.clean
+        } as any
       }));
 
-      // Save document info to database
+      // Save ONLY file IDs to database (isolated from file content)
       if (authUser?.id) {
         const documentData = {
           userId: authUser.id,
-          documents: {
-            [fileType.replace('File', '')]: {
-              name: file.name,
-              size: file.size,
-              type: file.type,
-              filePath: result.filePath,
-              fileUrl: result.fileUrl,
-              uploadedAt: new Date().toISOString()
-            }
+          document_file_ids: {
+            [fileType.replace('File', '')]: result.id // ONLY store Google Drive ID
+          },
+          document_status: {
+            [fileType.replace('File', '')]: 'uploaded' // Simple status tracking
           }
         };
 
@@ -253,10 +252,20 @@ export default function DocumentsPage() {
         }
       }
 
-      console.log(`Successfully uploaded ${fileType}:`, result.fileName);
-    } catch (error) {
-      console.error(`Error uploading ${fileType}:`, error);
-      alert('Upload failed. Please try again.');
+      console.log(`✅ ${fileType} uploaded securely to Google Drive with ClamAV scanning:`, result.name);
+    } catch (error: any) {
+      console.error(`🚨 Secure upload failed for ${fileType}:`, error);
+      
+      // Handle security-specific errors
+      if (error.message?.includes('virus') || error.message?.includes('malware')) {
+        alert('🦠 Security threat detected! This file cannot be uploaded. Please scan your device and try with a different file.');
+      } else if (error.message?.includes('content')) {
+        alert('🚫 File content not allowed. Please upload a valid document.');
+      } else {
+        alert('Upload failed. Please try again.');
+      }
+      
+      setErrors(prev => ({ ...prev, [fileType]: error.message }));
     } finally {
       // Hide uploading state
       setUploading(prev => ({ ...prev, [fileType]: false }));
