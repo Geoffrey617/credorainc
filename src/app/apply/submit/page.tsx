@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import '../../../types/apple-pay';
 import { 
   ChevronRightIcon, 
   CheckCircleIcon, 
@@ -184,11 +185,14 @@ export default function SubmitPage() {
   const handleApplePay = async () => {
     console.log('🍎 Apple Pay button clicked');
     
-    if (!window.ApplePaySession) {
+    // Check if we're in the browser and Apple Pay is available
+    if (typeof window === 'undefined' || !window.ApplePaySession) {
       alert('Apple Pay is not supported on this device or browser.');
       return;
     }
 
+    const ApplePaySession = window.ApplePaySession;
+    
     if (!ApplePaySession.canMakePayments()) {
       alert('Apple Pay is not set up on this device.');
       return;
