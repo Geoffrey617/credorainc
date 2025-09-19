@@ -113,10 +113,31 @@ export default function DocumentsPage() {
       // Load documents from database if user is authenticated and not loading
       if (!authLoading && isAuthenticated && authUser?.id) {
         try {
+          console.log('🔄 Loading existing documents for user:', authUser.id);
           const response = await fetch(`/api/applications?userId=${authUser.id}`);
-          const result = await response.json();
+          console.log('📥 GET response status:', response.status);
           
-          if (response.ok && result.applications && result.applications.length > 0) {
+          if (!response.ok) {
+            const errorText = await response.text();
+            console.log('❌ GET failed with response:', errorText);
+            
+            try {
+              const errorJson = JSON.parse(errorText);
+              console.log('📋 GET error details:', errorJson);
+              if (errorJson.details) {
+                alert(`GET Error: ${errorJson.details}`);
+              }
+            } catch (e) {
+              console.log('GET error was not JSON:', errorText);
+              alert(`GET Error: ${errorText}`);
+            }
+            return;
+          }
+          
+          const result = await response.json();
+          console.log('✅ GET successful, received data:', result);
+          
+          if (result.applications && result.applications.length > 0) {
             const latestApp = result.applications[0];
             console.log('📋 Loading existing application data:', latestApp);
             
@@ -262,34 +283,79 @@ export default function DocumentsPage() {
         // Save to database via applications API
         try {
           // First try to update existing application
+          console.log('🔄 Attempting PUT request with data:', documentData);
           const updateResponse = await fetch('/api/applications', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(documentData)
           });
           
-          // If no application exists, create one
+          console.log('📥 PUT response status:', updateResponse.status);
+          
           if (!updateResponse.ok) {
+            const putErrorText = await updateResponse.text();
+            console.log('❌ PUT failed with response:', putErrorText);
+            
+            try {
+              const putErrorJson = JSON.parse(putErrorText);
+              console.log('📋 PUT error details:', putErrorJson);
+              if (putErrorJson.details) {
+                alert(`PUT Error: ${putErrorJson.details}`);
+              }
+            } catch (e) {
+              console.log('PUT error was not JSON:', putErrorText);
+              alert(`PUT Error: ${putErrorText}`);
+            }
+            
             console.log('No existing application, creating new one');
-            await fetch('/api/applications', {
+            
+            const postData = {
+              userId: authUser.id,
+              firstName: authUser.firstName || authUser.name?.split(' ')[0] || '',
+              lastName: authUser.lastName || authUser.name?.split(' ')[1] || '',
+              email: authUser.email || '',
+              document_file_ids: {
+                [fileType.replace('File', '')]: result.handle // Store Filestack handle
+              },
+              document_status: {
+                [fileType.replace('File', '')]: 'uploaded'
+              }
+            };
+            
+            console.log('🔄 Attempting POST request with data:', postData);
+            const postResponse = await fetch('/api/applications', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                userId: authUser.id,
-                firstName: authUser.firstName || authUser.name?.split(' ')[0] || '',
-                lastName: authUser.lastName || authUser.name?.split(' ')[1] || '',
-                email: authUser.email || '',
-                document_file_ids: {
-                  [fileType.replace('File', '')]: result.handle // Store Filestack handle
-                },
-                document_status: {
-                  [fileType.replace('File', '')]: 'uploaded'
-                }
-              })
+              body: JSON.stringify(postData)
             });
+            
+            console.log('📥 POST response status:', postResponse.status);
+            
+            if (!postResponse.ok) {
+              const postErrorText = await postResponse.text();
+              console.log('❌ POST failed with response:', postErrorText);
+              
+              try {
+                const postErrorJson = JSON.parse(postErrorText);
+                console.log('📋 POST error details:', postErrorJson);
+                if (postErrorJson.details) {
+                  alert(`POST Error: ${postErrorJson.details}`);
+                }
+              } catch (e) {
+                console.log('POST error was not JSON:', postErrorText);
+                alert(`POST Error: ${postErrorText}`);
+              }
+            } else {
+              const postSuccess = await postResponse.json();
+              console.log('✅ POST successful:', postSuccess);
+            }
+          } else {
+            const putSuccess = await updateResponse.json();
+            console.log('✅ PUT successful:', putSuccess);
           }
         } catch (apiError) {
-          console.error('API error:', apiError);
+          console.error('❌ API request failed:', apiError);
+          alert(`API Request Failed: ${apiError.message}`);
         }
       }
 
