@@ -20,13 +20,6 @@ import { getSortedUSStates } from '../../../utils/us-states';
 import { STRIPE_CONFIG } from '../../../utils/stripe-payment';
 import AddressAutocomplete from '../../../components/AddressAutocomplete';
 
-// Apple Pay type declarations for browser-only usage
-declare global {
-  interface Window {
-    ApplePaySession?: any;
-  }
-}
-
 // Modern application steps with enhanced descriptions
 const steps = [
   { 
@@ -192,12 +185,12 @@ export default function SubmitPage() {
     console.log('🍎 Apple Pay button clicked');
     
     // Check if we're in the browser and Apple Pay is available
-    if (typeof window === 'undefined' || !window.ApplePaySession) {
+    if (typeof window === 'undefined' || !(window as any).ApplePaySession) {
       alert('Apple Pay is not supported on this device or browser.');
       return;
     }
 
-    const ApplePaySession = window.ApplePaySession;
+    const ApplePaySession = (window as any).ApplePaySession;
     
     if (!ApplePaySession.canMakePayments()) {
       alert('Apple Pay is not set up on this device.');
