@@ -4,8 +4,8 @@ import { Client } from '@microsoft/microsoft-graph-client';
 // OneDrive configuration for secure document uploads
 const msalConfig = {
   auth: {
-    clientId: process.env.NEXT_PUBLIC_ONEDRIVE_CLIENT_ID || 'your_client_id_here',
-    authority: 'https://login.microsoftonline.com/common',
+    clientId: process.env.NEXT_PUBLIC_ONEDRIVE_CLIENT_ID || 'ebee4a8d-8280-4631-8fe6-b56299ea0737',
+    authority: 'https://login.microsoftonline.com/f907e5b7-4310-4928-951b-1b073d96cc8b',
     redirectUri: typeof window !== 'undefined' ? window.location.origin + '/auth/onedrive/callback' : 'http://localhost:3000'
   },
   cache: {
