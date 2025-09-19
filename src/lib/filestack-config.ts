@@ -6,34 +6,19 @@ const FILESTACK_API_KEY = process.env.NEXT_PUBLIC_FILESTACK_API_KEY || 'AZrsx26m
 // Initialize Filestack client
 export const filestackClient = filestack.init(FILESTACK_API_KEY);
 
-// Security and upload configuration
-export const uploadConfig = {
-  // Security policies
-  security: {
-    policy: {
-      // Virus scanning and malware detection
-      virus_detection: 'block',
-      
-      // File type restrictions for security
-      allowed_extensions: ['pdf', 'jpg', 'jpeg', 'png', 'doc', 'docx'],
-      
-      // Size limits
-      max_size: 100 * 1024 * 1024, // 100MB max
-      
-      // Additional security
-      remove_metadata: true, // Strip potentially malicious metadata
-    }
-  },
+// Filestack security configuration
+export const securityConfig = {
+  // Virus scanning and malware detection
+  virus_detection: 'block',
   
-  // Upload options
-  uploadOptions: {
-    onProgress: (percentage: number) => {
-      console.log(`📤 Upload progress: ${percentage}%`);
-    },
-    onError: (error: any) => {
-      console.error('🚨 Filestack upload error:', error);
-    }
-  }
+  // File type restrictions for security
+  allowed_extensions: ['pdf', 'jpg', 'jpeg', 'png', 'doc', 'docx'],
+  
+  // Size limits
+  max_size: 100 * 1024 * 1024, // 100MB max
+  
+  // Additional security
+  remove_metadata: true // Strip potentially malicious metadata
 };
 
 // Secure document upload function
@@ -53,10 +38,10 @@ export const uploadSecureDocument = async (
 
     // Configure upload with security policies
     const uploadOptions = {
-      ...uploadConfig.uploadOptions,
       accept: ['.pdf', '.jpg', '.jpeg', '.png', '.doc', '.docx'],
       maxSize: documentType === 'incomeVerification' ? 100 * 1024 * 1024 : 10 * 1024 * 1024,
-      onProgress: (percentage: number) => {
+      onProgress: (evt: any) => {
+        const percentage = Math.round((evt.totalPercent || 0));
         console.log(`📤 Secure upload progress: ${percentage}%`);
         onProgress?.(percentage);
       },
