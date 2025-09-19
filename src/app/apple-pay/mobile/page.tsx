@@ -3,13 +3,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-// Apple Pay type declarations for mobile
-declare global {
-  interface Window {
-    ApplePaySession?: any;
-  }
-}
-
 export default function MobileApplePayPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
