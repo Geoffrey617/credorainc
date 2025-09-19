@@ -16,7 +16,8 @@ export async function POST(request: NextRequest) {
       customerEmail, 
       customerName, 
       service, 
-      description 
+      description,
+      paymentId
     } = await request.json();
 
     console.log('🍎 Processing Apple Pay payment:', { 

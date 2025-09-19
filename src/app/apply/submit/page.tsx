@@ -109,15 +109,30 @@ export default function SubmitPage() {
   const [completedSteps] = useState<string[]>(['personal', 'employment', 'rental', 'documents', 'review']);
   const [isProcessing, setIsProcessing] = useState(false);
   const [detectedCardType, setDetectedCardType] = useState<{ type: string | null; logoPath: string | null }>({ type: null, logoPath: null });
-  const [isAppleDevice, setIsAppleDevice] = useState(false);
+  const [isSafariDesktop, setIsSafariDesktop] = useState(false);
+  const [showQRModal, setShowQRModal] = useState(false);
+  const [qrCodeUrl, setQrCodeUrl] = useState('');
+  const [paymentId, setPaymentId] = useState('');
 
-  // Load form data from localStorage and detect Apple device
+  // Load form data from localStorage and detect Safari desktop
   useEffect(() => {
-    // Detect Apple devices/browsers
+    // Detect Safari on desktop (Mac) only
     const userAgent = navigator.userAgent.toLowerCase();
-    const isApple = /iphone|ipad|ipod|macintosh|mac os x/.test(userAgent) || 
-                   /safari/.test(userAgent) && !/chrome|chromium|edg/.test(userAgent);
-    setIsAppleDevice(isApple);
+    const isSafari = /safari/.test(userAgent) && 
+                    !/chrome|chromium|firefox|edg|edge|opera/.test(userAgent);
+    const isMac = /macintosh|mac os x/.test(userAgent);
+    const isDesktop = !/iphone|ipad|ipod|android|mobile/.test(userAgent);
+    
+    const isSafariOnMacDesktop = isSafari && isMac && isDesktop;
+    setIsSafariDesktop(isSafariOnMacDesktop);
+    
+    console.log('🍎 Browser detection:', {
+      userAgent,
+      isSafari,
+      isMac,
+      isDesktop,
+      showApplePay: isSafariOnMacDesktop
+    });
 
     const savedData = localStorage.getItem('credora_application_form');
     if (savedData) {
@@ -182,126 +197,75 @@ export default function SubmitPage() {
   };
 
   const handleApplePay = async () => {
-    console.log('🍎 Apple Pay button clicked');
+    console.log('🍎 Apple Pay button clicked - generating QR code');
     
-    // Check if we're in the browser and Apple Pay is available
-    if (typeof window === 'undefined' || !(window as any).ApplePaySession) {
-      alert('Apple Pay is not supported on this device or browser.');
-      return;
-    }
-
-    const ApplePaySession = (window as any).ApplePaySession;
-    
-    if (!ApplePaySession.canMakePayments()) {
-      alert('Apple Pay is not set up on this device.');
-      return;
-    }
-
-    setIsProcessing(true);
-
     try {
-      // Define the payment request with proper authentication requirements
-      const paymentRequest = {
-        countryCode: 'US',
-        currencyCode: 'USD',
-        supportedNetworks: ['visa', 'masterCard', 'amex', 'discover'],
-        merchantCapabilities: ['supports3DS', 'supportsEMV', 'supportsCredit', 'supportsDebit'],
-        total: {
-          label: 'Credora Cosigner Application Fee',
-          amount: (STRIPE_CONFIG.applicationFee / 100).toFixed(2), // Convert cents to dollars: 5500 → "55.00"
-          type: 'final'
-        },
-        requiredBillingContactFields: ['postalAddress'],
-        requiredShippingContactFields: [],
-      };
-
-      console.log('🍎 Creating Apple Pay session with request:', paymentRequest);
-
-      // Create Apple Pay session
-      const session = new ApplePaySession(3, paymentRequest);
-
-      // Handle merchant validation
-      session.onvalidatemerchant = async (event: any) => {
-        console.log('🍎 Validating merchant for Apple Pay');
-        try {
-          const response = await fetch('/api/apple-pay/validate-merchant', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              validationURL: event.validationURL,
-              domainName: window.location.hostname
-            })
-          });
-
-          if (!response.ok) {
-            throw new Error('Merchant validation failed');
-          }
-
-          const merchantSession = await response.json();
-          session.completeMerchantValidation(merchantSession);
-        } catch (error: any) {
-          console.error('🚨 Apple Pay merchant validation error:', error);
-          session.abort();
-          alert('Apple Pay setup failed. Please use card payment.');
-          setIsProcessing(false);
-        }
-      };
-
-      // Handle payment authorization
-      session.onpaymentauthorized = async (event: any) => {
-        console.log('🍎 Processing Apple Pay payment');
-        try {
-          const response = await fetch('/api/apple-pay/process-payment', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              paymentToken: event.payment.token,
-              amount: STRIPE_CONFIG.applicationFee / 100, // Convert cents to dollars: 5500 → 55
-              currency: STRIPE_CONFIG.currency,
-              customerEmail: formData.email,
-              customerName: `${formData.firstName} ${formData.lastName}`,
-              service: 'Cosigner Application Fee',
-              description: 'Credora Cosigner Application Fee'
-            })
-          });
-
-          if (!response.ok) {
-            throw new Error('Payment processing failed');
-          }
-
-          const paymentResult = await response.json();
-
-          if (paymentResult.success) {
-            session.completePayment(ApplePaySession.STATUS_SUCCESS);
-            
-            // Clear form data and redirect to success
-            localStorage.removeItem('credora_application_form');
-            router.push('/apply/success');
-          } else {
-            throw new Error(paymentResult.error || 'Payment failed');
-          }
-        } catch (error: any) {
-          console.error('🚨 Apple Pay payment error:', error);
-          session.completePayment(ApplePaySession.STATUS_FAILURE);
-          alert(`Payment failed: ${error.message || error.toString()}`);
-          setIsProcessing(false);
-        }
-      };
-
-      // Handle session cancellation
-      session.oncancel = (event: any) => {
-        console.log('🍎 Apple Pay session cancelled by user');
-        setIsProcessing(false);
-      };
-
-      // Start the Apple Pay session
-      session.begin();
-
+      // Generate unique payment ID
+      const newPaymentId = `apple_pay_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      setPaymentId(newPaymentId);
+      
+      // Create mobile Apple Pay URL
+      const mobilePaymentUrl = `${window.location.origin}/apple-pay/mobile?paymentId=${newPaymentId}&amount=55.00&customerEmail=${encodeURIComponent(formData.email)}&customerName=${encodeURIComponent(`${formData.firstName} ${formData.lastName}`)}&service=Cosigner%20Application%20Fee`;
+      
+      // Generate QR code using QR Server API
+      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&format=png&data=${encodeURIComponent(mobilePaymentUrl)}`;
+      setQrCodeUrl(qrUrl);
+      
+      console.log('📱 Generated mobile Apple Pay URL:', mobilePaymentUrl);
+      console.log('📄 Generated QR code URL:', qrUrl);
+      
+      // Show QR code modal
+      setShowQRModal(true);
+      
+      // Start polling for payment completion
+      startPaymentPolling(newPaymentId);
+      
     } catch (error: any) {
-      console.error('🚨 Apple Pay initialization error:', error);
-      alert(`Apple Pay failed: ${error.message || error.toString()}`);
-      setIsProcessing(false);
+      console.error('🚨 QR code generation error:', error);
+      alert(`Failed to generate Apple Pay QR code: ${error.message || error.toString()}`);
     }
+  };
+
+  // Poll for payment completion from mobile device
+  const startPaymentPolling = (paymentId: string) => {
+    console.log('🔄 Starting payment status polling for:', paymentId);
+    
+    const pollInterval = setInterval(async () => {
+      try {
+        const response = await fetch(`/api/apple-pay/payment-status?paymentId=${paymentId}`);
+        const result = await response.json();
+        
+        if (result.status === 'completed') {
+          console.log('✅ Payment completed on mobile device');
+          clearInterval(pollInterval);
+          setShowQRModal(false);
+          setIsProcessing(false);
+          
+          // Clear form data and redirect to success
+          localStorage.removeItem('credora_application_form');
+          router.push('/apply/success');
+          
+        } else if (result.status === 'failed') {
+          console.log('❌ Payment failed on mobile device');
+          clearInterval(pollInterval);
+          setShowQRModal(false);
+          setIsProcessing(false);
+          alert('Payment failed. Please try again.');
+        }
+        // If status is 'pending', continue polling
+        
+      } catch (error) {
+        console.error('Error polling payment status:', error);
+      }
+    }, 2000); // Poll every 2 seconds
+    
+    // Stop polling after 5 minutes
+    setTimeout(() => {
+      clearInterval(pollInterval);
+      setShowQRModal(false);
+      setIsProcessing(false);
+      console.log('⏰ Payment polling timeout');
+    }, 5 * 60 * 1000);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -553,8 +517,8 @@ export default function SubmitPage() {
               {/* Payment Form */}
               <div className="lg:col-span-2">
                 <form onSubmit={handleSubmit} className="space-y-6">
-                  {/* Apple Pay Button - Only show on Apple devices */}
-                  {isAppleDevice && (
+                  {/* Apple Pay Button - Only show on Safari desktop */}
+                  {isSafariDesktop && (
                     <div className="space-y-4">
                       <h3 className="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">Choose Payment Method</h3>
                       
@@ -586,7 +550,7 @@ export default function SubmitPage() {
 
                   {/* Card Information */}
                   <div className="space-y-4">
-                    <h3 className="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">{isAppleDevice ? 'Card Information' : 'Payment Information'}</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">{isSafariDesktop ? 'Card Information' : 'Payment Information'}</h3>
                     
                     <div className="space-y-4">
                       <div className="space-y-2">
@@ -815,6 +779,72 @@ export default function SubmitPage() {
           </div>
         </div>
       </div>
+
+      {/* Apple Pay QR Code Modal */}
+      {showQRModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-8 max-w-md w-full mx-4 text-center">
+            <div className="mb-6">
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">Pay with Apple Pay</h3>
+              <p className="text-gray-600">Scan with your iPhone camera to complete payment</p>
+            </div>
+            
+            <div className="mb-6">
+              <div className="bg-gray-50 p-4 rounded-lg inline-block">
+                <img 
+                  src={qrCodeUrl} 
+                  alt="Apple Pay QR Code" 
+                  className="w-64 h-64"
+                  onError={() => {
+                    console.error('Failed to load QR code');
+                    alert('Failed to generate QR code. Please use card payment.');
+                    setShowQRModal(false);
+                  }}
+                />
+              </div>
+            </div>
+            
+            <div className="mb-6 space-y-2">
+              <p className="text-lg font-semibold text-gray-900">Amount: $55.00</p>
+              <p className="text-sm text-gray-600">Credora Cosigner Application Fee</p>
+            </div>
+            
+            <div className="mb-6 text-left space-y-2 text-sm text-gray-600">
+              <p><strong>Instructions:</strong></p>
+              <p>1. Point your iPhone camera at the QR code</p>
+              <p>2. Tap the notification to open Apple Pay</p>
+              <p>3. Authenticate with Touch ID or Face ID</p>
+              <p>4. Complete payment on your iPhone</p>
+            </div>
+            
+            <div className="flex space-x-4">
+              <button
+                onClick={() => {
+                  setShowQRModal(false);
+                  setIsProcessing(false);
+                }}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  // Regenerate QR code
+                  handleApplePay();
+                }}
+                className="flex-1 px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
+              >
+                Refresh QR Code
+              </button>
+            </div>
+            
+            <div className="mt-4 text-xs text-gray-500">
+              <p>Waiting for payment completion...</p>
+              <p>This will close automatically when payment is complete</p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
