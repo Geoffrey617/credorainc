@@ -104,24 +104,6 @@ function ApplePayButtonContent({
               defaultCollapsed: false,
               radios: false,
               spacedAccordionItems: false
-            },
-            appearance: {
-              theme: 'stripe',
-              variables: {
-                colorPrimary: '#000000',
-                colorBackground: '#ffffff',
-                colorText: '#1f2937',
-                borderRadius: '12px',
-                fontFamily: 'system-ui, sans-serif'
-              },
-              rules: {
-                '.ApplePayButton': {
-                  backgroundColor: '#000000',
-                  borderRadius: '12px',
-                  padding: '16px',
-                  width: '100%'
-                }
-              }
             }
           }}
         />
