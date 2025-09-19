@@ -203,21 +203,39 @@ export async function PUT(request: NextRequest) {
     const existingApp = existingApps[0];
     console.log('📋 Found existing application:', existingApp.id);
     
-    // Merge documents and file IDs with existing data
-    const updatedDocuments = {
-      ...(existingApp.documents || {}),
-      ...(documents || {})
-    };
+    // Merge documents and file IDs with existing data, handling null values for removal
+    const updatedDocuments = { ...(existingApp.documents || {}) };
+    if (documents) {
+      Object.keys(documents).forEach(key => {
+        if (documents[key] === null) {
+          delete updatedDocuments[key]; // Remove the field
+        } else {
+          updatedDocuments[key] = documents[key]; // Update the field
+        }
+      });
+    }
     
-    const updatedFileIds = {
-      ...(existingApp.document_file_ids || {}),
-      ...(document_file_ids || {})
-    };
+    const updatedFileIds = { ...(existingApp.document_file_ids || {}) };
+    if (document_file_ids) {
+      Object.keys(document_file_ids).forEach(key => {
+        if (document_file_ids[key] === null) {
+          delete updatedFileIds[key]; // Remove the field
+        } else {
+          updatedFileIds[key] = document_file_ids[key]; // Update the field
+        }
+      });
+    }
     
-    const updatedStatus = {
-      ...(existingApp.document_status || {}),
-      ...(document_status || {})
-    };
+    const updatedStatus = { ...(existingApp.document_status || {}) };
+    if (document_status) {
+      Object.keys(document_status).forEach(key => {
+        if (document_status[key] === null) {
+          delete updatedStatus[key]; // Remove the field
+        } else {
+          updatedStatus[key] = document_status[key]; // Update the field
+        }
+      });
+    }
     
     const updatePayload = {
       documents: updatedDocuments,

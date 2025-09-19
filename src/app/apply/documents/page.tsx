@@ -399,29 +399,48 @@ export default function DocumentsPage() {
   };
 
   const removeFile = async (fileType: keyof FormData) => {
+    console.log(`🗑️ Removing ${fileType} from form and database`);
+    
     // Remove from form data
     setFormData(prev => ({
       ...prev,
       [fileType]: null
     }));
     
-    // Remove from database
+    // Remove from database - update all relevant fields
     if (authUser?.id) {
       try {
+        const documentType = fileType.replace('File', '');
         const documentData = {
           userId: authUser.id,
           documents: {
-            [fileType.replace('File', '')]: null // Set to null to remove
+            [documentType]: null // Set to null to remove
+          },
+          document_file_ids: {
+            [documentType]: null // Remove Filestack handle
+          },
+          document_status: {
+            [documentType]: null // Remove status
           }
         };
 
-        await fetch('/api/applications', {
+        console.log('🔄 Removing document with data:', documentData);
+        
+        const response = await fetch('/api/applications', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(documentData)
         });
+        
+        if (response.ok) {
+          const result = await response.json();
+          console.log('✅ Document removed successfully:', result);
+        } else {
+          const errorText = await response.text();
+          console.error('❌ Failed to remove document:', errorText);
+        }
       } catch (error) {
-        console.error('Error removing document from database:', error);
+        console.error('❌ Error removing document from database:', error);
       }
     }
     
