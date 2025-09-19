@@ -110,8 +110,8 @@ export default function DocumentsPage() {
         }));
       }
       
-      // Load documents from database if user is authenticated
-      if (authUser?.id) {
+      // Load documents from database if user is authenticated and not loading
+      if (!authLoading && isAuthenticated && authUser?.id) {
         try {
           const response = await fetch(`/api/applications?userId=${authUser.id}`);
           const result = await response.json();
@@ -144,7 +144,7 @@ export default function DocumentsPage() {
     };
     
     loadData();
-  }, []);
+  }, [authUser?.id, isAuthenticated, authLoading]);
 
   const handleFileUpload = async (fileType: keyof FormData, file: File) => {
     // File size validation
@@ -170,11 +170,22 @@ export default function DocumentsPage() {
     setErrors(prev => ({ ...prev, [fileType]: '' }));
 
     try {
-      // Check authentication
-      if (!authUser?.id) {
-        alert('Please sign in to upload documents');
+      // Check authentication with loading state
+      console.log('🔐 Auth state check:', { authLoading, isAuthenticated, userId: authUser?.id });
+      
+      if (authLoading) {
+        alert('Please wait for authentication to load');
         return;
       }
+      
+      if (!isAuthenticated || !authUser?.id) {
+        console.log('🚫 Authentication failed - redirecting to sign in');
+        alert('Please sign in to upload documents');
+        router.push('/auth/signin');
+        return;
+      }
+      
+      console.log('✅ Authentication verified, proceeding with upload');
 
       console.log('🛡️ Starting secure upload with Filestack virus scanning');
       
