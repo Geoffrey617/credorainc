@@ -54,8 +54,20 @@ export function useSimpleAuth(): UseSimpleAuthReturn {
       
       if (savedUser) {
         const userData = JSON.parse(savedUser);
+        
+        // Normalize user data - ensure we have an 'id' field
+        // Handle both Firebase (uid) and regular (id) authentication
+        if (userData.uid && !userData.id) {
+          userData.id = userData.uid;
+        }
+        
+        // Ensure we have a name field
+        if (!userData.name && userData.displayName) {
+          userData.name = userData.displayName;
+        }
+        
         setUser(userData);
-        console.log(`✅ User loaded from ${storageType}:`, userData.email);
+        console.log(`✅ User loaded from ${storageType}:`, userData.email, 'ID:', userData.id);
         return userData;
       } else {
         setUser(null);

@@ -171,7 +171,14 @@ export default function DocumentsPage() {
 
     try {
       // Check authentication with loading state
-      console.log('🔐 Auth state check:', { authLoading, isAuthenticated, userId: authUser?.id });
+      console.log('🔐 Auth state check:', { 
+        authLoading, 
+        isAuthenticated, 
+        userId: authUser?.id,
+        userUid: authUser?.uid,
+        userEmail: authUser?.email,
+        fullUser: authUser 
+      });
       
       if (authLoading) {
         alert('Please wait for authentication to load');
