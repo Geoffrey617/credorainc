@@ -50,9 +50,9 @@ export async function POST(request: NextRequest) {
 
     console.log('💳 Created payment method from Apple Pay token:', paymentMethod.id);
 
-    // Create and confirm payment intent
+    // Create and confirm payment intent (amount already in dollars, convert to cents)
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(amount * 100), // Convert to cents
+      amount: Math.round(amount * 100), // Convert dollars to cents: 55 → 5500
       currency: currency.toLowerCase(),
       payment_method: paymentMethod.id,
       confirm: true,

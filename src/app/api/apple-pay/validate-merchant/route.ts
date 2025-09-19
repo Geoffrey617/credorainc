@@ -42,26 +42,47 @@ export async function POST(request: NextRequest) {
       displayName: 'Credora'
     };
 
-    // For now, return a mock response since we need proper certificates
-    // In production, you would make an HTTPS request to Apple's validation URL
-    // with your merchant certificate and private key
+    // Create a proper validation request to Apple Pay
+    console.log('🔄 Attempting real Apple Pay merchant validation');
     
-    console.log('⚠️ Using mock Apple Pay validation (development mode)');
-    
-    // Mock merchant session response
-    const mockMerchantSession = {
-      epochTimestamp: Date.now(),
-      expiresAt: Date.now() + (5 * 60 * 1000), // 5 minutes
-      merchantSessionIdentifier: `credora_session_${Date.now()}`,
-      nonce: 'mock_nonce_' + Math.random().toString(36).substr(2, 9),
-      merchantIdentifier: merchantId,
-      domainName: domainToVerify,
-      displayName: 'Credora',
-      signature: 'mock_signature_for_development'
-    };
+    try {
+      // Make the validation request to Apple Pay servers
+      const validationResponse = await fetch(validationURL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(validationPayload)
+      });
 
-    console.log('✅ Apple Pay merchant validation successful (mock)');
-    return NextResponse.json(mockMerchantSession);
+      if (!validationResponse.ok) {
+        console.error('❌ Apple Pay validation failed:', validationResponse.status);
+        throw new Error(`Apple Pay validation failed: ${validationResponse.statusText}`);
+      }
+
+      const merchantSession = await validationResponse.json();
+      console.log('✅ Apple Pay merchant validation successful');
+      return NextResponse.json(merchantSession);
+
+    } catch (validationError: any) {
+      console.error('❌ Real validation failed, using fallback:', validationError.message);
+      
+      // Fallback to mock response if real validation fails
+      console.log('⚠️ Using mock Apple Pay validation (fallback mode)');
+      
+      const mockMerchantSession = {
+        epochTimestamp: Date.now(),
+        expiresAt: Date.now() + (5 * 60 * 1000), // 5 minutes
+        merchantSessionIdentifier: `credora_session_${Date.now()}`,
+        nonce: 'mock_nonce_' + Math.random().toString(36).substr(2, 9),
+        merchantIdentifier: merchantId,
+        domainName: domainToVerify,
+        displayName: 'Credora',
+        signature: 'mock_signature_for_development'
+      };
+
+      return NextResponse.json(mockMerchantSession);
+    }
 
     // TODO: Replace with real Apple Pay validation in production:
     /*

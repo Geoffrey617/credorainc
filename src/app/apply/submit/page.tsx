@@ -200,16 +200,19 @@ export default function SubmitPage() {
     setIsProcessing(true);
 
     try {
-      // Define the payment request
+      // Define the payment request with proper authentication requirements
       const paymentRequest = {
         countryCode: 'US',
         currencyCode: 'USD',
         supportedNetworks: ['visa', 'masterCard', 'amex', 'discover'],
-        merchantCapabilities: ['supports3DS'],
+        merchantCapabilities: ['supports3DS', 'supportsEMV', 'supportsCredit', 'supportsDebit'],
         total: {
           label: 'Credora Cosigner Application Fee',
-          amount: STRIPE_CONFIG.applicationFee.toString()
-        }
+          amount: (STRIPE_CONFIG.applicationFee / 100).toFixed(2), // Convert cents to dollars: 5500 → "55.00"
+          type: 'final'
+        },
+        requiredBillingContactFields: ['postalAddress'],
+        requiredShippingContactFields: [],
       };
 
       console.log('🍎 Creating Apple Pay session with request:', paymentRequest);
@@ -253,7 +256,7 @@ export default function SubmitPage() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               paymentToken: event.payment.token,
-              amount: STRIPE_CONFIG.applicationFee,
+              amount: STRIPE_CONFIG.applicationFee / 100, // Convert cents to dollars: 5500 → 55
               currency: STRIPE_CONFIG.currency,
               customerEmail: formData.email,
               customerName: `${formData.firstName} ${formData.lastName}`,
