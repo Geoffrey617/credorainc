@@ -447,56 +447,55 @@ export default function Home() {
 
       {/* Features Section */}
       <section className="py-16 bg-gray-50">
-              <div className="relative h-80 transform-gpu transition-all duration-500 group-hover:rotate-y-6 group-hover:-translate-y-4 preserve-3d">
-                <div className="absolute inset-0 rounded-3xl shadow-2xl bg-white/10 backdrop-blur-xl border border-white/20 transform translate-z-4 group-hover:shadow-white/25 transition-shadow duration-500">
-                  <div className="relative h-full overflow-hidden rounded-3xl">
-                    <Image
-                      src="/images/apartments/idyl-boston/WhatsApp Image 2025-08-31 at 11.23.26.jpeg"
-                      alt="Idyl Boston - Luxury Downtown Apartment"
-                      fill
-                      className="object-cover transition-transform duration-700 group-hover:scale-110"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
-                      }}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent"></div>
-                    <div className="absolute top-4 right-4 bg-gradient-to-r from-slate-700 to-slate-800 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg">
-                      $3,200/mo
-                    </div>
-                    <div className="absolute bottom-6 left-6 text-white">
-                      <h3 className="font-bold text-xl mb-1">Idyl Boston</h3>
-                      <p className="text-sm font-medium mb-1">Downtown Crossing, Boston</p>
-                      <div className="flex items-center gap-4 text-xs mb-2">
-                        <span>2 bed • 2 bath</span>
-                        <span>1,200 sq ft</span>
-                      </div>
-                      <div className="flex items-center mt-2 text-xs">
-                        <span className="bg-green-500/80 backdrop-blur-sm px-2 py-1 rounded-full">Available Now</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="absolute inset-0 rounded-3xl bg-slate-900/20 transform translate-z-2 -translate-y-2 translate-x-2 transition-all duration-500 group-hover:translate-x-4 group-hover:-translate-y-6"></div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-10">
+            <h2 className="text-2xl font-bold text-slate-900 mb-3">
+            Why Choose Bredora?
+          </h2>
+            <p className="text-lg text-slate-600">
+              We make apartment hunting easier by helping you find properties and providing professional cosigning services
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-8 mb-8">
+            <div className="bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition-shadow">
+              <div className="bg-gradient-to-br from-slate-600 to-slate-700 w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-6">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
               </div>
-            </Link>
-
-            {/* Apartment 2 - The Q Topanga */}
-            <Link href="/apartments/2" className="group perspective-1000 block">
-              <div className="relative h-80 transform-gpu transition-all duration-500 group-hover:rotate-y-6 group-hover:-translate-y-4 preserve-3d">
-                <div className="absolute inset-0 rounded-3xl shadow-2xl bg-white/10 backdrop-blur-xl border border-white/20 transform translate-z-4 group-hover:shadow-white/25 transition-shadow duration-500">
-                  <div className="relative h-full overflow-hidden rounded-3xl">
-                    <Image
-                      src="/images/apartments/the-q-topanga/WhatsApp Image 2025-08-31 at 11.58.31.jpeg"
-                      alt="The Q Topanga - Modern Studio with City Views"
-                      fill
-                      className="object-cover transition-transform duration-700 group-hover:scale-110"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
-                      }}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent"></div>
-                    <div className="absolute top-4 right-4 bg-gradient-to-r from-slate-700 to-slate-800 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg">
-                      $2,800/mo
+              <h3 className="text-lg font-semibold text-slate-900 mb-3 text-center">Find & Secure Apartments</h3>
+              <p className="text-slate-600 text-center leading-relaxed">
+                We help you discover available apartments that match your criteria and get approved in 24-48 hours with our cosigning service.
+              </p>
+            </div>
+            
+            <div className="bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition-shadow">
+              <div className="bg-gradient-to-br from-green-500 to-green-600 w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-6">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-slate-900 mb-3 text-center">Professional Cosigner</h3>
+              <p className="text-slate-600 text-center leading-relaxed">
+                Get matched with a professional cosigner with excellent credit to help you secure your dream apartment.
+              </p>
+            </div>
+            
+            <div className="bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition-shadow">
+              <div className="bg-gradient-to-br from-blue-500 to-blue-600 w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-6">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-slate-900 mb-3 text-center">24-48 Hour Approval</h3>
+              <p className="text-slate-600 text-center leading-relaxed">
+                Fast approval process with our streamlined application and professional cosigner network.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
                     </div>
                     <div className="absolute bottom-6 left-6 text-white">
                       <h3 className="font-bold text-xl mb-1">The Q Topanga</h3>
