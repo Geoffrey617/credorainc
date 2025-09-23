@@ -675,6 +675,7 @@ export default function Home() {
               <ul className="space-y-2 text-gray-400">
                 <li><a href="/about" className="hover:text-white transition-colors">About</a></li>
                 <li><a href="/contact" className="hover:text-white transition-colors">Contact</a></li>
+                <li><a href="/legal" className="hover:text-white transition-colors">Legal</a></li>
                 <li><a href="/privacy" className="hover:text-white transition-colors">Privacy Policy</a></li>
                 <li><a href="/cookies" className="hover:text-white transition-colors">Cookie Policy</a></li>
                 <li><a href="/terms" className="hover:text-white transition-colors">Terms of Service</a></li>
