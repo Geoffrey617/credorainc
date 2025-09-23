@@ -575,16 +575,18 @@ export default function Home() {
           </div>
         </div>
       </section>
-                        <span>1 bed • 1 bath</span>
-                        <span>900 sq ft</span>
-                      </div>
-                      <div className="flex items-center mt-2 text-xs">
-                        <span className="bg-purple-500/80 backdrop-blur-sm px-2 py-1 rounded-full">Historic</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="absolute inset-0 rounded-3xl bg-slate-900/20 transform translate-z-2 -translate-y-2 translate-x-2 transition-all duration-500 group-hover:translate-x-4 group-hover:-translate-y-6"></div>
+
+      {/* Recent Rental Blog Section */}
+      <section className="py-16 bg-slate-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">
+              Recent Rental Blog
+          </h2>
+            <p className="text-lg text-slate-600">
+              Tips and insights for renters
+            </p>
+          </div>
               </div>
             </Link>
 
