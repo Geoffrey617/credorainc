@@ -508,21 +508,73 @@ export default function Home() {
               Get approved for your dream apartment in 7 simple steps
             </p>
           </div>
-                      alt="Heritage House - Historic Charm Meets Modern Comfort"
-                      fill
-                      className="object-cover transition-transform duration-700 group-hover:scale-110"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
-                      }}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent"></div>
-                    <div className="absolute top-4 right-4 bg-gradient-to-r from-slate-700 to-slate-800 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg">
-                      $2,400/mo
-                    </div>
-                    <div className="absolute bottom-6 left-6 text-white">
-                      <h3 className="font-bold text-xl mb-1">Heritage House</h3>
-                      <p className="text-sm font-medium mb-1">Center City, Philadelphia</p>
-                      <div className="flex items-center gap-4 text-xs mb-2">
+          
+          <div className="grid md:grid-cols-3 lg:grid-cols-7 gap-8">
+            {/* Step 1 */}
+            <div className="text-center">
+              <div className="bg-gradient-to-br from-slate-600 to-slate-700 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-white font-bold text-xl">1</span>
+              </div>
+              <h3 className="font-semibold text-slate-900 mb-2">Apply</h3>
+              <p className="text-sm text-slate-600">Submit your application</p>
+            </div>
+            
+            {/* Step 2 */}
+            <div className="text-center">
+              <div className="bg-gradient-to-br from-slate-600 to-slate-700 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-white font-bold text-xl">2</span>
+              </div>
+              <h3 className="font-semibold text-slate-900 mb-2">Upload</h3>
+              <p className="text-sm text-slate-600">Secure document upload</p>
+            </div>
+            
+            {/* Step 3 */}
+            <div className="text-center">
+              <div className="bg-gradient-to-br from-slate-600 to-slate-700 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-white font-bold text-xl">3</span>
+              </div>
+              <h3 className="font-semibold text-slate-900 mb-2">Review</h3>
+              <p className="text-sm text-slate-600">Application review</p>
+            </div>
+            
+            {/* Step 4 */}
+            <div className="text-center">
+              <div className="bg-gradient-to-br from-slate-600 to-slate-700 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-white font-bold text-xl">4</span>
+              </div>
+              <h3 className="font-semibold text-slate-900 mb-2">Pay</h3>
+              <p className="text-sm text-slate-600">Secure payment</p>
+            </div>
+            
+            {/* Step 5 */}
+            <div className="text-center">
+              <div className="bg-gradient-to-br from-green-500 to-green-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-white font-bold text-xl">5</span>
+              </div>
+              <h3 className="font-semibold text-slate-900 mb-2">Match</h3>
+              <p className="text-sm text-slate-600">Cosigner matching</p>
+            </div>
+            
+            {/* Step 6 */}
+            <div className="text-center">
+              <div className="bg-gradient-to-br from-blue-500 to-blue-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-white font-bold text-xl">6</span>
+              </div>
+              <h3 className="font-semibold text-slate-900 mb-2">Approve</h3>
+              <p className="text-sm text-slate-600">Get approved</p>
+            </div>
+            
+            {/* Step 7 */}
+            <div className="text-center">
+              <div className="bg-gradient-to-br from-purple-500 to-purple-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-white font-bold text-xl">7</span>
+              </div>
+              <h3 className="font-semibold text-slate-900 mb-2">Move In</h3>
+              <p className="text-sm text-slate-600">Secure your apartment</p>
+            </div>
+          </div>
+        </div>
+      </section>
                         <span>1 bed • 1 bath</span>
                         <span>900 sq ft</span>
                       </div>
