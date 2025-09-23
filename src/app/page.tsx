@@ -496,31 +496,18 @@ export default function Home() {
           </div>
         </div>
       </section>
-                    </div>
-                    <div className="absolute bottom-6 left-6 text-white">
-                      <h3 className="font-bold text-xl mb-1">The Q Topanga</h3>
-                      <p className="text-sm font-medium mb-1">Woodland Hills, CA</p>
-                      <div className="flex items-center gap-4 text-xs mb-2">
-                        <span>1 bed • 1 bath</span>
-                        <span>850 sq ft</span>
-                      </div>
-                      <div className="flex items-center mt-2 text-xs">
-                        <span className="bg-blue-500/80 backdrop-blur-sm px-2 py-1 rounded-full">City Views</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="absolute inset-0 rounded-3xl bg-slate-900/20 transform translate-z-2 -translate-y-2 translate-x-2 transition-all duration-500 group-hover:translate-x-4 group-hover:-translate-y-6"></div>
-              </div>
-            </Link>
 
-            {/* Apartment 3 - Heritage House */}
-            <Link href="/apartments/3" className="group perspective-1000 block">
-              <div className="relative h-80 transform-gpu transition-all duration-500 group-hover:rotate-y-6 group-hover:-translate-y-4 preserve-3d">
-                <div className="absolute inset-0 rounded-3xl shadow-2xl bg-white/10 backdrop-blur-xl border border-white/20 transform translate-z-4 group-hover:shadow-white/25 transition-shadow duration-500">
-                  <div className="relative h-full overflow-hidden rounded-3xl">
-                    <Image
-                      src="/images/apartments/heritage-house/WhatsApp Image 2025-08-31 at 10.19.00.jpeg"
+      {/* How It Works */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-10">
+            <h2 className="text-2xl font-bold text-slate-900 mb-3">
+            How It Works
+          </h2>
+            <p className="text-lg text-slate-600">
+              Get approved for your dream apartment in 7 simple steps
+            </p>
+          </div>
                       alt="Heritage House - Historic Charm Meets Modern Comfort"
                       fill
                       className="object-cover transition-transform duration-700 group-hover:scale-110"
