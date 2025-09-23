@@ -38,13 +38,13 @@ export default function Navigation() {
               </Link>
             </li>
             <li role="none">
-              <Link href="/legal" className="text-slate-700 hover:text-slate-900 transition-all duration-300 font-medium hover:scale-105" role="menuitem">
-                Legal
+              <Link href="/contact" className="text-slate-700 hover:text-slate-900 transition-all duration-300 font-medium hover:scale-105" role="menuitem">
+                Contact
               </Link>
             </li>
             <li role="none">
-              <Link href="/contact" className="text-slate-700 hover:text-slate-900 transition-all duration-300 font-medium hover:scale-105" role="menuitem">
-                Contact
+              <Link href="/legal" className="text-slate-700 hover:text-slate-900 transition-all duration-300 font-medium hover:scale-105" role="menuitem">
+                Legal
               </Link>
             </li>
             <li role="none">
@@ -129,22 +129,22 @@ export default function Navigation() {
               </li>
               <li role="none">
                 <Link 
-                  href="/legal" 
-                  className="text-slate-700 hover:text-slate-900 hover:bg-white/20 transition-all duration-300 py-3 px-4 rounded-xl font-medium block"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  role="menuitem"
-                >
-                  Legal
-                </Link>
-              </li>
-              <li role="none">
-                <Link 
                   href="/contact" 
                   className="text-slate-700 hover:text-slate-900 hover:bg-white/20 transition-all duration-300 py-3 px-4 rounded-xl font-medium block"
                   onClick={() => setIsMobileMenuOpen(false)}
                   role="menuitem"
                 >
                   Contact
+                </Link>
+              </li>
+              <li role="none">
+                <Link 
+                  href="/legal" 
+                  className="text-slate-700 hover:text-slate-900 hover:bg-white/20 transition-all duration-300 py-3 px-4 rounded-xl font-medium block"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  role="menuitem"
+                >
+                  Legal
                 </Link>
               </li>
               <li role="none">
