@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Turnstile } from '@marsidev/react-turnstile';
+import ReCAPTCHA from 'react-google-recaptcha';
 import { supabase } from '../../../lib/supabase-auth'
 import { signInWithEmail, firebaseAuth } from '../../../lib/firebase-auth';
 
@@ -16,7 +16,7 @@ export default function SignInPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [isClient, setIsClient] = useState(false);
-  const [turnstileToken, setTurnstileToken] = useState('');
+  const [recaptchaToken, setRecaptchaToken] = useState('');
 
   useEffect(() => {
     setIsClient(true);
@@ -97,8 +97,8 @@ export default function SignInPage() {
         return;
       }
 
-      if (!turnstileToken) {
-        setError('Please complete the security verification');
+      if (!recaptchaToken) {
+        setError('Please complete the reCAPTCHA verification');
         setIsLoading(false);
         return;
       }
@@ -274,22 +274,22 @@ export default function SignInPage() {
                 </div>
               </div>
 
-              {/* Cloudflare Turnstile */}
+              {/* Google reCAPTCHA */}
               <div className="flex justify-center">
-                <Turnstile
-                  siteKey={process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY || '1x00000000000000000000AA'}
-                  onVerify={(token) => {
-                    console.log('✅ Turnstile verification successful');
-                    setTurnstileToken(token);
+                <ReCAPTCHA
+                  sitekey="6Lc8yNIrAAAAAJUj19A5oh3H2_LLYPShbbqg5Hm0"
+                  onChange={(token) => {
+                    console.log('✅ reCAPTCHA verification successful');
+                    setRecaptchaToken(token || '');
                   }}
-                  onError={() => {
-                    console.error('❌ Turnstile verification failed');
+                  onExpired={() => {
+                    console.log('⏰ reCAPTCHA token expired');
+                    setRecaptchaToken('');
+                  }}
+                  onErrored={() => {
+                    console.error('❌ reCAPTCHA verification failed');
                     setError('Security verification failed. Please try again.');
-                    setTurnstileToken('');
-                  }}
-                  onExpire={() => {
-                    console.log('⏰ Turnstile token expired');
-                    setTurnstileToken('');
+                    setRecaptchaToken('');
                   }}
                   theme="light"
                   size="normal"
@@ -298,7 +298,7 @@ export default function SignInPage() {
 
               <button
                 type="submit"
-                disabled={isLoading || !turnstileToken}
+                disabled={isLoading || !recaptchaToken}
                 className="w-full flex justify-center py-3 px-4 bg-gray-700 hover:bg-gray-800 border border-transparent rounded-md shadow-sm text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 {isLoading ? (
