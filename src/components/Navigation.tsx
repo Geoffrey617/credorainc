@@ -61,8 +61,8 @@ export default function Navigation() {
 
           {/* CTA Button */}
           <div className="hidden lg:flex">
-            <Link href="/auth/signin" className="bg-gradient-to-r from-slate-700 to-slate-800 text-white px-6 py-2.5 rounded-full font-semibold hover:from-slate-800 hover:to-slate-900 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl" aria-label="Apply for apartment cosigner service">
-              Apply
+            <Link href="/auth/signin" className="bg-gradient-to-r from-slate-700 to-slate-800 text-white px-6 py-2.5 rounded-full font-semibold hover:from-slate-800 hover:to-slate-900 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl" aria-label="Sign in to your account">
+              Sign In
             </Link>
           </div>
 
@@ -174,7 +174,7 @@ export default function Navigation() {
                   onClick={() => setIsMobileMenuOpen(false)}
                   role="menuitem"
                 >
-                  Apply
+                  Sign In
                 </Link>
               </li>
             </ul>
