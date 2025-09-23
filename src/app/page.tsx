@@ -709,6 +709,28 @@ export default function Home() {
                 <p className="mb-2">A Delaware Corporation | Licensed in all 50 states</p>
                 <p className="mb-2">Apartment Finder | Lease Cosigner Service</p>
               </div>
+              
+              <div className="text-xs text-gray-500 max-w-4xl mx-auto">
+                <p className="mb-2">
+                  <strong>Legal Notice:</strong> Bredora Inc is incorporated in the State of Delaware and operates as an apartment finder and lease cosigner service with mailing address in San Francisco, California. 
+                  Our services are subject to employment verification and rental history review processes. Fees are non-refundable except as outlined in our Terms of Service.
+                </p>
+                <p className="mb-2">
+                  <strong>California Residents:</strong> You have the right to request information about our business practices. 
+                  For questions regarding our services, licensing, or to file a complaint, contact us at legal@bredora.com.
+                </p>
+                <p>
+                  <strong>Disclaimer:</strong> Lease approval is subject to landlord acceptance and meeting all application requirements. 
+                  Bredora Inc acts as a cosigner service and does not guarantee apartment availability or landlord approval decisions.
+                </p>
+              </div>
+              
+              <div className="flex flex-wrap justify-center gap-4 text-xs text-gray-500">
+                <Link href="/privacy" className="hover:text-gray-300 transition-colors">Privacy Policy</Link>
+                <Link href="/terms" className="hover:text-gray-300 transition-colors">Terms of Service</Link>
+                <Link href="/cookies" className="hover:text-gray-300 transition-colors">Cookie Policy</Link>
+                <Link href="/contact" className="hover:text-gray-300 transition-colors">Contact Us</Link>
+              </div>
             </div>
           </div>
         </div>
