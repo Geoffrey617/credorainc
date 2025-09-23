@@ -18,11 +18,6 @@ export default function Navigation() {
           {/* Desktop Navigation - Semantic HTML */}
           <ul className="hidden lg:flex items-center space-x-8" role="menubar">
             <li role="none">
-              <Link href="/apartments" className="text-slate-700 hover:text-slate-900 transition-all duration-300 font-medium hover:scale-105" role="menuitem">
-                Find Apartments
-              </Link>
-            </li>
-            <li role="none">
               <Link href="/for-renters" className="text-slate-700 hover:text-slate-900 transition-all duration-300 font-medium hover:scale-105" role="menuitem">
                 For Renters
               </Link>
@@ -30,11 +25,6 @@ export default function Navigation() {
             <li role="none">
               <Link href="/pricing" className="text-slate-700 hover:text-slate-900 transition-all duration-300 font-medium hover:scale-105" role="menuitem">
                 Pricing
-              </Link>
-            </li>
-            <li role="none">
-              <Link href="/landlords" className="text-slate-700 hover:text-slate-900 transition-all duration-300 font-medium hover:scale-105" role="menuitem">
-                For Landlords
               </Link>
             </li>
             <li role="none">
@@ -94,16 +84,6 @@ export default function Navigation() {
             <ul className="flex flex-col space-y-1 p-4" role="menu">
               <li role="none">
                 <Link 
-                  href="/apartments" 
-                  className="text-slate-700 hover:text-slate-900 hover:bg-white/20 transition-all duration-300 py-3 px-4 rounded-xl font-medium block"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  role="menuitem"
-                >
-                  Find Apartments
-                </Link>
-              </li>
-              <li role="none">
-                <Link 
                   href="/for-renters" 
                   className="text-slate-700 hover:text-slate-900 hover:bg-white/20 transition-all duration-300 py-3 px-4 rounded-xl font-medium block"
                   onClick={() => setIsMobileMenuOpen(false)}
@@ -120,16 +100,6 @@ export default function Navigation() {
                   role="menuitem"
                 >
                   Pricing
-                </Link>
-              </li>
-              <li role="none">
-                <Link 
-                  href="/landlords" 
-                  className="text-slate-700 hover:text-slate-900 hover:bg-white/20 transition-all duration-300 py-3 px-4 rounded-xl font-medium block"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  role="menuitem"
-                >
-                  For Landlords
                 </Link>
               </li>
               <li role="none">
