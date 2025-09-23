@@ -587,41 +587,135 @@ export default function Home() {
               Tips and insights for renters
             </p>
           </div>
-              </div>
-            </Link>
-
-            {/* Apartment 4 - The Point at Ridgeline */}
-            <Link href="/apartments/4" className="group perspective-1000 block">
-              <div className="relative h-80 transform-gpu transition-all duration-500 group-hover:rotate-y-6 group-hover:-translate-y-4 preserve-3d">
-                <div className="absolute inset-0 rounded-3xl shadow-2xl bg-white/10 backdrop-blur-xl border border-white/20 transform translate-z-4 group-hover:shadow-white/25 transition-shadow duration-500">
-                  <div className="relative h-full overflow-hidden rounded-3xl">
-                    <Image
-                      src="/images/apartments/the-point-at-ridgeline/WhatsApp Image 2025-08-31 at 12.27.34.jpeg"
-                      alt="The Point at Ridgeline - Luxury Living in Northern Virginia"
-                      fill
-                      className="object-cover transition-transform duration-700 group-hover:scale-110"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
-                      }}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent"></div>
-                    <div className="absolute top-4 right-4 bg-gradient-to-r from-slate-700 to-slate-800 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg">
-                      $2,600/mo
-                    </div>
-                    <div className="absolute bottom-6 left-6 text-white">
-                      <h3 className="font-bold text-xl mb-1">The Point at Ridgeline</h3>
-                      <p className="text-sm font-medium mb-1">Herndon, VA</p>
-                      <div className="flex items-center gap-4 text-xs mb-2">
-                        <span>2 bed • 2 bath</span>
-                        <span>1,100 sq ft</span>
-                      </div>
-                      <div className="flex items-center mt-2 text-xs">
-                        <span className="bg-emerald-500/80 backdrop-blur-sm px-2 py-1 rounded-full">Resort Style</span>
-                      </div>
-                    </div>
-                  </div>
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* Blog Post 1 */}
+            <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow">
+              <h3 className="text-lg font-semibold text-slate-900 mb-3">
+                How Your Credit Score Affects Rental Approval
+              </h3>
+              <p className="text-slate-600 mb-4">
+                Understanding the relationship between credit scores and rental approvals. Learn what landlords look for and how to improve your chances.
+              </p>
+              <div className="flex items-center justify-between">
+                <div className="text-sm text-slate-500">
+                  <span>5 min read</span>
                 </div>
-                <div className="absolute inset-0 rounded-3xl bg-slate-900/20 transform translate-z-2 -translate-y-2 translate-x-2 transition-all duration-500 group-hover:translate-x-4 group-hover:-translate-y-6"></div>
+                <a href="/blog/credit-score-rental-approval" className="text-slate-700 hover:text-slate-900 font-medium">
+                  Read More →
+                </a>
+              </div>
+            </div>
+            
+            {/* Blog Post 2 */}
+            <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow">
+              <h3 className="text-lg font-semibold text-slate-900 mb-3">
+                Apartment Hunting Checklist
+              </h3>
+              <p className="text-slate-600 mb-4">
+                Essential tips for apartment hunting success. What to look for, questions to ask, and red flags to avoid.
+              </p>
+              <div className="flex items-center justify-between">
+                <div className="text-sm text-slate-500">
+                  <span>7 min read</span>
+                </div>
+                <a href="/blog/apartment-hunting-checklist" className="text-slate-700 hover:text-slate-900 font-medium">
+                  Read More →
+                </a>
+              </div>
+            </div>
+            
+            {/* Blog Post 3 */}
+            <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow">
+              <h3 className="text-lg font-semibold text-slate-900 mb-3">
+                Lease Agreement Red Flags
+              </h3>
+              <p className="text-slate-600 mb-4">
+                Important warning signs in lease agreements. Protect yourself from unfair terms and hidden fees.
+              </p>
+              <div className="flex items-center justify-between">
+                <div className="text-sm text-slate-500">
+                  <span>6 min read</span>
+                </div>
+                <a href="/blog/lease-agreement-red-flags" className="text-slate-700 hover:text-slate-900 font-medium">
+                  Read More →
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 3D Testimonials Section */}
+      <section className="py-20 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 overflow-hidden relative">
+        {/* Background Effects */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500 rounded-full blur-3xl"></div>
+        </div>
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-white mb-6">
+              What Our Customers Say
+            </h2>
+            <p className="text-xl text-slate-300 max-w-3xl mx-auto">
+              Stories from renters who found their perfect home with our professional cosigning service
+            </p>
+          </div>
+          
+          {/* Continuous Sliding Testimonials */}
+          <div className="relative overflow-hidden">
+            <div className="flex space-x-8 animate-slide-left">
+              {/* Add testimonials content here */}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-slate-900 text-white py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-3 gap-8 mb-12">
+            <div>
+              <h3 className="text-xl font-bold mb-4">Bredora Inc</h3>
+              <p className="text-gray-400 mb-4">
+                Apartment Finder and lease cosigning service for renters nationwide.
+              </p>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4">For Renters</h4>
+              <ul className="space-y-2 text-gray-400">
+                <li><a href="/auth/signin" className="hover:text-white transition-colors">Apply Now</a></li>
+                <li><a href="/faq" className="hover:text-white transition-colors">FAQ</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4">Company</h4>
+              <ul className="space-y-2 text-gray-400">
+                <li><a href="/about" className="hover:text-white transition-colors">About</a></li>
+                <li><a href="/contact" className="hover:text-white transition-colors">Contact</a></li>
+                <li><a href="/privacy" className="hover:text-white transition-colors">Privacy Policy</a></li>
+                <li><a href="/cookies" className="hover:text-white transition-colors">Cookie Policy</a></li>
+                <li><a href="/terms" className="hover:text-white transition-colors">Terms of Service</a></li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="border-t border-gray-800 pt-8">
+            <div className="text-center text-gray-400 space-y-4">
+              <div className="text-sm">
+                <p className="mb-2">&copy; 2025 Bredora Inc. All rights reserved.</p>
+                <p className="mb-2">A Delaware Corporation | Licensed in all 50 states</p>
+                <p className="mb-2">Apartment Finder | Lease Cosigner Service</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </main>
+  );
+}
               </div>
             </Link>
           </div>
