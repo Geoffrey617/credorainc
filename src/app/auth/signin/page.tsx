@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { Turnstile } from '@marsidev/react-turnstile';
 import { supabase } from '../../../lib/supabase-auth'
 import { signInWithEmail, firebaseAuth } from '../../../lib/firebase-auth';
 
@@ -15,6 +16,7 @@ export default function SignInPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [isClient, setIsClient] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState('');
 
   useEffect(() => {
     setIsClient(true);
@@ -91,6 +93,12 @@ export default function SignInPage() {
     try {
       if (!formData.email || !formData.password) {
         setError('Please enter both email and password');
+        setIsLoading(false);
+        return;
+      }
+
+      if (!turnstileToken) {
+        setError('Please complete the security verification');
         setIsLoading(false);
         return;
       }
@@ -266,9 +274,31 @@ export default function SignInPage() {
                 </div>
               </div>
 
+              {/* Cloudflare Turnstile */}
+              <div className="flex justify-center">
+                <Turnstile
+                  siteKey={process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY || '1x00000000000000000000AA'}
+                  onVerify={(token) => {
+                    console.log('✅ Turnstile verification successful');
+                    setTurnstileToken(token);
+                  }}
+                  onError={() => {
+                    console.error('❌ Turnstile verification failed');
+                    setError('Security verification failed. Please try again.');
+                    setTurnstileToken('');
+                  }}
+                  onExpire={() => {
+                    console.log('⏰ Turnstile token expired');
+                    setTurnstileToken('');
+                  }}
+                  theme="light"
+                  size="normal"
+                />
+              </div>
+
               <button
                 type="submit"
-                disabled={isLoading}
+                disabled={isLoading || !turnstileToken}
                 className="w-full flex justify-center py-3 px-4 bg-gray-700 hover:bg-gray-800 border border-transparent rounded-md shadow-sm text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 {isLoading ? (

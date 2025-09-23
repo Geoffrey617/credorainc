@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { Turnstile } from '@marsidev/react-turnstile';
 import { signUpWithEmail, firebaseAuth } from '../../../lib/firebase-auth';
 
 export default function SignUpPage() {
@@ -26,6 +27,7 @@ export default function SignUpPage() {
     hasNumber: false,
     hasSpecialChar: false
   });
+  const [turnstileToken, setTurnstileToken] = useState('');
 
 
   const checkPasswordStrength = (password: string) => {
@@ -96,6 +98,13 @@ export default function SignUpPage() {
     setError('');
 
     // Email uniqueness will be checked by the API
+
+    // Turnstile validation
+    if (!turnstileToken) {
+      setError('Please complete the security verification');
+      setIsLoading(false);
+      return;
+    }
 
     // Basic validation
     if (formData.password !== formData.confirmPassword) {
@@ -490,9 +499,31 @@ export default function SignUpPage() {
                 </label>
               </div>
 
+              {/* Cloudflare Turnstile */}
+              <div className="flex justify-center">
+                <Turnstile
+                  siteKey={process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY || '1x00000000000000000000AA'}
+                  onVerify={(token) => {
+                    console.log('✅ Turnstile verification successful');
+                    setTurnstileToken(token);
+                  }}
+                  onError={() => {
+                    console.error('❌ Turnstile verification failed');
+                    setError('Security verification failed. Please try again.');
+                    setTurnstileToken('');
+                  }}
+                  onExpire={() => {
+                    console.log('⏰ Turnstile token expired');
+                    setTurnstileToken('');
+                  }}
+                  theme="light"
+                  size="normal"
+                />
+              </div>
+
               <button
                 type="submit"
-                disabled={isLoading}
+                disabled={isLoading || !turnstileToken}
                 className="w-full flex justify-center py-3 px-4 bg-gray-700 hover:bg-gray-800 border border-transparent rounded-md shadow-sm text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 {isLoading ? (
