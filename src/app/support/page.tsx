@@ -4,7 +4,7 @@ import SupportPageClient from './SupportPageClient';
 
 export const metadata: Metadata = createMetadata({
   title: "Support Center",
-  description: "Get help with your Credora cosigner application. Access live chat support, FAQs, and troubleshooting guides. Our support team is here to help you succeed.",
+  description: "Get help with your Bredora cosigner application. Access live chat support, FAQs, and troubleshooting guides. Our support team is here to help you succeed.",
   path: "/support",
   keywords: [
     "support center",

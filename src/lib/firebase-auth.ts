@@ -2,7 +2,7 @@
 import { initializeApp, getApps } from 'firebase/app';
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut as firebaseSignOut, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 
-// Firebase config - Credora Firebase project
+// Firebase config - Bredora Firebase project
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || 'AIzaSyD6e9xkP836yeN3jHvMQbwIul7mw2Vf7UM',
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || 'credora-auth.firebaseapp.com',

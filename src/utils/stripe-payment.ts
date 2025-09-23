@@ -165,10 +165,10 @@ export const processStripePayment = async (
 };
 
 export const PAYMENT_DESCRIPTIONS = {
-  APPLICATION_FEE: 'Credora Apartment Application Processing Fee',
-  COSIGNER_SERVICE: 'Credora Professional Cosigner Service',
-  APARTMENT_FINDER: 'Credora Apartment Finder Service',
-  SUBSCRIPTION: 'Credora Landlord Subscription Service'
+  APPLICATION_FEE: 'Bredora Apartment Application Processing Fee',
+  COSIGNER_SERVICE: 'Bredora Professional Cosigner Service',
+  APARTMENT_FINDER: 'Bredora Apartment Finder Service',
+  SUBSCRIPTION: 'Bredora Landlord Subscription Service'
 };
 
 export const STRIPE_CONFIG = {

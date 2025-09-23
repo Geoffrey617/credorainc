@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 export const metadata: Metadata = createMetadata({
   title: "Cookie Policy",
-  description: "Credora Inc cookie policy. Information about how we use cookies on our website to improve your experience with our cosigner services. Cookie preferences and settings.",
+  description: "Bredora Inc cookie policy. Information about how we use cookies on our website to improve your experience with our cosigner services. Cookie preferences and settings.",
   path: "/cookies",
   keywords: [
     "cookie policy",

@@ -9,7 +9,7 @@ interface AnimatedHeroProps {
 }
 
 export default function AnimatedHero({ 
-  title = "Welcome to Credora",
+  title = "Welcome to Bredora",
   subtitle = "Your trusted partner for apartment lease cosigning",
   className = "",
   images = [],
