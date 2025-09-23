@@ -12,7 +12,7 @@ export default function Navigation() {
         <div className="flex justify-between items-center h-16 px-6">
           {/* Logo */}
           <Link href="/" className="text-2xl font-bold text-slate-900 hover:text-slate-700 transition-colors">
-            Credora
+            Bredora
           </Link>
 
           {/* Desktop Navigation - Semantic HTML */}

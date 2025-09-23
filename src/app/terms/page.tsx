@@ -11,7 +11,7 @@ export default function TermsPage() {
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-4xl font-bold text-slate-900 mb-4">Terms of Service</h1>
           <p className="text-lg text-slate-600 mb-6">
-            <span className="font-bold text-slate-800 text-xl tracking-wide">Legal Agreement.</span> Please read these terms carefully before using Credora's services.
+            <span className="font-bold text-slate-800 text-xl tracking-wide">Legal Agreement.</span> Please read these terms carefully before using Bredora's services.
           </p>
           <p className="text-sm text-slate-500">
             Last updated: January 1, 2025 | Effective Date: January 1, 2025
@@ -28,7 +28,7 @@ export default function TermsPage() {
             <div className="mb-12">
               <h2 className="text-2xl font-bold text-slate-800 mb-4">1. Agreement to Terms</h2>
               <p className="text-slate-600 mb-4 leading-relaxed">
-                By accessing or using Credora Inc's services ("Service"), you agree to be bound by these Terms of Service ("Terms"). 
+                By accessing or using Bredora Inc's services ("Service"), you agree to be bound by these Terms of Service ("Terms"). 
                 If you disagree with any part of these terms, then you may not access the Service.
               </p>
               <p className="text-slate-600 leading-relaxed">
@@ -41,7 +41,7 @@ export default function TermsPage() {
             <div className="mb-12">
               <h2 className="text-2xl font-bold text-slate-800 mb-4">2. Description of Service</h2>
               <p className="text-slate-600 mb-4 leading-relaxed">
-                Credora Inc provides professional cosigning services for residential lease agreements. Our services include:
+                Bredora Inc provides professional cosigning services for residential lease agreements. Our services include:
               </p>
               <ul className="list-disc list-inside text-slate-600 space-y-2 mb-4">
                 <li>Professional cosigning for qualified rental applicants</li>
@@ -51,7 +51,7 @@ export default function TermsPage() {
                 <li>Lease agreement facilitation</li>
               </ul>
               <p className="text-slate-600 leading-relaxed">
-                Credora acts as a professional cosigner and guarantor for lease agreements, subject to our approval criteria and risk assessment.
+                Bredora acts as a professional cosigner and guarantor for lease agreements, subject to our approval criteria and risk assessment.
               </p>
             </div>
 
@@ -69,7 +69,7 @@ export default function TermsPage() {
                 <li>Meet our creditworthiness and income verification requirements</li>
               </ul>
               <p className="text-slate-600 leading-relaxed">
-                Credora reserves the right to refuse service to any applicant who does not meet our eligibility criteria.
+                Bredora reserves the right to refuse service to any applicant who does not meet our eligibility criteria.
               </p>
             </div>
 
@@ -99,7 +99,7 @@ export default function TermsPage() {
             <div className="mb-12">
               <h2 className="text-2xl font-bold text-slate-800 mb-4">5. Cosigning Obligations and Guarantees</h2>
               <p className="text-slate-600 mb-4 leading-relaxed">
-                When Credora acts as your cosigner, we guarantee:
+                When Bredora acts as your cosigner, we guarantee:
               </p>
               <ul className="list-disc list-inside text-slate-600 space-y-2 mb-4">
                 <li>Payment of monthly rent if tenant defaults</li>
@@ -109,10 +109,10 @@ export default function TermsPage() {
               </ul>
               <p className="text-slate-600 mb-4 leading-relaxed">
                 <strong>Tenant Responsibilities:</strong> Tenants remain primarily responsible for all lease obligations. 
-                Credora's cosigning does not release tenants from their contractual duties.
+                Bredora's cosigning does not release tenants from their contractual duties.
               </p>
               <p className="text-slate-600 leading-relaxed">
-                <strong>Recovery Rights:</strong> Credora reserves the right to pursue collection from tenants for any amounts 
+                <strong>Recovery Rights:</strong> Bredora reserves the right to pursue collection from tenants for any amounts 
                 paid on their behalf, including legal fees and collection costs.
               </p>
             </div>
@@ -166,7 +166,7 @@ export default function TermsPage() {
                 <p className="text-slate-700 font-semibold mb-2">Important Refund Information:</p>
                 <ul className="list-disc list-inside text-slate-600 space-y-2">
                   <li><strong>Application Fee ($55):</strong> Non-refundable in all circumstances</li>
-                  <li><strong>Cosigning Fee:</strong> Refundable if lease is not approved or if Credora fails to provide cosigning services</li>
+                  <li><strong>Cosigning Fee:</strong> Refundable if lease is not approved or if Bredora fails to provide cosigning services</li>
                   <li><strong>Cosigning Fee:</strong> Non-refundable once lease is signed</li>
                   <li><strong>Pre-signing Cancellation:</strong> Full refund of cosigning fee if cancelled before lease execution</li>
                 </ul>
@@ -180,7 +180,7 @@ export default function TermsPage() {
             <div className="mb-12">
               <h2 className="text-2xl font-bold text-slate-800 mb-4">9. Limitation of Liability</h2>
               <p className="text-slate-600 mb-4 leading-relaxed">
-                Credora's liability is limited to the amount of fees paid by the user. We are not liable for:
+                Bredora's liability is limited to the amount of fees paid by the user. We are not liable for:
               </p>
               <ul className="list-disc list-inside text-slate-600 space-y-2 mb-4">
                 <li>Indirect, incidental, or consequential damages</li>
@@ -214,7 +214,7 @@ export default function TermsPage() {
               <h2 className="text-2xl font-bold text-slate-800 mb-4">11. Termination</h2>
               <p className="text-slate-600 mb-4 leading-relaxed">
                 Either party may terminate this agreement with 30 days written notice, subject to existing cosigning obligations. 
-                Credora may terminate immediately for:
+                Bredora may terminate immediately for:
               </p>
               <ul className="list-disc list-inside text-slate-600 space-y-2 mb-4">
                 <li>Breach of these Terms</li>
@@ -245,7 +245,7 @@ export default function TermsPage() {
             <div className="mb-12">
               <h2 className="text-2xl font-bold text-slate-800 mb-4">13. Changes to Terms</h2>
               <p className="text-slate-600 mb-4 leading-relaxed">
-                Credora reserves the right to modify these Terms at any time. We will notify users of material changes via:
+                Bredora reserves the right to modify these Terms at any time. We will notify users of material changes via:
               </p>
               <ul className="list-disc list-inside text-slate-600 space-y-2 mb-4">
                 <li>Email notification to registered users</li>

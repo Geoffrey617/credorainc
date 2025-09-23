@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: "Pricing - Credora Inc | Transparent Lease Cosigner Service Rates",
-  description: "Simple, transparent pricing for Credora Inc lease cosigner service. Student rates from 75% of rent, standard rates from first month's rent. No hidden fees.",
+  title: "Pricing - Bredora Inc | Transparent Lease Cosigner Service Rates",
+  description: "Simple, transparent pricing for Bredora Inc lease cosigner service. Student rates from 75% of rent, standard rates from first month's rent. No hidden fees.",
   keywords: [
     "lease cosigner pricing",
     "apartment cosigner cost", 
@@ -15,23 +15,23 @@ export const metadata: Metadata = {
     "rental cosigner pricing"
   ],
   openGraph: {
-    title: "Pricing - Credora Inc | Transparent Lease Cosigner Service Rates",
+    title: "Pricing - Bredora Inc | Transparent Lease Cosigner Service Rates",
     description: "Simple, transparent pricing for lease cosigner service. Student rates from 75% of rent, standard rates from first month's rent.",
     url: "https://credorainc.com/pricing",
-    siteName: "Credora Inc",
+    siteName: "Bredora Inc",
     images: [
       {
         url: "https://credorainc.com/og-pricing.jpg",
         width: 1200,
         height: 630,
-        alt: "Credora Inc - Transparent Pricing for Lease Cosigner Services"
+        alt: "Bredora Inc - Transparent Pricing for Lease Cosigner Services"
       }
     ],
     type: "website"
   },
   twitter: {
     card: "summary_large_image",
-    title: "Pricing - Credora Inc | Transparent Lease Cosigner Service Rates",
+    title: "Pricing - Bredora Inc | Transparent Lease Cosigner Service Rates",
     description: "Simple, transparent pricing for lease cosigner service. Student rates from 75% of rent.",
     images: ["https://credorainc.com/og-pricing.jpg"]
   },

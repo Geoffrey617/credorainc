@@ -1,10 +1,10 @@
-# Credora - Professional Lease Cosigning Service
+# Bredora - Professional Lease Cosigning Service
 
-Credora is a trusted lease cosigning service that helps renters secure apartments when they need a qualified cosigner. We bridge the gap between renters and landlords by providing financial security and peace of mind.
+Bredora is a trusted lease cosigning service that helps renters secure apartments when they need a qualified cosigner. We bridge the gap between renters and landlords by providing financial security and peace of mind.
 
 ## 🏢 Business Overview
 
-Credora provides professional cosigning services for apartment leases, helping renters who:
+Bredora provides professional cosigning services for apartment leases, helping renters who:
 - Are building or rebuilding credit
 - Have insufficient income relative to rent requirements (less than 3x rent)
 - Are international students or workers without US credit history
@@ -272,7 +272,7 @@ npm run dev
 
 ## 📞 Contact Information
 
-**Credora Lease Cosigning Services**
+**Bredora Lease Cosigning Services**
 - **Website**: https://credora.com
 - **Email**: info@credora.com
 - **Phone**: 855-997-6615

@@ -164,7 +164,7 @@ export default function SignUpPage() {
           <div className="text-center">
             <h2 className="text-2xl font-bold text-gray-900">Create your account</h2>
             <p className="mt-2 text-gray-600">
-              Join thousands of renters who trust Credora
+              Join thousands of renters who trust Bredora
             </p>
           </div>
           

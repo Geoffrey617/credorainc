@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Credora Inc - Apartment finder & Lease Cosigner service",
-  description: "Credora Inc provides apartment finder and lease cosigner services. Get approved in 24-48 hours with our assigned cosigners. Serving all 50 states.",
+  title: "Bredora Inc - Apartment finder & Lease Cosigner service",
+  description: "Bredora Inc provides apartment finder and lease cosigner services. Get approved in 24-48 hours with our assigned cosigners. Serving all 50 states.",
   keywords: [
     "apartment cosigner",
     "lease guarantor", 
@@ -27,12 +27,12 @@ export const metadata: Metadata = {
     "lease cosigner service",
     "apartment rental help",
     "guaranteed lease approval",
-    "Credora LLC",
+    "Bredora LLC",
     "cosigning service"
   ],
-  authors: [{ name: "Credora Inc" }],
-  creator: "Credora Inc",
-  publisher: "Credora Inc",
+  authors: [{ name: "Bredora Inc" }],
+  creator: "Bredora Inc",
+  publisher: "Bredora Inc",
   robots: {
     index: true,
     follow: true,
@@ -48,23 +48,23 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_US',
     url: 'https://credorainc.com',
-    siteName: 'Credora Inc',
-    title: 'Credora Inc - Apartment finder & Lease Cosigner service',
+    siteName: 'Bredora Inc',
+    title: 'Bredora Inc - Apartment finder & Lease Cosigner service',
     description: 'Apartment finder and lease cosigner service. Get approved in 24-48 hours. Serving all 50 states.',
     images: [
       {
         url: 'https://credorainc.com/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'Credora Inc - Apartment finder & Lease Cosigner service',
+        alt: 'Bredora Inc - Apartment finder & Lease Cosigner service',
       }
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    site: '@CredoraInc',
-    creator: '@CredoraInc',
-    title: 'Credora Inc - Apartment finder & Lease Cosigner service',
+    site: '@BredoraInc',
+    creator: '@BredoraInc',
+    title: 'Bredora Inc - Apartment finder & Lease Cosigner service',
     description: 'Apartment Finder and lease cosigner service. Get approved in 24-48 hours.',
     images: ['https://credorainc.com/twitter-image.jpg'],
   },
@@ -90,8 +90,8 @@ export default function RootLayout({
       {
         "@type": "Organization",
         "@id": "https://credorainc.com/#organization",
-        "name": "Credora Inc",
-        "legalName": "Credora Inc",
+        "name": "Bredora Inc",
+        "legalName": "Bredora Inc",
         "url": "https://credorainc.com",
         "logo": {
           "@type": "ImageObject",
@@ -121,8 +121,8 @@ export default function RootLayout({
           "addressCountry": "US"
         },
         "sameAs": [
-          "https://twitter.com/CredoraInc",
-          "https://facebook.com/CredoraInc",
+          "https://twitter.com/BredoraInc",
+          "https://facebook.com/BredoraInc",
           "https://linkedin.com/company/credora-inc"
         ],
         "areaServed": {
@@ -134,7 +134,7 @@ export default function RootLayout({
         "@type": "WebSite",
         "@id": "https://credorainc.com/#website",
         "url": "https://credorainc.com",
-        "name": "Credora Inc",
+        "name": "Bredora Inc",
         "description": "Professional apartment lease cosigning services with guaranteed approval",
         "publisher": {
           "@id": "https://credorainc.com/#organization"
@@ -193,7 +193,7 @@ export default function RootLayout({
       {
         "@type": "LocalBusiness",
         "@id": "https://credorainc.com/#localbusiness",
-        "name": "Credora Inc",
+        "name": "Bredora Inc",
         "description": "Professional apartment lease cosigning services with guaranteed approval",
         "url": "https://credorainc.com",
         "telephone": "+1-800-273-3672",
@@ -262,8 +262,8 @@ export default function RootLayout({
         <meta name="msapplication-TileColor" content="#334155" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="Credora Inc" />
-        <meta name="application-name" content="Credora Inc" />
+        <meta name="apple-mobile-web-app-title" content="Bredora Inc" />
+        <meta name="application-name" content="Bredora Inc" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}

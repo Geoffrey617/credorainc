@@ -5,7 +5,7 @@ import Image from 'next/image';
 
 export const metadata: Metadata = createMetadata({
   title: "For Renters",
-  description: "Credora Inc helps renters get approved for apartments with professional cosigner services. Get the apartment you want with guaranteed approval and expert rental assistance.",
+  description: "Bredora Inc helps renters get approved for apartments with professional cosigner services. Get the apartment you want with guaranteed approval and expert rental assistance.",
   path: "/for-renters",
   keywords: [
     "renter services",

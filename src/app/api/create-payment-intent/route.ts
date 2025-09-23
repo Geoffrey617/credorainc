@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
           customerName,
           service: service || 'Cosigner Application Fee'
         },
-        description: description || `Credora ${service} - ${customerEmail}`,
+        description: description || `Bredora ${service} - ${customerEmail}`,
       });
 
       return NextResponse.json({
@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
           customerName,
           service: service || 'Cosigner Application Fee'
         },
-        description: description || `Credora Cosigner Application Fee - ${customerEmail}`,
+        description: description || `Bredora Cosigner Application Fee - ${customerEmail}`,
       };
 
       // Add payment method configuration

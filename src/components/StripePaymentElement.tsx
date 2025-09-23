@@ -90,7 +90,7 @@ function StripePaymentContent({
             <div className="text-sm text-gray-700">
               I agree to the <a href="/terms" className="text-gray-600 hover:text-gray-700 underline">Terms of Service</a> and 
               <a href="/privacy" className="text-gray-600 hover:text-gray-700 underline ml-1">Privacy Policy</a>. 
-              I authorize Credora to process my application and charge the application fee.
+              I authorize Bredora to process my application and charge the application fee.
             </div>
           </label>
         </div>

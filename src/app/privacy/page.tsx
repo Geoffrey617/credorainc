@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 export const metadata: Metadata = createMetadata({
   title: "Privacy Policy",
-  description: "Credora Inc privacy policy. Learn how we protect your personal information and data when using our apartment cosigner services. GDPR and CCPA compliant.",
+  description: "Bredora Inc privacy policy. Learn how we protect your personal information and data when using our apartment cosigner services. GDPR and CCPA compliant.",
   path: "/privacy",
   keywords: [
     "privacy policy",

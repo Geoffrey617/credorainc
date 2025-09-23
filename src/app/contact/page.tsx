@@ -4,7 +4,7 @@ import ContactPageClient from './ContactPageClient';
 
 export const metadata: Metadata = createMetadata({
   title: "Contact Us",
-  description: "Get in touch with Credora Inc for apartment cosigner services. Professional support team available to help with your rental approval needs. Phone, email, and live chat support.",
+  description: "Get in touch with Bredora Inc for apartment cosigner services. Professional support team available to help with your rental approval needs. Phone, email, and live chat support.",
   path: "/contact",
   keywords: [
     "contact support",

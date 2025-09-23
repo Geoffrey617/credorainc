@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     const validationPayload = {
       merchantIdentifier: merchantId,
       domainName: domainToVerify,
-      displayName: 'Credora'
+      displayName: 'Bredora'
     };
 
     // For real Apple Pay validation, we need the merchant certificate
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
       nonce: crypto.randomUUID(), // Use proper UUID for nonce
       merchantIdentifier: merchantId,
       domainName: domainToVerify,
-      displayName: 'Credora',
+      displayName: 'Bredora',
       // Note: In production with real certificates, this would include proper signature
       signature: `prod_signature_${Date.now()}`
     };

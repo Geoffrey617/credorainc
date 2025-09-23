@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import LandlordsPageClient from './LandlordsPageClient';
 
 export const metadata: Metadata = {
-  title: "For Landlords - Credora Inc | Property Listing & Guaranteed Cosigners",
-  description: "List your property on Credora Inc and connect with pre-screened tenants backed by guaranteed cosigners. Reduce vacancy time and rental risk with professional tenant matching.",
+  title: "For Landlords - Bredora Inc | Property Listing & Guaranteed Cosigners",
+  description: "List your property on Bredora Inc and connect with pre-screened tenants backed by guaranteed cosigners. Reduce vacancy time and rental risk with professional tenant matching.",
   keywords: [
     "landlord property listing",
     "guaranteed cosigners for landlords", 
@@ -15,23 +15,23 @@ export const metadata: Metadata = {
     "property rental guarantee"
   ],
   openGraph: {
-    title: "For Landlords - Credora Inc | Property Listing & Guaranteed Cosigners",
+    title: "For Landlords - Bredora Inc | Property Listing & Guaranteed Cosigners",
     description: "List your property and connect with pre-screened tenants backed by guaranteed cosigners. Reduce vacancy time and rental risk.",
     url: "https://credorainc.com/landlords",
-    siteName: "Credora Inc",
+    siteName: "Bredora Inc",
     images: [
       {
         url: "https://credorainc.com/og-landlords.jpg",
         width: 1200,
         height: 630,
-        alt: "Credora Inc - For Landlords Property Listing Platform"
+        alt: "Bredora Inc - For Landlords Property Listing Platform"
       }
     ],
     type: "website"
   },
   twitter: {
     card: "summary_large_image",
-    title: "For Landlords - Credora Inc | Property Listing & Guaranteed Cosigners",
+    title: "For Landlords - Bredora Inc | Property Listing & Guaranteed Cosigners",
     description: "List your property and connect with pre-screened tenants backed by guaranteed cosigners.",
     images: ["https://credorainc.com/og-landlords.jpg"]
   },

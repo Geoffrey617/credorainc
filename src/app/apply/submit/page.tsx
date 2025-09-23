@@ -311,7 +311,7 @@ export default function SubmitPage() {
           customerEmail: formData.email,
           customerName: `${formData.firstName} ${formData.lastName}`,
           service: 'Cosigner Application Fee',
-          description: 'Credora Cosigner Application Fee',
+          description: 'Bredora Cosigner Application Fee',
           cardDetails: {
             cardNumber: paymentData.cardNumber.replace(/\s/g, ''),
             expiryDate: paymentData.expiryDate,

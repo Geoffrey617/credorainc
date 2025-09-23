@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
         service: service || 'Cosigner Application Fee',
         paymentMethod: 'apple_pay'
       },
-      description: description || `Credora ${service} - Apple Pay Payment`,
+      description: description || `Bredora ${service} - Apple Pay Payment`,
     });
 
     console.log('✅ Apple Pay payment intent created:', paymentIntent.id);

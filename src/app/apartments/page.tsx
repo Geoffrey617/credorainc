@@ -4,7 +4,7 @@ import ApartmentsPageClient from './ApartmentsPageClient';
 
 export const metadata: Metadata = createMetadata({
   title: "Find Apartments",
-  description: "Browse quality apartments with guaranteed cosigner backing from Credora Inc. Search by location, price, bedrooms. All listings come with professional lease guarantee service.",
+  description: "Browse quality apartments with guaranteed cosigner backing from Bredora Inc. Search by location, price, bedrooms. All listings come with professional lease guarantee service.",
   path: "/apartments",
   keywords: [
     "apartment search",

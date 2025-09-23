@@ -258,7 +258,7 @@ export default function LandlordDashboard() {
             {/* Logo */}
             <div className="flex items-center">
               <Link href="/" className="text-2xl font-bold text-slate-800">
-                Credora
+                Bredora
               </Link>
               <span className="ml-2 px-2 py-1 text-xs bg-slate-700 text-white rounded-full">
                 Landlord Portal

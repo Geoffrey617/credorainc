@@ -5,7 +5,7 @@ import FAQPageClient from './FAQPageClient';
 
 export const metadata: Metadata = createMetadata({
   title: "FAQ",
-  description: "Frequently asked questions about Credora Inc's apartment cosigner services. Get answers about our lease guarantee process, pricing, requirements, and application process.",
+  description: "Frequently asked questions about Bredora Inc's apartment cosigner services. Get answers about our lease guarantee process, pricing, requirements, and application process.",
   path: "/faq",
   keywords: [
     "FAQ",

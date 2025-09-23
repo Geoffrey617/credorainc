@@ -40,7 +40,7 @@ export default function AboutPage() {
       <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-5xl font-bold text-slate-900 mb-6">
-            About <span className="text-slate-700">Credora Inc</span>
+            About <span className="text-slate-700">Bredora Inc</span>
           </h1>
           <p className="text-xl text-slate-600 mb-12 leading-relaxed">
             <span className="font-bold text-slate-800 text-2xl tracking-wide">Revolutionizing Rental Approvals.</span> We're the leading professional cosigning service helping renters secure apartments and landlords find quality tenants with guaranteed backing.
@@ -58,9 +58,9 @@ export default function AboutPage() {
                 To eliminate the barriers that prevent qualified renters from securing their dream apartments. We bridge the gap between renters who need cosigners and landlords who want guaranteed rent payments, creating a win-win solution for everyone.
               </p>
               <div className="bg-slate-100 rounded-xl p-6">
-                <h3 className="text-xl font-bold text-slate-800 mb-3">Why We Started Credora</h3>
+                <h3 className="text-xl font-bold text-slate-800 mb-3">Why We Started Bredora</h3>
                 <p className="text-slate-600 leading-relaxed">
-                  After seeing countless qualified young professionals struggle to find apartments due to lack of cosigners, our founders created Credora to provide professional, reliable cosigning services that landlords trust and renters can afford.
+                  After seeing countless qualified young professionals struggle to find apartments due to lack of cosigners, our founders created Bredora to provide professional, reliable cosigning services that landlords trust and renters can afford.
                 </p>
               </div>
             </div>
@@ -99,7 +99,7 @@ export default function AboutPage() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-slate-900 mb-4">Our Journey</h2>
-            <p className="text-xl text-slate-600">Growth milestones and achievements - the Credora story</p>
+            <p className="text-xl text-slate-600">Growth milestones and achievements - the Bredora story</p>
           </div>
           
           <div className="relative">
@@ -134,7 +134,7 @@ export default function AboutPage() {
       <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-slate-900 mb-4">Credora by the Numbers</h2>
+            <h2 className="text-4xl font-bold text-slate-900 mb-4">Bredora by the Numbers</h2>
             <p className="text-xl text-slate-600">Our impact on the rental market</p>
           </div>
           
@@ -214,7 +214,7 @@ export default function AboutPage() {
       {/* CTA Section */}
       <section className="py-20 bg-slate-900 text-white">
         <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-          <h2 className="text-4xl font-bold mb-6">Join the Credora Family</h2>
+          <h2 className="text-4xl font-bold mb-6">Join the Bredora Family</h2>
           <p className="text-xl text-slate-300 mb-8">
             Whether you're a renter looking for guaranteed approval or a landlord seeking quality tenants, we're here to help you succeed.
           </p>
