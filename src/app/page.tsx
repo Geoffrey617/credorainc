@@ -509,68 +509,92 @@ export default function Home() {
             </p>
           </div>
           
-          <div className="grid md:grid-cols-3 lg:grid-cols-7 gap-8">
-            {/* Step 1 */}
-            <div className="text-center">
-              <div className="bg-gradient-to-br from-slate-600 to-slate-700 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-white font-bold text-xl">1</span>
+          <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-6">
+            {/* Step 1: Apply */}
+            <div className="text-center group">
+              <div className="relative mb-4">
+                <div className="bg-gradient-to-br from-slate-600 to-slate-700 text-white w-16 h-16 rounded-full flex items-center justify-center mx-auto text-xl font-bold group-hover:scale-110 transition-transform">
+                1
               </div>
-              <h3 className="font-semibold text-slate-900 mb-2">Apply</h3>
-              <p className="text-sm text-slate-600">Submit your application</p>
+            </div>
+              <h3 className="text-lg font-semibold text-slate-800 mb-3">Apply</h3>
+              <p className="text-slate-600 leading-relaxed text-sm">Complete our online application with your employment and income details in 10 minutes.</p>
             </div>
             
-            {/* Step 2 */}
-            <div className="text-center">
-              <div className="bg-gradient-to-br from-slate-600 to-slate-700 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-white font-bold text-xl">2</span>
+            {/* Step 2: Background Check */}
+            <div className="text-center group">
+              <div className="relative mb-4">
+                <div className="bg-gradient-to-br from-slate-500 to-slate-600 text-white w-16 h-16 rounded-full flex items-center justify-center mx-auto text-xl font-bold group-hover:scale-110 transition-transform">
+                2
               </div>
-              <h3 className="font-semibold text-slate-900 mb-2">Upload</h3>
-              <p className="text-sm text-slate-600">Secure document upload</p>
+            </div>
+              <h3 className="text-lg font-semibold text-slate-800 mb-3">Background Check</h3>
+              <p className="text-slate-600 leading-relaxed text-sm">We verify your employment, income stability, and assess your ability to pay rent.</p>
             </div>
             
-            {/* Step 3 */}
-            <div className="text-center">
-              <div className="bg-gradient-to-br from-slate-600 to-slate-700 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-white font-bold text-xl">3</span>
+            {/* Step 3: Get Approved */}
+            <div className="text-center group">
+              <div className="relative mb-4">
+                <div className="bg-gradient-to-br from-blue-500 to-slate-600 text-white w-16 h-16 rounded-full flex items-center justify-center mx-auto text-xl font-bold group-hover:scale-110 transition-transform">
+                3
               </div>
-              <h3 className="font-semibold text-slate-900 mb-2">Review</h3>
-              <p className="text-sm text-slate-600">Application review</p>
+            </div>
+              <h3 className="text-lg font-semibold text-slate-800 mb-3">Get Approved</h3>
+              <p className="text-slate-600 leading-relaxed text-sm">Receive approval within 24-48 hours and get matched with your assigned cosigner.</p>
             </div>
             
-            {/* Step 4 */}
-            <div className="text-center">
-              <div className="bg-gradient-to-br from-slate-600 to-slate-700 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-white font-bold text-xl">4</span>
+            {/* Step 4: Sign Service Agreement */}
+            <div className="text-center group">
+              <div className="relative mb-4">
+                <div className="bg-gradient-to-br from-slate-700 to-slate-800 text-white w-16 h-16 rounded-full flex items-center justify-center mx-auto text-xl font-bold group-hover:scale-110 transition-transform">
+                4
               </div>
-              <h3 className="font-semibold text-slate-900 mb-2">Pay</h3>
-              <p className="text-sm text-slate-600">Secure payment</p>
+            </div>
+              <h3 className="text-lg font-semibold text-slate-800 mb-3">Sign Service Agreement</h3>
+              <p className="text-slate-600 leading-relaxed text-sm">Complete our cosigning service agreement</p>
             </div>
             
-            {/* Step 5 */}
-            <div className="text-center">
-              <div className="bg-gradient-to-br from-green-500 to-green-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-white font-bold text-xl">5</span>
+            {/* Step 5: We Cosign Your Lease */}
+            <div className="text-center group">
+              <div className="relative mb-4">
+                <div className="bg-gradient-to-br from-blue-600 to-slate-700 text-white w-16 h-16 rounded-full flex items-center justify-center mx-auto text-xl font-bold group-hover:scale-110 transition-transform">
+                  5
+                </div>
               </div>
-              <h3 className="font-semibold text-slate-900 mb-2">Match</h3>
-              <p className="text-sm text-slate-600">Cosigner matching</p>
+              <h3 className="text-lg font-semibold text-slate-800 mb-3">We Cosign Your Lease</h3>
+              <p className="text-slate-600 leading-relaxed text-sm">Your assigned cosigner backs your lease application</p>
             </div>
             
-            {/* Step 6 */}
-            <div className="text-center">
-              <div className="bg-gradient-to-br from-blue-500 to-blue-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-white font-bold text-xl">6</span>
+            {/* Step 6: Lease Approved */}
+            <div className="text-center group">
+              <div className="relative mb-4">
+                <div className="bg-gradient-to-br from-slate-600 to-blue-600 text-white w-16 h-16 rounded-full flex items-center justify-center mx-auto text-xl font-bold group-hover:scale-110 transition-transform">
+                  6
+                </div>
               </div>
-              <h3 className="font-semibold text-slate-900 mb-2">Approve</h3>
-              <p className="text-sm text-slate-600">Get approved</p>
+              <h3 className="text-lg font-semibold text-slate-800 mb-3">Lease Approved</h3>
+              <p className="text-slate-600 leading-relaxed text-sm">Your lease application gets approved</p>
             </div>
             
-            {/* Step 7 */}
-            <div className="text-center">
-              <div className="bg-gradient-to-br from-purple-500 to-purple-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-white font-bold text-xl">7</span>
+            {/* Step 7: Move In */}
+            <div className="text-center group">
+              <div className="relative mb-4">
+                <div className="bg-gradient-to-br from-slate-700 to-blue-700 text-white w-16 h-16 rounded-full flex items-center justify-center mx-auto text-xl font-bold group-hover:scale-110 transition-transform">
+                  7
+                </div>
               </div>
-              <h3 className="font-semibold text-slate-900 mb-2">Move In</h3>
-              <p className="text-sm text-slate-600">Secure your apartment</p>
+              <h3 className="text-lg font-semibold text-slate-800 mb-3">Move In</h3>
+              <p className="text-slate-600 leading-relaxed text-sm">Complete your lease signing and move into your new apartment!</p>
+            </div>
+          </div>
+
+          {/* Process Timeline */}
+          <div className="mt-12 text-center">
+            <div className="inline-flex items-center bg-gray-100 rounded-full px-6 py-3">
+              <svg className="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+              <span className="text-sm font-medium text-slate-700">Complete process typically takes 3-7 days from application to move-in</span>
             </div>
           </div>
         </div>
