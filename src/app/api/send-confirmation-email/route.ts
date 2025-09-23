@@ -78,7 +78,6 @@ export async function POST(request: NextRequest) {
           </div>
           
           <div style="margin-bottom: 20px;">
-            <a href="https://credorainc.com/apartments" style="color: #64748b; text-decoration: none; margin: 0 15px; font-size: 14px;">Find Apartments</a>
             <a href="https://credorainc.com/for-renters" style="color: #64748b; text-decoration: none; margin: 0 15px; font-size: 14px;">For Renters</a>
             <a href="https://credorainc.com/pricing" style="color: #64748b; text-decoration: none; margin: 0 15px; font-size: 14px;">Pricing</a>
             <a href="https://credorainc.com/faq" style="color: #64748b; text-decoration: none; margin: 0 15px; font-size: 14px;">FAQ</a>
