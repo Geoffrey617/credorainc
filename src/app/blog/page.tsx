@@ -4,7 +4,7 @@ import BlogPageClient from './BlogPageClient';
 
 export const metadata: Metadata = createMetadata({
   title: "Blog",
-  description: "Expert advice and tips for apartment hunting, rental approval, and lease cosigning from Credora Inc. Stay informed about rental market trends and apartment search strategies.",
+  description: "Expert advice and tips for apartment hunting, rental approval, and lease cosigning from Bredora Inc. Stay informed about rental market trends and apartment search strategies.",
   path: "/blog",
   keywords: [
     "apartment blog",

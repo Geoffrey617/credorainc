@@ -315,7 +315,7 @@ export default function LandlordSettings() {
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center space-x-4">
               <Link href="/landlords/dashboard" className="text-2xl font-bold text-slate-900 hover:text-slate-700 transition-colors">
-                Credora
+                Bredora
               </Link>
               <span className="text-slate-400">|</span>
               <span className="text-slate-600">Landlord Portal</span>

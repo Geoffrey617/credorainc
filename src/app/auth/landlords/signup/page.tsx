@@ -220,7 +220,7 @@ export default function LandlordSignUp() {
         {/* Header */}
         <div className="text-center mb-8">
           <Link href="/" className="text-3xl font-bold text-slate-800 mb-8 inline-block">
-            Credora
+            Bredora
           </Link>
           <h2 className="text-3xl font-bold text-slate-900 mb-2">
             Join Our Landlord Network
@@ -576,7 +576,7 @@ export default function LandlordSignUp() {
                   className="mt-1 h-4 w-4 text-slate-600 focus:ring-slate-500 border-slate-300 rounded"
                 />
                 <label htmlFor="agreeToTerms" className="ml-3 text-sm text-slate-700">
-                  I agree to Credora's{' '}
+                  I agree to Bredora's{' '}
                   <Link href="/terms" className="text-slate-700 font-semibold hover:text-slate-900 transition-colors">
                     Terms of Service
                   </Link>{' '}

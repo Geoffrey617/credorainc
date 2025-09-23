@@ -68,7 +68,7 @@ function MobileApplePayContent() {
         supportedNetworks: ['visa', 'masterCard', 'amex', 'discover'],
         merchantCapabilities: ['supports3DS'],
         total: {
-          label: 'Credora Cosigner Application Fee',
+          label: 'Bredora Cosigner Application Fee',
           amount: paymentData.amount.toFixed(2)
         }
       };
@@ -136,7 +136,7 @@ function MobileApplePayContent() {
               customerEmail: paymentData.customerEmail,
               customerName: paymentData.customerName,
               service: paymentData.service,
-              description: 'Credora Cosigner Application Fee',
+              description: 'Bredora Cosigner Application Fee',
               paymentId: paymentData.paymentId
             })
           });

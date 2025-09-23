@@ -159,7 +159,7 @@ export default function LandlordSignIn() {
         {/* Header */}
         <div className="text-center">
           <Link href="/" className="text-3xl font-bold text-slate-800 mb-8 inline-block">
-            Credora
+            Bredora
           </Link>
           <h2 className="text-3xl font-bold text-slate-900 mb-2">
             Landlord Portal
@@ -295,7 +295,7 @@ export default function LandlordSignIn() {
           <div className="mt-8 pt-6 border-t border-slate-200">
             <div className="text-center">
               <p className="text-slate-600">
-                New to Credora's landlord platform?{' '}
+                New to Bredora's landlord platform?{' '}
                 <Link href="/auth/landlords/signup" className="font-semibold text-slate-700 hover:text-slate-900 transition-colors">
                   Create account
                 </Link>
@@ -306,7 +306,7 @@ export default function LandlordSignIn() {
 
         {/* Benefits Reminder */}
         <div className="bg-slate-700 text-white rounded-2xl p-6 text-center">
-          <h3 className="font-bold text-lg mb-2">Why Choose Credora?</h3>
+          <h3 className="font-bold text-lg mb-2">Why Choose Bredora?</h3>
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div className="flex items-center">
               <svg className="w-4 h-4 text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
