@@ -30,6 +30,52 @@ export default function Home() {
     successRate: 94.2
   };
 
+  // Testimonials data
+  const testimonials = [
+    {
+      name: "Sarah Chen",
+      role: "Graduate Student",
+      initial: "S",
+      color: "bg-gradient-to-br from-blue-500 to-blue-600",
+      review: "Bredora made my apartment hunt so much easier! As a graduate student with limited credit history, I was worried about getting approved. Their cosigning service got me into my dream apartment in just 3 days."
+    },
+    {
+      name: "Marcus Johnson",
+      role: "Software Engineer",
+      initial: "M", 
+      color: "bg-gradient-to-br from-green-500 to-green-600",
+      review: "The process was incredibly smooth and professional. I needed to relocate quickly for work, and Bredora's team handled everything efficiently. Highly recommend their service!"
+    },
+    {
+      name: "Emily Rodriguez",
+      role: "Nursing Student",
+      initial: "E",
+      color: "bg-gradient-to-br from-purple-500 to-purple-600", 
+      review: "As an international student, finding housing was my biggest concern. Bredora's cosigning service gave me the confidence I needed. The team was supportive throughout the entire process."
+    },
+    {
+      name: "David Park",
+      role: "Recent Graduate",
+      initial: "D",
+      color: "bg-gradient-to-br from-orange-500 to-orange-600",
+      review: "I was amazed by how quickly everything was processed. Within 48 hours, I had approval and was matched with a cosigner. The transparency and communication were excellent."
+    },
+    {
+      name: "Jessica Williams",
+      role: "Marketing Professional", 
+      initial: "J",
+      color: "bg-gradient-to-br from-pink-500 to-pink-600",
+      review: "Moving to a new city for work was stressful, but Bredora made the apartment search effortless. Their professional cosigners have excellent credit, which gave landlords confidence in my application."
+    },
+    {
+      name: "Alex Thompson",
+      role: "PhD Candidate",
+      initial: "A",
+      color: "bg-gradient-to-br from-indigo-500 to-indigo-600",
+      review: "The service exceeded my expectations. Not only did I get approved quickly, but the team also provided valuable advice about lease terms. Worth every penny!"
+    }
+  ];
+
   // Your updated apartment/property images for the animated hero (20 images)
   const heroAnimatedImages = [
     '/hero-images/WhatsApp Image 2025-09-05 at 10.22.48.jpeg',
@@ -760,8 +806,61 @@ export default function Home() {
           
           {/* Continuous Sliding Testimonials */}
           <div className="relative overflow-hidden">
+            {/* Single Row - Continuous Movement */}
             <div className="flex space-x-8 animate-slide-left">
-              {/* Add testimonials content here */}
+              {[...testimonials, ...testimonials, ...testimonials].map((testimonial, index) => (
+                <div 
+                  key={`testimonial-${index}`} 
+                  className="group cursor-pointer preserve-3d flex-shrink-0 w-96"
+                  style={{
+                    transform: `rotateY(${index % 2 === 0 ? '5deg' : '-5deg'}) rotateX(2deg)`,
+                    transformStyle: 'preserve-3d'
+                  }}
+                >
+                  <div className="relative bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-8 shadow-2xl transform transition-all duration-500 group-hover:scale-105 group-hover:rotate-0 group-hover:shadow-white/25">
+                    {/* 3D Card Back Shadow */}
+                    <div className="absolute inset-0 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl transform translate-z-[-20px] translate-x-4 translate-y-4 opacity-60"></div>
+                    
+                    {/* Quote Icon */}
+                    <div className="absolute -top-4 -left-4 w-12 h-12 bg-white/20 backdrop-blur-sm border border-white/30 rounded-full flex items-center justify-center shadow-lg transform rotate-12 group-hover:rotate-0 transition-transform duration-300">
+                      <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h4v10h-10z"/>
+                      </svg>
+                    </div>
+                    
+                    {/* Customer Info */}
+                    <div className="flex items-center mb-6 relative z-10">
+                      <div className={`w-16 h-16 ${testimonial.color} rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg transform group-hover:scale-110 transition-transform duration-300`}>
+                        {testimonial.initial}
+                      </div>
+                      <div className="ml-4">
+                        <h4 className="font-bold text-white text-lg">{testimonial.name}</h4>
+                        <p className="text-slate-200 font-medium">{testimonial.role}</p>
+                      </div>
+                    </div>
+                    
+                    {/* Review Text */}
+                    <div className="relative z-10 mb-6">
+                      <p className="text-slate-100 leading-relaxed italic text-lg">
+                        "{testimonial.review}"
+                      </p>
+                    </div>
+                    
+                    {/* 5 Star Rating */}
+                    <div className="flex justify-center space-x-1 relative z-10">
+                      {[...Array(5)].map((_, i) => (
+                        <svg key={i} className="w-6 h-6 text-yellow-400 fill-current transform group-hover:scale-110 transition-transform duration-300" style={{transitionDelay: `${i * 50}ms`}} viewBox="0 0 20 20">
+                          <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
+                        </svg>
+                      ))}
+                    </div>
+                    
+                    {/* Floating Elements */}
+                    <div className="absolute top-4 right-4 w-3 h-3 bg-blue-400 rounded-full opacity-60 animate-pulse"></div>
+                    <div className="absolute bottom-8 left-6 w-2 h-2 bg-purple-400 rounded-full opacity-40 animate-pulse" style={{animationDelay: '1s'}}></div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
