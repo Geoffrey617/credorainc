@@ -608,64 +608,134 @@ export default function Home() {
               Recent Rental Blog
           </h2>
             <p className="text-lg text-slate-600">
-              Tips and insights for renters
+              Stay updated with the latest rental market trends, tips, and insights
             </p>
           </div>
           
           <div className="grid md:grid-cols-3 gap-8">
             {/* Blog Post 1 */}
-            <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow">
-              <h3 className="text-lg font-semibold text-slate-900 mb-3">
-                How Your Credit Score Affects Rental Approval
-              </h3>
-              <p className="text-slate-600 mb-4">
-                Understanding the relationship between credit scores and rental approvals. Learn what landlords look for and how to improve your chances.
-              </p>
-              <div className="flex items-center justify-between">
-                <div className="text-sm text-slate-500">
-                  <span>5 min read</span>
+            <article className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer group">
+              <Link href="/blog/apartment-hunting-checklist" className="block">
+                <div className="relative h-48">
+                  <Image
+                    src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&auto=format&fit=crop&w=2340&q=80"
+                    alt="Young professional looking at apartment listings on laptop"
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute top-4 left-4 bg-slate-700 text-white px-3 py-1 rounded-full text-xs font-medium">
+                    Rental Tips
+                  </div>
+                  <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </div>
-                <a href="/blog/credit-score-rental-approval" className="text-slate-700 hover:text-slate-900 font-medium">
-                  Read More →
-                </a>
-              </div>
-            </div>
-            
+                <div className="p-6">
+                  <div className="text-sm text-slate-500 mb-2">June 25, 2025</div>
+                  <h3 className="text-lg font-semibold text-slate-900 mb-3 group-hover:text-slate-700 transition-colors">
+                    The Ultimate Apartment Hunting Checklist for 2025
+                  </h3>
+                  <p className="text-slate-600 mb-4 line-clamp-3">
+                    Navigate the competitive rental market with our comprehensive checklist. From budgeting to viewing appointments, we cover everything you need to secure your perfect apartment.
+                  </p>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center text-sm text-slate-500">
+                      <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                        <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd"/>
+                      </svg>
+                      <span>2,847</span> views
+                    </div>
+                    <span className="text-sm font-medium text-slate-700">5 min read</span>
+                  </div>
+                </div>
+              </Link>
+            </article>
+
             {/* Blog Post 2 */}
-            <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow">
-              <h3 className="text-lg font-semibold text-slate-900 mb-3">
-                Apartment Hunting Checklist
-              </h3>
-              <p className="text-slate-600 mb-4">
-                Essential tips for apartment hunting success. What to look for, questions to ask, and red flags to avoid.
-              </p>
-              <div className="flex items-center justify-between">
-                <div className="text-sm text-slate-500">
-                  <span>7 min read</span>
+            <article className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer group">
+              <Link href="/blog/credit-score-rental-approval" className="block">
+                <div className="relative h-48">
+                  <Image
+                    src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?ixlib=rb-4.0.3&auto=format&fit=crop&w=2340&q=80"
+                    alt="Person reviewing credit report and financial documents"
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute top-4 left-4 bg-slate-700 text-white px-3 py-1 rounded-full text-xs font-medium">
+                    Credit Guide
+                  </div>
+                  <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </div>
-                <a href="/blog/apartment-hunting-checklist" className="text-slate-700 hover:text-slate-900 font-medium">
-                  Read More →
-                </a>
-              </div>
-            </div>
-            
+                <div className="p-6">
+                  <div className="text-sm text-slate-500 mb-2">July 5, 2025</div>
+                  <h3 className="text-lg font-semibold text-slate-900 mb-3 group-hover:text-slate-700 transition-colors">
+                    How Your Credit Score Affects Rental Approval
+                  </h3>
+                  <p className="text-slate-600 mb-4 line-clamp-3">
+                    Understanding the relationship between credit scores and rental approvals. Learn what landlords look for and how to improve your chances of getting approved.
+                  </p>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center text-sm text-slate-500">
+                      <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                        <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd"/>
+                      </svg>
+                      <span>1,923</span> views
+                    </div>
+                    <span className="text-sm font-medium text-slate-700">7 min read</span>
+                  </div>
+                </div>
+              </Link>
+            </article>
+
             {/* Blog Post 3 */}
-            <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow">
-              <h3 className="text-lg font-semibold text-slate-900 mb-3">
-                Lease Agreement Red Flags
-              </h3>
-              <p className="text-slate-600 mb-4">
-                Important warning signs in lease agreements. Protect yourself from unfair terms and hidden fees.
-              </p>
-              <div className="flex items-center justify-between">
-                <div className="text-sm text-slate-500">
-                  <span>6 min read</span>
+            <article className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer group">
+              <Link href="/blog/lease-agreement-red-flags" className="block">
+                <div className="relative h-48">
+                  <Image
+                    src="https://images.unsplash.com/photo-1589829545856-d10d557cf95f?ixlib=rb-4.0.3&auto=format&fit=crop&w=2340&q=80"
+                    alt="Professional woman reading lease agreement carefully"
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute top-4 left-4 bg-slate-700 text-white px-3 py-1 rounded-full text-xs font-medium">
+                    Legal Guide
+                  </div>
+                  <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </div>
-                <a href="/blog/lease-agreement-red-flags" className="text-slate-700 hover:text-slate-900 font-medium">
-                  Read More →
-                </a>
-              </div>
-            </div>
+                <div className="p-6">
+                  <div className="text-sm text-slate-500 mb-2">August 29, 2025</div>
+                  <h3 className="text-lg font-semibold text-slate-900 mb-3 group-hover:text-slate-700 transition-colors">
+                    Red Flags to Watch for in Lease Agreements
+                  </h3>
+                  <p className="text-slate-600 mb-4 line-clamp-3">
+                    Protect yourself from unfair lease terms. Our legal experts share the most common red flags to watch for when reviewing rental agreements.
+                  </p>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center text-sm text-slate-500">
+                      <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                        <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd"/>
+                      </svg>
+                      <span>3,156</span> views
+                    </div>
+                    <span className="text-sm font-medium text-slate-700">6 min read</span>
+                  </div>
+                </div>
+              </Link>
+            </article>
+          </div>
+
+          {/* View All Blog Posts Button */}
+          <div className="text-center mt-12">
+            <Link 
+              href="/blog" 
+              className="inline-flex items-center bg-slate-700 text-white px-8 py-3 rounded-xl font-semibold hover:bg-slate-800 transition-colors"
+            >
+              View All Blog Posts
+              <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </Link>
           </div>
         </div>
       </section>
