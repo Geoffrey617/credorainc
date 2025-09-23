@@ -443,22 +443,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Available Apartments Preview */}
-      <section className="py-20 bg-gradient-to-br from-slate-600 to-slate-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-white mb-4">
-              Available Apartments
-            </h2>
-            <p className="text-lg text-slate-100 max-w-3xl mx-auto">
-              Preview our curated selection of premium apartments. Get approved with our cosigning service and move in fast!
-            </p>
-          </div>
-          
-          {/* Apartment Listings Preview */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {/* Apartment 1 - Idyl Boston */}
-            <Link href="/apartments/1" className="group perspective-1000 block">
+      {/* Apartment listings section removed - focusing on core services */}
+
+      {/* Features Section */}
+      <section className="py-16 bg-gray-50">
               <div className="relative h-80 transform-gpu transition-all duration-500 group-hover:rotate-y-6 group-hover:-translate-y-4 preserve-3d">
                 <div className="absolute inset-0 rounded-3xl shadow-2xl bg-white/10 backdrop-blur-xl border border-white/20 transform translate-z-4 group-hover:shadow-white/25 transition-shadow duration-500">
                   <div className="relative h-full overflow-hidden rounded-3xl">
@@ -1258,16 +1246,7 @@ export default function Home() {
               <h4 className="font-semibold mb-4">For Renters</h4>
               <ul className="space-y-2 text-gray-400">
                 <li><Link href="/auth/signin" className="hover:text-white transition-colors">Apply Now</Link></li>
-                <li><Link href="/apartments" className="hover:text-white transition-colors">Find Apartments</Link></li>
                 <li><Link href="/faq" className="hover:text-white transition-colors">FAQ</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">For Landlords</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li><Link href="/landlords" className="hover:text-white transition-colors">Landlord Portal</Link></li>
-                <li><Link href="/landlords/benefits" className="hover:text-white transition-colors">Benefits</Link></li>
-                <li><Link href="/landlords/signup" className="hover:text-white transition-colors">Sign Up</Link></li>
               </ul>
             </div>
             <div>
