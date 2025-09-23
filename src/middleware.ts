@@ -102,7 +102,7 @@ function checkRateLimit(ip: string): boolean {
 
 export function middleware(request: NextRequest) {
   const userAgent = request.headers.get('user-agent') || '';
-  const ip = request.ip || request.headers.get('x-forwarded-for') || 'unknown';
+  const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
   const url = request.nextUrl.pathname;
   
   // Log suspicious requests
