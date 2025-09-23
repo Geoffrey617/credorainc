@@ -664,7 +664,7 @@ export default function Home() {
               </p>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">For Renters</h4>
+              <h4 className="font-semibold mb-4">Renters</h4>
               <ul className="space-y-2 text-gray-400">
                 <li><a href="/auth/signin" className="hover:text-white transition-colors">Apply Now</a></li>
                 <li><a href="/faq" className="hover:text-white transition-colors">FAQ</a></li>

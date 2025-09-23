@@ -19,7 +19,7 @@ export default function Navigation() {
           <ul className="hidden lg:flex items-center space-x-8" role="menubar">
             <li role="none">
               <Link href="/for-renters" className="text-slate-700 hover:text-slate-900 transition-all duration-300 font-medium hover:scale-105" role="menuitem">
-                For Renters
+                Renters
               </Link>
             </li>
             <li role="none">
@@ -89,7 +89,7 @@ export default function Navigation() {
                   onClick={() => setIsMobileMenuOpen(false)}
                   role="menuitem"
                 >
-                  For Renters
+                  Renters
                 </Link>
               </li>
               <li role="none">
