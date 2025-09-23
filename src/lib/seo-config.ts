@@ -11,17 +11,17 @@ export interface SEOConfig {
 }
 
 export const defaultSEO: SEOConfig = {
-  title: "Bredora Inc - Professional Apartment Lease Cosigning Services",
-  description: "Get guaranteed apartment approval with Bredora's professional cosigning services. Trusted by thousands across all 50 states. Apply today and secure your dream apartment.",
+  title: "Bredora - Apartment Finder & Lease Cosigner Service",
+  description: "Professional apartment finder and lease cosigner service. Get approved for your dream apartment with our expert cosigning services. Trusted nationwide.",
   keywords: [
-    "apartment cosigner",
-    "lease cosigning",
-    "apartment approval",
-    "rental guarantee",
     "apartment finder",
-    "lease guarantee",
-    "rental cosigner",
-    "apartment rental help"
+    "lease cosigner", 
+    "apartment cosigning",
+    "rental approval",
+    "apartment approval",
+    "cosigner service",
+    "apartment search",
+    "rental assistance"
   ],
   ogImage: "/og-image.jpg",
   ogType: "website",
@@ -29,53 +29,47 @@ export const defaultSEO: SEOConfig = {
 };
 
 export const pageSEO = {
-  apartments: {
-    title: "Browse Apartments with Guaranteed Approval | Bredora Inc",
-    description: "Search quality apartments with guaranteed cosigner backing. Filter by location, price, bedrooms. All listings come with professional lease guarantee service.",
-    keywords: ["apartments for rent", "guaranteed approval apartments", "apartment search", "rental listings"]
-  },
-  
   blog: {
-    title: "Apartment Rental Tips & Guides | Bredora Inc Blog",
-    description: "Expert advice on apartment hunting, lease agreements, credit improvement, and rental tips. Learn from industry professionals.",
+    title: "Rental Tips & Guides | Bredora Blog",
+    description: "Expert advice on apartment hunting, lease agreements, and rental tips from Bredora's apartment finder and cosigner service.",
     keywords: ["apartment tips", "rental advice", "lease guide", "apartment hunting"]
   },
   
   contact: {
-    title: "Contact Bredora Inc | Get Help with Apartment Cosigning",
-    description: "Get in touch with our expert team for apartment cosigning questions. Phone, email, and live chat support available.",
-    keywords: ["contact credora", "cosigning help", "apartment support", "rental assistance"]
+    title: "Contact Bredora | Apartment Finder & Cosigner Help",
+    description: "Get in touch with Bredora for apartment finder and cosigning service questions. Expert support available.",
+    keywords: ["contact bredora", "apartment finder help", "cosigning support", "rental assistance"]
   },
   
   cookies: {
-    title: "Cookie Policy | Bredora Inc Privacy Information",
-    description: "Learn about how Bredora Inc uses cookies to improve your browsing experience and protect your privacy.",
+    title: "Cookie Policy | Bredora Privacy Information",
+    description: "Learn about how Bredora uses cookies to improve your apartment finder and cosigning service experience.",
     keywords: ["cookie policy", "privacy", "data protection", "website cookies"],
     noindex: true
   },
   
   faq: {
-    title: "Frequently Asked Questions | Bredora Inc Cosigning FAQ",
-    description: "Find answers to common questions about apartment cosigning, approval process, pricing, and requirements.",
-    keywords: ["cosigning faq", "apartment questions", "lease help", "rental faq"]
+    title: "FAQ | Bredora Apartment Finder & Cosigner Service",
+    description: "Find answers to common questions about our apartment finder service, cosigning process, pricing, and requirements.",
+    keywords: ["apartment finder faq", "cosigning questions", "rental help", "service faq"]
   },
   
   forRenters: {
-    title: "For Renters | Apartment Cosigning Services | Bredora Inc",
-    description: "Professional cosigning services for renters. Get approved for your dream apartment with our guaranteed cosigner backing.",
-    keywords: ["renter services", "apartment cosigner", "rental help", "lease approval"]
+    title: "Renters | Bredora Apartment Finder & Cosigner Service",
+    description: "Professional apartment finder and cosigning services for renters. Get approved for your dream apartment quickly.",
+    keywords: ["apartment finder", "cosigner service", "rental help", "apartment approval"]
   },
   
   privacy: {
-    title: "Privacy Policy | Bredora Inc Data Protection",
-    description: "Learn how Bredora Inc protects your personal information and privacy when using our cosigning services.",
+    title: "Privacy Policy | Bredora Data Protection",
+    description: "Learn how Bredora protects your personal information when using our apartment finder and cosigning services.",
     keywords: ["privacy policy", "data protection", "personal information", "privacy rights"],
     noindex: true
   },
   
   terms: {
-    title: "Terms of Service | Bredora Inc Legal Agreement",
-    description: "Read the terms and conditions for using Bredora Inc's apartment cosigning services and platform.",
+    title: "Terms of Service | Bredora Legal Agreement", 
+    description: "Terms and conditions for using Bredora's apartment finder and lease cosigning services.",
     keywords: ["terms of service", "legal agreement", "service terms", "user agreement"],
     noindex: true
   }
@@ -132,7 +126,7 @@ export function createMetadata(config: {
   keywords?: string[];
   noindex?: boolean;
 }): any {
-  const baseUrl = 'https://credorainc.com';
+  const baseUrl = 'https://bredora.com';
   const fullUrl = config.path ? `${baseUrl}${config.path}` : baseUrl;
   
   return {
@@ -144,7 +138,7 @@ export function createMetadata(config: {
       title: config.title,
       description: config.description,
       url: fullUrl,
-      siteName: 'Bredora Inc',
+      siteName: 'Bredora',
       type: 'website',
       images: [
         {

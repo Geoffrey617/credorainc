@@ -1,4 +1,5 @@
 // Security monitoring and threat detection
+import { NextRequest } from 'next/server';
 
 interface SecurityEvent {
   type: 'bot_detected' | 'rate_limit_exceeded' | 'suspicious_activity' | 'scraping_attempt';
