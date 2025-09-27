@@ -4,6 +4,8 @@
 
 [build.environment]
   NODE_VERSION = "20"
+  # Firebase API keys are public and safe to expose in client-side code
+  SECRETS_SCAN_SMART_DETECTION_OMIT_VALUES = "AIza*"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
