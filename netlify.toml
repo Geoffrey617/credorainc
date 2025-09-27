@@ -1,6 +1,9 @@
 [build]
   command = "npm run build"
   publish = ".next"
+  
+  # Configure secrets scanning to ignore Firebase public API key
+  environment = { SECRETS_SCAN_SMART_DETECTION_OMIT_VALUES = "AIza*" }
 
 [build.environment]
   NODE_VERSION = "20"
