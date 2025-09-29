@@ -220,7 +220,7 @@ function ApartmentFinderPaymentContent() {
                     console.error('🚨 Stripe payment error:', error);
                     alert(`Payment failed: ${error}`);
                   }}
-                  disabled={isProcessing}
+                  disabled={false}
                 />
               </div>
             </div>
