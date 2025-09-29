@@ -11,6 +11,7 @@ interface StripePaymentElementProps {
   amount: number; // Amount in cents (5500 for $55.00)
   customerEmail: string;
   customerName: string;
+  description?: string; // Payment description for Stripe dashboard
   onSuccess: () => void;
   onError: (error: string) => void;
   disabled?: boolean;
@@ -131,6 +132,9 @@ export default function StripePaymentElement(props: StripePaymentElementProps) {
           body: JSON.stringify({
             amount: props.amount / 100, // Convert cents to dollars
             currency: 'usd',
+            customerEmail: props.customerEmail,
+            customerName: props.customerName,
+            description: props.description || 'Payment processing',
             automatic_payment_methods: {
               enabled: true
             }

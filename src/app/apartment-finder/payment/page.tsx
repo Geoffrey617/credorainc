@@ -178,6 +178,7 @@ function ApartmentFinderPaymentContent() {
                   amount={25000} // $250.00 in cents
                   customerEmail={paymentData?.userEmail || ''}
                   customerName={draftRequest?.userName || ''}
+                  description="Apartment Finder Service Fee"
                   onSuccess={async () => {
                     console.log('✅ Stripe payment successful!');
                     

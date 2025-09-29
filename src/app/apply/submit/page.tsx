@@ -548,6 +548,7 @@ export default function SubmitPage() {
                     amount={STRIPE_CONFIG.applicationFee} // 5500 cents = $55.00
                     customerEmail={formData.email}
                     customerName={`${formData.firstName} ${formData.lastName}`}
+                    description="Lease Cosigner Application Fee"
                     onSuccess={async () => {
                       console.log('✅ Stripe payment successful!');
                       
