@@ -3,8 +3,8 @@ import { generatePageSEO, generateMetaTags, createMetadata, createBreadcrumbSche
 import BlogPageClient from './BlogPageClient';
 
 export const metadata: Metadata = createMetadata({
-  title: "Blog",
-  description: "Expert advice and tips for apartment hunting, rental approval, and lease cosigning from Bredora Inc. Stay informed about rental market trends and apartment search strategies.",
+  title: "Recent Blog",
+  description: "Expert advice and tips for apartment hunting, rental approval, and lease cosigning from Bredora. Stay informed about rental market trends and apartment search strategies.",
   path: "/blog",
   keywords: [
     "apartment blog",
@@ -21,7 +21,7 @@ export const metadata: Metadata = createMetadata({
 export default function BlogPage() {
   const breadcrumbSchema = createBreadcrumbSchema([
     { name: "Home", url: "https://bredora.com" },
-    { name: "Blog", url: "https://bredora.com/blog" }
+    { name: "Recent Blog", url: "https://bredora.com/blog" }
   ]);
 
   return (
