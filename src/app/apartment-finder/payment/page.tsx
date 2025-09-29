@@ -201,16 +201,9 @@ function ApartmentFinderPaymentContent() {
           {/* Right Side - Payment Form (Desktop) / Bottom (Mobile) */}
           <div className="lg:w-3/5 lg:flex-1 lg:overflow-y-auto lg:h-full">
             <div className="bg-white rounded-xl shadow-lg p-8 h-full lg:pb-12">
-              {/* Payment Method */}
-              <div className="mb-8">
-                <h3 className="text-lg font-semibold text-slate-800 mb-4">Choose Payment Method</h3>
-                
-                {/* Apple Pay and card payment now handled by Stripe Elements automatically */}
-
               {/* Payment Form Container */}
-            <div className="flex-1 min-h-0 h-full">
-              <div className="bg-white rounded-lg p-6 border border-slate-200 shadow-sm h-full">
-                <h4 className="text-lg font-semibold text-slate-800 mb-4">Payment Information</h4>
+              <div className="flex-1 min-h-0 h-full">
+                <h3 className="text-lg font-semibold text-slate-800 mb-6">Payment Information</h3>
                 
                 {/* Stripe Payment Element */}
                 <StripePaymentElement
@@ -259,23 +252,13 @@ function ApartmentFinderPaymentContent() {
                   }}
                   disabled={isProcessing}
                 />
-
-                {/* Back to form link */}
-                <div className="text-center mt-6 hidden lg:block">
-                  <Link
-                    href="/apartment-finder"
-                    className="text-slate-600 hover:text-slate-800 text-sm font-medium"
-                  >
-                    ← Back to form
-                  </Link>
-                </div>
               </div>
             </div>
         </div>
       </div>
 
-      {/* Back Link - Only show for card step on desktop */}
-      <div className="text-center mt-8 lg:hidden">
+      {/* Back Link */}
+      <div className="text-center mt-8">
         <Link
           href="/apartment-finder"
           className="text-slate-600 hover:text-slate-800 text-sm font-medium"
