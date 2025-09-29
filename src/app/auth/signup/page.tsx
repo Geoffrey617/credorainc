@@ -75,8 +75,19 @@ export default function SignUpPage() {
         return;
       }
       
-      // Store user data in localStorage for consistency
-      localStorage.setItem('credora_user', JSON.stringify(result.user));
+      // Store user data with proper name parsing
+      const userData = {
+        ...result.user,
+        firstName: result.user.displayName?.split(' ')[0] || '',
+        lastName: result.user.displayName?.split(' ').slice(1).join(' ') || '',
+        first_name: result.user.displayName?.split(' ')[0] || '',
+        last_name: result.user.displayName?.split(' ').slice(1).join(' ') || '',
+        name: result.user.displayName || result.user.email?.split('@')[0] || '',
+        provider: 'google',
+        emailVerified: true
+      };
+      
+      localStorage.setItem('credora_user', JSON.stringify(userData));
       localStorage.setItem('credora_session', 'firebase_session');
       
       console.log('✅ Google sign-up successful:', result.user.email);

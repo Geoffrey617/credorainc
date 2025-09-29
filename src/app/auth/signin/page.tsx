@@ -51,18 +51,24 @@ export default function SignInPage() {
 
       console.log('✅ Google authentication successful:', googleResult.user.email);
       
-      // Store Firebase user data directly in session
+      // Store Firebase user data with proper name parsing
+      const userData = {
+        uid: googleResult.user.uid,
+        id: googleResult.user.uid,
+        email: googleResult.user.email,
+        displayName: googleResult.user.displayName,
+        firstName: googleResult.user.displayName?.split(' ')[0] || '',
+        lastName: googleResult.user.displayName?.split(' ').slice(1).join(' ') || '',
+        first_name: googleResult.user.displayName?.split(' ')[0] || '',
+        last_name: googleResult.user.displayName?.split(' ').slice(1).join(' ') || '',
+        name: googleResult.user.displayName || googleResult.user.email?.split('@')[0] || '',
+        photoURL: googleResult.user.photoURL,
+        provider: 'google',
+        emailVerified: true
+      };
+      
       const sessionData = {
-        user: {
-          uid: googleResult.user.uid,
-          email: googleResult.user.email,
-          displayName: googleResult.user.displayName,
-          firstName: googleResult.user.displayName?.split(' ')[0] || 'Google',
-          lastName: googleResult.user.displayName?.split(' ')[1] || 'User',
-          photoURL: googleResult.user.photoURL,
-          provider: 'google',
-          emailVerified: true
-        },
+        user: userData,
         sessionToken: `firebase_${googleResult.user.uid}`,
         loginTime: Date.now(),
         lastActivity: Date.now()
