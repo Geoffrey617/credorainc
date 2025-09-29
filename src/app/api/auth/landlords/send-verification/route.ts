@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verify Your Landlord Account - Credora</title>
+    <title>Verify Your Landlord Account - Bredora</title>
     <style>
         body {
             font-family: Arial, Helvetica, sans-serif;
@@ -147,14 +147,14 @@ export async function POST(request: NextRequest) {
         <div class="email-container">
             <!-- Header -->
             <div class="header">
-                <div class="logo">Credora</div>
+                <div class="logo">Bredora</div>
                 <div class="tagline">Property Listing</div>
             </div>
             
             <!-- Main Content -->
             <div class="content">
                 <div class="landlord-badge">🏢 LANDLORD PORTAL</div>
-                <h1 class="welcome-title">Welcome to Credora, ${firstName}!</h1>
+                <h1 class="welcome-title">Welcome to Bredora, ${firstName}!</h1>
                 <p class="description">
                     Thank you for joining our landlord network. You're one step away from connecting with 
                     pre-screened tenants backed by professional cosigners.
@@ -177,7 +177,7 @@ export async function POST(request: NextRequest) {
                     <p style="font-size: 11px; color: #e2e8f0; line-height: 1.4; margin: 0; font-family: Arial, Helvetica, sans-serif;">
                         <strong>Disclaimer:</strong> This transmission may contain information that is privileged, confidential and/or exempt from disclosure under applicable law. If you are not the intended recipient, you are hereby notified that any disclosure, copying, distribution or use of the information contained herein (including any reliance thereon) is STRICTLY PROHIBITED. If you received this transmission in error, please immediately contact the sender and destroy the material in its entirety, whether in electronic or in hard copy format.
                         <br><br>
-                        Email is not a secure method of communication because it may be intercepted by third parties. Please do not include any sensitive or private information in your email correspondence directed to Credora.
+                        Email is not a secure method of communication because it may be intercepted by third parties. Please do not include any sensitive or private information in your email correspondence directed to Bredora.
                     </p>
                 </td>
             </tr>
@@ -187,7 +187,7 @@ export async function POST(request: NextRequest) {
                 <!-- Important Info -->
                 <div style="margin-bottom: 25px;">
                     <p style="font-size: 14px; color: #94a3b8; margin: 0 0 8px 0; line-height: 1.4; font-family: Arial, Helvetica, sans-serif;">This verification link expires in 24 hours</p>
-                    <p style="font-size: 14px; color: #94a3b8; margin: 0; line-height: 1.4; font-family: Arial, Helvetica, sans-serif;">If you didn't create a Credora landlord account, you can safely ignore this email</p>
+                    <p style="font-size: 14px; color: #94a3b8; margin: 0; line-height: 1.4; font-family: Arial, Helvetica, sans-serif;">If you didn't create a Bredora landlord account, you can safely ignore this email</p>
                 </div>
                 
                 <!-- Support Section -->
@@ -215,7 +215,7 @@ export async function POST(request: NextRequest) {
                 <!-- Copyright -->
                 <div>
                     <p style="font-size: 12px; color: #ffffff; margin: 0; font-family: Arial, Helvetica, sans-serif;">
-                        © 2025 Credora Inc. • Property Listing
+                        © 2025 Bredora Inc. • Property Listing
                     </p>
                 </div>
             </div>
@@ -226,7 +226,7 @@ export async function POST(request: NextRequest) {
 
     // Plain text version
     const textContent = `
-Welcome to Credora Landlord Portal, ${firstName}!
+Welcome to Bredora Landlord Portal, ${firstName}!
 
 Thank you for joining our landlord network. You're one step away from connecting with pre-screened tenants backed by professional cosigners.
 
@@ -235,7 +235,7 @@ ${verificationUrl}
 
 This verification link expires in 24 hours.
 
-If you didn't create a Credora landlord account, you can safely ignore this email.
+If you didn't create a Bredora landlord account, you can safely ignore this email.
 
 Need help? Contact us:
 Email: landlords@bredora.com
@@ -243,15 +243,15 @@ Phone: 1-800-CREDORA
 
 DISCLAIMER: This transmission may contain information that is privileged, confidential and/or exempt from disclosure under applicable law. If you are not the intended recipient, you are hereby notified that any disclosure, copying, distribution or use of the information contained herein (including any reliance thereon) is STRICTLY PROHIBITED. If you received this transmission in error, please immediately contact the sender and destroy the material in its entirety, whether in electronic or in hard copy format.
 
-Email is not a secure method of communication because it may be intercepted by third parties. Please do not include any sensitive or private information in your email correspondence directed to Credora.
+Email is not a secure method of communication because it may be intercepted by third parties. Please do not include any sensitive or private information in your email correspondence directed to Bredora.
 
-© 2025 Credora Inc. • Property Listing
+© 2025 Bredora Inc. • Property Listing
 `;
 
     const data = await resend.emails.send({
       from: 'Bredora Landlord Portal <noreply@bredora.com>',
       to: [email],
-      subject: `Verify Your Landlord Account - Welcome to Credora, ${firstName}!`,
+      subject: `Verify Your Landlord Account - Welcome to Bredora, ${firstName}!`,
       html: htmlContent,
       text: textContent,
     });

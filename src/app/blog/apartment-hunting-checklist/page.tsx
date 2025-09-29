@@ -52,7 +52,7 @@ export default function ApartmentHuntingChecklistBlog() {
           
           <h3 className="text-lg font-semibold text-slate-800 mb-3">1. Determine Your Budget</h3>
           <p className="text-slate-700 mb-6">
-            The golden rule is to spend no more than 30% of your gross monthly income on rent. Don't forget to factor in utilities, parking, and other fees. If you're concerned about meeting income requirements, consider using a cosigning service like Credora to strengthen your application.
+            The golden rule is to spend no more than 30% of your gross monthly income on rent. Don't forget to factor in utilities, parking, and other fees. If you're concerned about meeting income requirements, consider using a cosigning service like Bredora to strengthen your application.
           </p>
 
           <h3 className="text-lg font-semibold text-slate-800 mb-3">2. Check Your Credit Score</h3>
@@ -97,13 +97,13 @@ export default function ApartmentHuntingChecklistBlog() {
 
           <h3 className="text-lg font-semibold text-slate-800 mb-3">7. Consider Professional Help</h3>
           <p className="text-slate-700 mb-6">
-            If you're struggling with income requirements or credit scores, professional cosigning services like Credora can significantly improve your approval chances. We handle the entire process, from application to lease signing.
+            If you're struggling with income requirements or credit scores, professional cosigning services like Bredora can significantly improve your approval chances. We handle the entire process, from application to lease signing.
           </p>
 
           <div className="bg-slate-50 p-8 rounded-2xl mt-12">
             <h3 className="text-lg font-semibold text-slate-900 mb-4">Need Help With Your Application?</h3>
             <p className="text-slate-700 mb-6">
-              Don't let income requirements or credit concerns hold you back from your perfect apartment. Credora's professional cosigning service has helped thousands of renters secure their ideal homes.
+              Don't let income requirements or credit concerns hold you back from your perfect apartment. Bredora's professional cosigning service has helped thousands of renters secure their ideal homes.
             </p>
             <Link 
               href="/auth/signin" 

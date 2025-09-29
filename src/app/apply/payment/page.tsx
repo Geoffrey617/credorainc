@@ -116,7 +116,7 @@ export default function PaymentPage() {
       const paymentResult = await processStripePayment(
         {
           amount: 55, // $55 cosigner service application fee
-          description: 'Credora Cosigner Service Application Fee - Background check and processing',
+          description: 'Bredora Cosigner Service Application Fee - Background check and processing',
           metadata: {
             type: 'application_fee',
             applicantId: 'current_user', // In production, use actual user ID
@@ -173,7 +173,7 @@ export default function PaymentPage() {
           <div className="flex justify-between h-16">
             <div className="flex items-center">
               <Link href="/" className="flex-shrink-0">
-                <h1 className="text-2xl font-bold text-blue-600">Credora</h1>
+                <h1 className="text-2xl font-bold text-blue-600">Bredora</h1>
               </Link>
             </div>
             <div className="flex items-center space-x-4">
@@ -413,7 +413,7 @@ export default function PaymentPage() {
                         <a href="/privacy" className="text-blue-600 hover:text-blue-700">
                           Privacy Policy
                         </a>
-                        . I authorize Credora to process the $55 application fee and conduct employment verification and rental history review as part of the cosigning application process. I understand that upon approval, I will be charged a cosigning fee (75% of first month's rent for students, 85% for employed/self-employed individuals).
+                        . I authorize Bredora to process the $55 application fee and conduct employment verification and rental history review as part of the cosigning application process. I understand that upon approval, I will be charged a cosigning fee (75% of first month's rent for students, 85% for employed/self-employed individuals).
                       </label>
                     </div>
                   </div>

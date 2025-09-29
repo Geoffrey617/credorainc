@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Authentication Error - Credora Inc',
+  title: 'Authentication Error - Bredora Inc',
   description: 'An error occurred during authentication. Please try again.',
 }
 

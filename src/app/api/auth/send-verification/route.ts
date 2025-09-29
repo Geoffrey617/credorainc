@@ -47,11 +47,11 @@ export async function POST(request: NextRequest) {
         <head>
           <meta charset="utf-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Action required: verify your email - Credora Inc</title>
+          <title>Action required: verify your email - Bredora Inc</title>
         </head>
         <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #374151; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8fafc;">
           <div style="background: linear-gradient(135deg, #64748b 0%, #475569 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
-            <h1 style="color: white; margin: 0; font-size: 32px; font-weight: bold;">Credora Inc</h1>
+            <h1 style="color: white; margin: 0; font-size: 32px; font-weight: bold;">Bredora Inc</h1>
             <p style="color: #e2e8f0; margin: 10px 0 0 0; font-size: 16px;">Apartment finder & Lease Cosigner Service</p>
           </div>
           
@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
               </p>
               
               <p style="color: #64748b; font-size: 12px; margin: 0; line-height: 1.5;">
-                Email is not a secure method of communication because it may be intercepted by third parties. Please do not include any sensitive or private information in your email correspondence directed to Credora.
+                Email is not a secure method of communication because it may be intercepted by third parties. Please do not include any sensitive or private information in your email correspondence directed to Bredora.
               </p>
             </div>
             
@@ -101,12 +101,12 @@ export async function POST(request: NextRequest) {
             <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;">
             
             <p style="color: #9ca3af; font-size: 12px; margin: 10px 0 0 0;">
-              © 2025 Credora Inc • Apartment Finder & Lease Cosigner Service<br>
+              © 2025 Bredora Inc • Apartment Finder & Lease Cosigner Service<br>
               San Francisco, California • All rights reserved
             </p>
             
             <p style="color: #9ca3af; font-size: 11px; margin: 15px 0 0 0;">
-              You received this email because you signed up for Credora Inc.<br>
+              You received this email because you signed up for Bredora Inc.<br>
               <a href="https://bredora.com/contact" style="color: #64748b;">Contact us</a> if you have questions.
             </p>
           </div>

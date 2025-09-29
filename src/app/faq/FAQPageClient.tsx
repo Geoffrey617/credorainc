@@ -14,8 +14,8 @@ const faqData: FAQItem[] = [
   // General Questions
   {
     id: 'what-is-credora',
-    question: 'What is Credora and how does it work?',
-    answer: 'Credora Inc is a professional cosigning service that helps renters secure apartments when they need an assigned cosigner or guarantor. We run comprehensive background checks and employment verification to assess each renter\'s ability to pay rent, then connect approved applicants with vetted, financially assigned cosigners who meet landlord requirements.',
+    question: 'What is Bredora and how does it work?',
+    answer: 'Bredora Inc is a professional cosigning service that helps renters secure apartments when they need an assigned cosigner or guarantor. We run comprehensive background checks and employment verification to assess each renter\'s ability to pay rent, then connect approved applicants with vetted, financially assigned cosigners who meet landlord requirements.',
     category: 'general'
   },
   {
@@ -27,7 +27,7 @@ const faqData: FAQItem[] = [
   {
     id: 'cosigner-vs-guarantor',
     question: 'What\'s the difference between a cosigner and guarantor?',
-    answer: 'The terms are often used interchangeably, but technically a cosigner signs the lease alongside you and shares equal responsibility, while a guarantor provides a separate guarantee to pay if you default. At Credora Inc, our professional cosigners function as guarantors - they don\'t live in the apartment but guarantee your rent payments to the landlord.',
+    answer: 'The terms are often used interchangeably, but technically a cosigner signs the lease alongside you and shares equal responsibility, while a guarantor provides a separate guarantee to pay if you default. At Bredora Inc, our professional cosigners function as guarantors - they don\'t live in the apartment but guarantee your rent payments to the landlord.',
     category: 'general'
   },
   {
@@ -46,7 +46,7 @@ const faqData: FAQItem[] = [
   // Pricing Questions
   {
     id: 'how-much-cost',
-    question: 'How much does Credora cost?',
+    question: 'How much does Bredora cost?',
     answer: 'Our pricing varies based on your situation. Students typically pay 75% of the first month\'s rent, while working professionals pay the equivalent of the first month\'s rent. There are no hidden fees - just one upfront payment for the cosigning service.',
     category: 'pricing'
   },
@@ -59,7 +59,7 @@ const faqData: FAQItem[] = [
   {
     id: 'refund-policy',
     question: 'What if I don\'t get approved for the apartment?',
-    answer: 'If you\'re approved by Credora Inc but then rejected by the landlord for reasons unrelated to the cosigner (such as too many applicants), we offer a full refund. However, if you\'re approved by both Credora Inc and the landlord but choose not to proceed, the fee is non-refundable.',
+    answer: 'If you\'re approved by Bredora Inc but then rejected by the landlord for reasons unrelated to the cosigner (such as too many applicants), we offer a full refund. However, if you\'re approved by both Bredora Inc and the landlord but choose not to proceed, the fee is non-refundable.',
     category: 'pricing'
   },
   {
@@ -105,7 +105,7 @@ const faqData: FAQItem[] = [
   {
     id: 'meet-cosigner',
     question: 'Will I meet my cosigner in person?',
-    answer: 'Not necessarily. Our cosigners are professional service providers, not personal contacts. Communication typically happens through Credora Inc as an intermediary. However, if the landlord requires an in-person meeting or phone call, we can facilitate that.',
+    answer: 'Not necessarily. Our cosigners are professional service providers, not personal contacts. Communication typically happens through Bredora Inc as an intermediary. However, if the landlord requires an in-person meeting or phone call, we can facilitate that.',
     category: 'process'
   },
   {
@@ -145,7 +145,7 @@ const faqData: FAQItem[] = [
   {
     id: 'states-covered',
     question: 'Which states do you operate in?',
-    answer: 'Credora Inc operates in all 50 states, with the highest concentration of cosigners in major metropolitan areas like New York, Los Angeles, Chicago, Boston, San Francisco, Washington DC, and other major cities.',
+    answer: 'Bredora Inc operates in all 50 states, with the highest concentration of cosigners in major metropolitan areas like New York, Los Angeles, Chicago, Boston, San Francisco, Washington DC, and other major cities.',
     category: 'general'
   },
   {
@@ -215,7 +215,7 @@ export default function FAQPageClient() {
             Frequently Asked Questions
           </h1>
           <p className="text-xl text-slate-600 mb-8">
-            Everything you need to know about Credora Inc's apartment cosigning service. Can't find what you're looking for? <Link href="/contact" className="text-slate-700 hover:text-slate-900 underline">Contact us</Link>.
+            Everything you need to know about Bredora Inc's apartment cosigning service. Can't find what you're looking for? <Link href="/contact" className="text-slate-700 hover:text-slate-900 underline">Contact us</Link>.
           </p>
           
           {/* Search Bar */}

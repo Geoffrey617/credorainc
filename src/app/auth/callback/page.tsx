@@ -83,7 +83,7 @@ export default function AuthCallbackPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              <h1 className="text-2xl font-bold text-slate-800 mb-4">Welcome to Credora Inc!</h1>
+              <h1 className="text-2xl font-bold text-slate-800 mb-4">Welcome to Bredora Inc!</h1>
               <p className="text-slate-600 mb-6">{message}</p>
             </>
           )}

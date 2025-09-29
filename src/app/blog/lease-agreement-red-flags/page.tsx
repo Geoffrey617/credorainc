@@ -106,7 +106,7 @@ export default function LeaseRedFlagsBlog() {
           <div className="bg-yellow-50 border-l-4 border-yellow-400 p-6 mb-8">
             <h4 className="text-base font-semibold text-yellow-800 mb-2">💡 Pro Tip:</h4>
             <p className="text-yellow-700">
-              If you're working with a professional cosigning service like Credora, we review lease terms as part of our service to help protect you from unfavorable agreements.
+              If you're working with a professional cosigning service like Bredora, we review lease terms as part of our service to help protect you from unfavorable agreements.
             </p>
           </div>
 
@@ -128,7 +128,7 @@ export default function LeaseRedFlagsBlog() {
           <div className="bg-slate-50 p-8 rounded-2xl mt-12">
             <h3 className="text-lg font-semibold text-slate-900 mb-4">Professional Lease Review</h3>
             <p className="text-slate-700 mb-6">
-              When you work with Credora's cosigning service, our team reviews lease agreements to help identify potential issues and protect your interests throughout the rental process.
+              When you work with Bredora's cosigning service, our team reviews lease agreements to help identify potential issues and protect your interests throughout the rental process.
             </p>
             <Link 
               href="/auth/signin" 

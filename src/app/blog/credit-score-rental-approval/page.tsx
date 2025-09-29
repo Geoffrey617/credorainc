@@ -87,7 +87,7 @@ export default function CreditScoreRentalBlog() {
 
           <h3 className="text-lg font-semibold text-slate-800 mb-3">Professional Cosigning Services</h3>
           <p className="text-slate-700 mb-6">
-            If your rental history is limited, don't give up on your apartment dreams. Apartment Finder and lease cosigner services like Credora can provide the financial backing landlords require, even if your personal rental history isn't extensive.
+            If your rental history is limited, don't give up on your apartment dreams. Apartment Finder and lease cosigner services like Bredora can provide the financial backing landlords require, even if your personal rental history isn't extensive.
           </p>
 
           <h3 className="text-lg font-semibold text-slate-800 mb-3">Benefits of Professional Cosigners</h3>
@@ -107,7 +107,7 @@ export default function CreditScoreRentalBlog() {
           <div className="bg-slate-50 p-8 rounded-2xl mt-12">
             <h3 className="text-lg font-semibold text-slate-900 mb-4">Credit Concerns? We Can Help</h3>
             <p className="text-slate-700 mb-6">
-              Don't let a low credit score prevent you from getting the apartment you want. Credora's professional cosigning service has helped thousands of renters with credit challenges secure their ideal homes.
+              Don't let a low credit score prevent you from getting the apartment you want. Bredora's professional cosigning service has helped thousands of renters with credit challenges secure their ideal homes.
             </p>
             <Link 
               href="/auth/signin" 

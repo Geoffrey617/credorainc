@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
 
     const response = await fetch(nominatimUrl, {
       headers: {
-        'User-Agent': 'Credora-Address-Autocomplete/1.0'
+        'User-Agent': 'Bredora-Address-Autocomplete/1.0'
       }
     });
 

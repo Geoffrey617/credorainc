@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
     const { data, error: emailError } = await resend.emails.send({
       from: 'Bredora Inc <noreply@bredora.com>',
       to: [email],
-      subject: 'Reset your password - Credora Inc',
+      subject: 'Reset your password - Bredora Inc',
       html: `
         <!DOCTYPE html>
         <html>
@@ -64,18 +64,18 @@ export async function POST(request: NextRequest) {
           <meta charset="utf-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <meta name="color-scheme" content="light dark">
-          <title>Reset your password - Credora Inc</title>
+          <title>Reset your password - Bredora Inc</title>
         </head>
         <body style="font-family: Arial, sans-serif; line-height: 1.6; color-scheme: light dark; max-width: 600px; margin: 0 auto; padding: 20px;">
           <div style="background: linear-gradient(135deg, #64748b 0%, #475569 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
-            <h1 style="color: white; margin: 0; font-size: 32px; font-weight: bold;">Credora Inc</h1>
+            <h1 style="color: white; margin: 0; font-size: 32px; font-weight: bold;">Bredora Inc</h1>
             <p style="color: #e2e8f0; margin: 10px 0 0 0; font-size: 16px;">Apartment finder & Lease Cosigner Service</p>
           </div>
           
           <div style="background: white; padding: 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 10px 10px;">
             <p style="margin: 0 0 20px 0; font-size: 16px;">Hi ${user.first_name || 'there'},</p>
             
-            <p style="margin: 0 0 20px 0; font-size: 16px;">We received a request to reset your password for your Credora account.</p>
+            <p style="margin: 0 0 20px 0; font-size: 16px;">We received a request to reset your password for your Bredora account.</p>
             
             <p style="margin: 0 0 30px 0; font-size: 16px;">Click the button below to reset your password:</p>
             
@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
               </p>
               
               <p style="color: #64748b; font-size: 12px; margin: 0; line-height: 1.5;">
-                Email is not a secure method of communication because it may be intercepted by third parties. Please do not include any sensitive or private information in your email correspondence directed to Credora.
+                Email is not a secure method of communication because it may be intercepted by third parties. Please do not include any sensitive or private information in your email correspondence directed to Bredora.
               </p>
             </div>
             
@@ -110,7 +110,7 @@ export async function POST(request: NextRequest) {
             <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;">
             
             <p style="color: #9ca3af; font-size: 12px; margin: 10px 0 0 0;">
-              © 2025 Credora Inc • Apartment Finder & Lease Cosigner Service<br>
+              © 2025 Bredora Inc • Apartment Finder & Lease Cosigner Service<br>
               San Francisco, California • All rights reserved
             </p>
           </div>
