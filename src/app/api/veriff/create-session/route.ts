@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
 
     // Use HTTPS callback URL (required by Veriff)
     const httpsCallback = callback?.includes('localhost') 
-      ? 'https://credorainc.com/auth/landlords/verification-complete'
+      ? 'https://bredora.com/auth/landlords/verification-complete'
       : callback;
 
     const requestBody = {

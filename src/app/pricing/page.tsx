@@ -17,11 +17,11 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Pricing - Bredora Inc | Transparent Lease Cosigner Service Rates",
     description: "Simple, transparent pricing for lease cosigner service. Student rates from 75% of rent, standard rates from first month's rent.",
-    url: "https://credorainc.com/pricing",
+    url: "https://bredora.com/pricing",
     siteName: "Bredora Inc",
     images: [
       {
-        url: "https://credorainc.com/og-pricing.jpg",
+        url: "https://bredora.com/og-pricing.jpg",
         width: 1200,
         height: 630,
         alt: "Bredora Inc - Transparent Pricing for Lease Cosigner Services"
@@ -33,10 +33,10 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Pricing - Bredora Inc | Transparent Lease Cosigner Service Rates",
     description: "Simple, transparent pricing for lease cosigner service. Student rates from 75% of rent.",
-    images: ["https://credorainc.com/og-pricing.jpg"]
+    images: ["https://bredora.com/og-pricing.jpg"]
   },
   alternates: {
-    canonical: "https://credorainc.com/pricing"
+    canonical: "https://bredora.com/pricing"
   }
 };
 
@@ -49,13 +49,13 @@ export default function PricingPage() {
         "@type": "ListItem",
         "position": 1,
         "name": "Home",
-        "item": "https://credorainc.com"
+        "item": "https://bredora.com"
       },
       {
         "@type": "ListItem",
         "position": 2,
         "name": "Pricing",
-        "item": "https://credorainc.com/pricing"
+        "item": "https://bredora.com/pricing"
       }
     ]
   };

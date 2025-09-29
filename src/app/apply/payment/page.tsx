@@ -178,7 +178,7 @@ export default function PaymentPage() {
             </div>
             <div className="flex items-center space-x-4">
               <span className="text-gray-700">Need help?</span>
-              <a href="mailto:support@credora.com" className="text-blue-600 hover:text-blue-700">
+              <a href="mailto:support@bredora.com" className="text-blue-600 hover:text-blue-700">
                 Contact Support
               </a>
             </div>

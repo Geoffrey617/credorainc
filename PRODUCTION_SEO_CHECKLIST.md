@@ -8,7 +8,7 @@
 - Updated all metadata, structured data, and social links
 
 ### **✅ 2. Domain Configuration**
-- Updated all URLs from `credora.com` to `credorainc.com`
+- Updated all URLs from `credora.com` to `bredora.com`
 - Updated sitemap, robots.txt, canonical URLs
 - Updated all Open Graph and Twitter Card URLs
 - Updated structured data organization info
@@ -82,23 +82,23 @@
 3. **Update Environment Variables** (5 minutes):
    ```bash
    # Update .env.local for production:
-   NEXTAUTH_URL=https://credorainc.com
+   NEXTAUTH_URL=https://bredora.com
    NEXT_PUBLIC_SUPABASE_URL=https://lzpeggbbytjgeoumomsg.supabase.co
    # Add other production URLs
    ```
 
 4. **Google Search Console Setup** (10 minutes):
-   - Add credorainc.com property
-   - Submit sitemap: `https://credorainc.com/sitemap.xml`
+   - Add bredora.com property
+   - Submit sitemap: `https://bredora.com/sitemap.xml`
    - Verify ownership with meta tag
 
 ### **🔧 Production Deployment Checklist**
 
-- [ ] **Domain Setup**: Point credorainc.com to your hosting
+- [ ] **Domain Setup**: Point bredora.com to your hosting
 - [ ] **SSL Certificate**: Ensure HTTPS is working
 - [ ] **Environment Variables**: Update all URLs to production
 - [ ] **Social Media**: Update Twitter handle to @CredoraInc
-- [ ] **Email**: Update support email to support@credorainc.com
+- [ ] **Email**: Update support email to support@bredora.com
 - [ ] **Analytics**: Add Google Analytics 4 tracking
 - [ ] **Search Console**: Submit sitemap and verify
 

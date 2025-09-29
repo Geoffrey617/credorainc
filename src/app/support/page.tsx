@@ -22,8 +22,8 @@ export const metadata: Metadata = createMetadata({
 
 export default function SupportPage() {
   const breadcrumbSchema = createBreadcrumbSchema([
-    { name: "Home", url: "https://credorainc.com" },
-    { name: "Support", url: "https://credorainc.com/support" }
+    { name: "Home", url: "https://bredora.com" },
+    { name: "Support", url: "https://bredora.com/support" }
   ]);
 
   return (

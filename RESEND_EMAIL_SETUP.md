@@ -29,14 +29,14 @@ The landlord sign-up functionality requires email verification, which uses the R
 For production, you'll need to verify your domain:
 1. In Resend dashboard, go to **Domains**
 2. Click **Add Domain**
-3. Enter your domain (e.g., `credorainc.com`)
+3. Enter your domain (e.g., `bredora.com`)
 4. Follow the DNS verification steps
 
 ## 🔧 Development vs Production
 
 ### Development (localhost)
 - Resend allows sending emails from any address during development
-- The current setup uses `noreply@credorainc.com` as the sender
+- The current setup uses `noreply@bredora.com` as the sender
 - Emails will be sent but may go to spam folders
 
 ### Production

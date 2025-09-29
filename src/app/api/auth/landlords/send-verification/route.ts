@@ -194,7 +194,7 @@ export async function POST(request: NextRequest) {
                 <div style="margin-bottom: 25px; padding: 15px 0; border-top: 1px solid #475569; border-bottom: 1px solid #475569;">
                     <p style="font-size: 13px; color: #ffffff; margin: 0 0 8px 0; font-weight: bold; font-family: Arial, Helvetica, sans-serif;">Need Help?</p>
                     <p style="font-size: 13px; color: #94a3b8; margin: 0; line-height: 1.4; font-family: Arial, Helvetica, sans-serif;">
-                        Email: <a href="mailto:landlords@credorainc.com" style="color: #60a5fa; text-decoration: none; font-weight: bold;">landlords@credorainc.com</a> | 
+                        Email: <a href="mailto:landlords@bredora.com" style="color: #60a5fa; text-decoration: none; font-weight: bold;">landlords@bredora.com</a> | 
                         Phone: <a href="tel:+1-855-997-6615" style="color: #60a5fa; text-decoration: none; font-weight: bold;">855-997-6615</a>
                     </p>
                 </div>
@@ -202,13 +202,13 @@ export async function POST(request: NextRequest) {
                 <!-- Links Section -->
                 <div style="margin-bottom: 25px;">
                     <div style="display: inline-block; line-height: 1.6;">
-                        <a href="https://credorainc.com/landlords" style="color: #60a5fa; text-decoration: none; font-size: 12px; margin: 0 8px; font-family: Arial, Helvetica, sans-serif;">Landlord Resources</a>
+                        <a href="https://bredora.com/landlords" style="color: #60a5fa; text-decoration: none; font-size: 12px; margin: 0 8px; font-family: Arial, Helvetica, sans-serif;">Landlord Resources</a>
                         <span style="color: #94a3b8; margin: 0 2px;">•</span>
-                        <a href="https://credorainc.com/pricing" style="color: #60a5fa; text-decoration: none; font-size: 12px; margin: 0 8px; font-family: Arial, Helvetica, sans-serif;">Plans & Pricing</a>
+                        <a href="https://bredora.com/pricing" style="color: #60a5fa; text-decoration: none; font-size: 12px; margin: 0 8px; font-family: Arial, Helvetica, sans-serif;">Plans & Pricing</a>
                         <span style="color: #94a3b8; margin: 0 2px;">•</span>
-                        <a href="https://credorainc.com/contact" style="color: #60a5fa; text-decoration: none; font-size: 12px; margin: 0 8px; font-family: Arial, Helvetica, sans-serif;">Contact Support</a>
+                        <a href="https://bredora.com/contact" style="color: #60a5fa; text-decoration: none; font-size: 12px; margin: 0 8px; font-family: Arial, Helvetica, sans-serif;">Contact Support</a>
                         <span style="color: #94a3b8; margin: 0 2px;">•</span>
-                        <a href="https://credorainc.com/terms" style="color: #60a5fa; text-decoration: none; font-size: 12px; margin: 0 8px; font-family: Arial, Helvetica, sans-serif;">Terms of Service</a>
+                        <a href="https://bredora.com/terms" style="color: #60a5fa; text-decoration: none; font-size: 12px; margin: 0 8px; font-family: Arial, Helvetica, sans-serif;">Terms of Service</a>
                     </div>
                 </div>
                 
@@ -238,7 +238,7 @@ This verification link expires in 24 hours.
 If you didn't create a Credora landlord account, you can safely ignore this email.
 
 Need help? Contact us:
-Email: landlords@credorainc.com
+Email: landlords@bredora.com
 Phone: 1-800-CREDORA
 
 DISCLAIMER: This transmission may contain information that is privileged, confidential and/or exempt from disclosure under applicable law. If you are not the intended recipient, you are hereby notified that any disclosure, copying, distribution or use of the information contained herein (including any reliance thereon) is STRICTLY PROHIBITED. If you received this transmission in error, please immediately contact the sender and destroy the material in its entirety, whether in electronic or in hard copy format.
@@ -249,7 +249,7 @@ Email is not a secure method of communication because it may be intercepted by t
 `;
 
     const data = await resend.emails.send({
-      from: 'Credora Landlord Portal <noreply@credorainc.com>',
+      from: 'Bredora Landlord Portal <noreply@bredora.com>',
       to: [email],
       subject: `Verify Your Landlord Account - Welcome to Credora, ${firstName}!`,
       html: htmlContent,

@@ -16,7 +16,7 @@ async function testVeriffAPI() {
       },
       body: JSON.stringify({
         verification: {
-          callback: 'https://credorainc.com/api/veriff/webhook',
+          callback: 'https://bredora.com/api/veriff/webhook',
           person: {
             reference: 'test-landlord-123'
           },

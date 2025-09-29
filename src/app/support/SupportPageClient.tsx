@@ -83,7 +83,7 @@ export default function SupportPageClient() {
                 Send us a detailed message
               </p>
               <a 
-                href="mailto:support@credorainc.com"
+                href="mailto:support@bredora.com"
                 className="bg-white text-green-700 px-6 py-2 rounded-lg font-semibold hover:bg-green-50 transition-colors inline-block"
               >
                 Send Email

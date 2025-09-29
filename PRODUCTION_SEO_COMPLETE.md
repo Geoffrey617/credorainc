@@ -5,7 +5,7 @@
 ### **🏷️ Site Branding & Domain Configuration**
 - ✅ Updated from "Credora LLC" to "Credora Inc"
 - ✅ Updated tagline to "Apartment finder & Lease Cosigner service"
-- ✅ All URLs updated from `credora.com` to `credorainc.com`
+- ✅ All URLs updated from `credora.com` to `bredora.com`
 - ✅ All metadata, structured data, and social links updated
 - ✅ Robots.txt and sitemap updated for new domain
 
@@ -185,13 +185,13 @@ Create these images at 1200x630px:
 - `public/twitter-image.jpg` (Twitter cards)
 
 ### **2. Deploy to Production Domain**
-- Point `credorainc.com` to your hosting
+- Point `bredora.com` to your hosting
 - Ensure HTTPS/SSL is working
 - Update environment variables for production
 
 ### **3. Google Search Console Setup (5 minutes)**
-- Add `credorainc.com` property
-- Submit sitemap: `https://credorainc.com/sitemap.xml`
+- Add `bredora.com` property
+- Submit sitemap: `https://bredora.com/sitemap.xml`
 - Verify ownership
 
 ### **4. Analytics Setup**

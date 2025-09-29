@@ -172,7 +172,7 @@ export default function TermsPage() {
                 </ul>
               </div>
               <p className="text-slate-600 leading-relaxed">
-                Refund requests must be submitted in writing to support@credora.com within the applicable timeframe.
+                Refund requests must be submitted in writing to support@bredora.com within the applicable timeframe.
               </p>
             </div>
 
@@ -265,7 +265,7 @@ export default function TermsPage() {
                 If you have questions about these Terms of Service, please contact us:
               </p>
               <div className="space-y-2 text-slate-600">
-                <p><strong>Email:</strong> legal@credora.com</p>
+                <p><strong>Email:</strong> legal@bredora.com</p>
                 <p><strong>Phone:</strong> 1-800-CREDORA (1-800-273-3672)</p>
                 <p><strong>Business Hours:</strong> Monday-Friday, 9:00 AM - 6:00 PM PST</p>
               </div>

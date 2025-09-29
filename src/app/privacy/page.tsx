@@ -20,8 +20,8 @@ export const metadata: Metadata = createMetadata({
 
 export default function PrivacyPolicyPage() {
   const breadcrumbSchema = createBreadcrumbSchema([
-    { name: "Home", url: "https://credorainc.com" },
-    { name: "Privacy Policy", url: "https://credorainc.com/privacy" }
+    { name: "Home", url: "https://bredora.com" },
+    { name: "Privacy Policy", url: "https://bredora.com/privacy" }
   ]);
   return (
     <>
@@ -139,7 +139,7 @@ export default function PrivacyPolicyPage() {
             
             <h3 className="text-xl font-semibold text-gray-900 mb-3">Access and Correction</h3>
             <p className="text-gray-700 mb-4">
-              You have the right to access, update, or correct your personal information. Contact us at privacy@credora.com to exercise these rights.
+              You have the right to access, update, or correct your personal information. Contact us at privacy@bredora.com to exercise these rights.
             </p>
 
             <h3 className="text-xl font-semibold text-gray-900 mb-3">Marketing Communications</h3>
@@ -192,7 +192,7 @@ export default function PrivacyPolicyPage() {
             </p>
             
             <div className="bg-gray-50 p-6 rounded-lg mb-6">
-              <p className="text-gray-700 mb-2"><strong>Email:</strong> privacy@credora.com</p>
+              <p className="text-gray-700 mb-2"><strong>Email:</strong> privacy@bredora.com</p>
               <p className="text-gray-700 mb-2"><strong>Phone:</strong> 1-800-CREDORA (1-800-273-3672)</p>
             </div>
 

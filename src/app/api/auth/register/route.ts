@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
     // Send verification email
     try {
       const { data, error } = await resend.emails.send({
-        from: 'Credora Inc <noreply@credorainc.com>',
+        from: 'Bredora Inc <noreply@bredora.com>',
         to: [email],
         subject: 'Action required: verify your email',
         html: `
@@ -132,16 +132,16 @@ export async function POST(request: NextRequest) {
             </div>
             
             <div style="margin-bottom: 20px;">
-              <a href="https://credorainc.com/apartments" style="color: #64748b; text-decoration: none; margin: 0 15px; font-size: 14px;">Find Apartments</a>
-              <a href="https://credorainc.com/for-renters" style="color: #64748b; text-decoration: none; margin: 0 15px; font-size: 14px;">Renters</a>
-              <a href="https://credorainc.com/pricing" style="color: #64748b; text-decoration: none; margin: 0 15px; font-size: 14px;">Pricing</a>
-              <a href="https://credorainc.com/faq" style="color: #64748b; text-decoration: none; margin: 0 15px; font-size: 14px;">FAQ</a>
+              <a href="https://bredora.com/apartments" style="color: #64748b; text-decoration: none; margin: 0 15px; font-size: 14px;">Find Apartments</a>
+              <a href="https://bredora.com/for-renters" style="color: #64748b; text-decoration: none; margin: 0 15px; font-size: 14px;">Renters</a>
+              <a href="https://bredora.com/pricing" style="color: #64748b; text-decoration: none; margin: 0 15px; font-size: 14px;">Pricing</a>
+              <a href="https://bredora.com/faq" style="color: #64748b; text-decoration: none; margin: 0 15px; font-size: 14px;">FAQ</a>
             </div>
             
             <div style="margin-bottom: 20px;">
-              <a href="https://credorainc.com/contact" style="color: #64748b; text-decoration: none; margin: 0 15px; font-size: 14px;">Contact</a>
-              <a href="https://credorainc.com/privacy" style="color: #64748b; text-decoration: none; margin: 0 15px; font-size: 14px;">Privacy</a>
-              <a href="https://credorainc.com/cookies" style="color: #64748b; text-decoration: none; margin: 0 15px; font-size: 14px;">Cookies</a>
+              <a href="https://bredora.com/contact" style="color: #64748b; text-decoration: none; margin: 0 15px; font-size: 14px;">Contact</a>
+              <a href="https://bredora.com/privacy" style="color: #64748b; text-decoration: none; margin: 0 15px; font-size: 14px;">Privacy</a>
+              <a href="https://bredora.com/cookies" style="color: #64748b; text-decoration: none; margin: 0 15px; font-size: 14px;">Cookies</a>
             </div>
             
             <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;">
@@ -153,7 +153,7 @@ export async function POST(request: NextRequest) {
             
             <p style="color: #9ca3af; font-size: 11px; margin: 15px 0 0 0;">
               You received this email because you signed up for Credora Inc.<br>
-              <a href="https://credorainc.com/contact" style="color: #64748b;">Contact us</a> if you have questions.
+              <a href="https://bredora.com/contact" style="color: #64748b;">Contact us</a> if you have questions.
             </p>
           </div>
         </body>

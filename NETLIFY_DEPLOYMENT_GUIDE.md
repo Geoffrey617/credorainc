@@ -25,7 +25,7 @@
 #### **Add Your Domain:**
 1. In Netlify dashboard → **Domain settings**
 2. Click "Add custom domain"
-3. Enter your domain: `credora.com`
+3. Enter your domain: `bredora.com`
 4. Click "Add domain"
 
 #### **Set Up DNS:**
@@ -44,7 +44,7 @@
 #### **Add Domain to Resend:**
 1. Go to [resend.com/domains](https://resend.com/domains)
 2. Click "Add Domain"
-3. Enter: `credora.com`
+3. Enter: `bredora.com`
 4. Copy the DNS records provided
 
 #### **Add DNS Records in Netlify:**
@@ -65,7 +65,7 @@ Value: [provided by Resend - unique key]
 # DMARC Record (Optional but recommended)
 Type: TXT
 Name: _dmarc
-Value: v=DMARC1; p=quarantine; rua=mailto:dmarc@credora.com
+Value: v=DMARC1; p=quarantine; rua=mailto:dmarc@bredora.com
 ```
 
 ### 4. ⚙️ Environment Variables
@@ -79,10 +79,10 @@ Value: v=DMARC1; p=quarantine; rua=mailto:dmarc@credora.com
 RESEND_API_KEY=re_39TvdQPL_65KwBqZZLZgq5mtGwZXF82dV
 
 # Production URL (update with your domain)
-NEXT_PUBLIC_BASE_URL=https://credora.com
+NEXT_PUBLIC_BASE_URL=https://bredora.com
 
 # Email sender (use your verified domain)
-FROM_EMAIL=Credora <noreply@credora.com>
+FROM_EMAIL=Bredora <noreply@bredora.com>
 ```
 
 ### 5. 🔄 Redeploy
@@ -96,7 +96,7 @@ FROM_EMAIL=Credora <noreply@credora.com>
 ## 🧪 Testing the Email Flow
 
 ### **Test Signup Process:**
-1. Go to: `https://credora.com/auth/signup`
+1. Go to: `https://bredora.com/auth/signup`
 2. Sign up with any email address
 3. Check inbox for verification email
 4. Click verification link
@@ -186,8 +186,8 @@ FROM_EMAIL=Credora <noreply@credora.com>
 
 Once all steps are complete:
 
-1. **Domain**: `https://credora.com`
-2. **Email**: Sending from `noreply@credora.com`
+1. **Domain**: `https://bredora.com`
+2. **Email**: Sending from `noreply@bredora.com`
 3. **Verification**: Full email verification flow
 4. **Performance**: Global CDN delivery
 5. **Security**: HTTPS + email authentication

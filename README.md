@@ -273,8 +273,8 @@ npm run dev
 ## 📞 Contact Information
 
 **Bredora Lease Cosigning Services**
-- **Website**: https://credora.com
-- **Email**: info@credora.com
+- **Website**: https://bredora.com
+- **Email**: info@bredora.com
 - **Phone**: 855-997-6615
 - **Mailing Address**: 50 California Street, Suite 1500, San Francisco, CA 94111
 

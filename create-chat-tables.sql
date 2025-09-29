@@ -83,5 +83,5 @@ CREATE TRIGGER update_chat_conversations_updated_at
 -- Insert sample admin user for testing (optional)
 -- You can remove this if you don't want sample data
 INSERT INTO chat_conversations (user_email, user_name, status, last_message, last_message_at) 
-VALUES ('admin@credorainc.com', 'Admin', 'active', 'Welcome to Credora Support!', NOW())
+VALUES ('admin@bredora.com', 'Admin', 'active', 'Welcome to Bredora Support!', NOW())
 ON CONFLICT DO NOTHING;

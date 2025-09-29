@@ -15,7 +15,7 @@
 
 ### 3. Set Up Domain (Optional but Recommended)
 1. Go to [Domains](https://resend.com/domains)
-2. Add your domain (e.g., `credora.com`)
+2. Add your domain (e.g., `bredora.com`)
 3. Add the required DNS records
 4. Wait for verification ✅
 
@@ -30,14 +30,14 @@ RESEND_API_KEY=re_xxxxxxxxxxxxxxxxxxxxxxxxxx
 NEXT_PUBLIC_BASE_URL=http://localhost:3000
 
 # Email Configuration (use your verified domain)
-FROM_EMAIL=noreply@credora.com
+FROM_EMAIL=noreply@bredora.com
 ```
 
 ### 5. Update Email Settings
 In `src/app/api/auth/send-verification/route.ts`, update:
 
 ```typescript
-from: 'Credora <noreply@credora.com>', // Replace with your verified domain
+from: 'Bredora <noreply@bredora.com>', // Replace with your verified domain
 ```
 
 ## 🔧 Development vs Production

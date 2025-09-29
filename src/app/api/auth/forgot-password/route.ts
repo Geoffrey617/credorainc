@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
 
     // Send password reset email
     const { data, error: emailError } = await resend.emails.send({
-      from: 'Credora Inc <noreply@credorainc.com>',
+      from: 'Bredora Inc <noreply@bredora.com>',
       to: [email],
       subject: 'Reset your password - Credora Inc',
       html: `
@@ -103,8 +103,8 @@ export async function POST(request: NextRequest) {
             </div>
             
             <div style="margin-bottom: 20px;">
-              <a href="https://credorainc.com/contact" style="color: #64748b; text-decoration: none; margin: 0 15px; font-size: 14px;">Contact Support</a>
-              <a href="https://credorainc.com/privacy" style="color: #64748b; text-decoration: none; margin: 0 15px; font-size: 14px;">Privacy</a>
+              <a href="https://bredora.com/contact" style="color: #64748b; text-decoration: none; margin: 0 15px; font-size: 14px;">Contact Support</a>
+              <a href="https://bredora.com/privacy" style="color: #64748b; text-decoration: none; margin: 0 15px; font-size: 14px;">Privacy</a>
             </div>
             
             <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;">

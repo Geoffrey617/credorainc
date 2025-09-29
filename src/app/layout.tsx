@@ -47,13 +47,13 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://credorainc.com',
+    url: 'https://bredora.com',
     siteName: 'Bredora',
     title: 'Bredora - Apartment Finder & Lease Cosigner Service',
     description: 'Apartment finder and lease cosigner service. Get approved in 24-48 hours. Serving all 50 states.',
     images: [
       {
-        url: 'https://credorainc.com/og-image.jpg',
+        url: 'https://bredora.com/og-image.jpg',
         width: 1200,
         height: 630,
         alt: 'Bredora - Apartment Finder & Lease Cosigner Service',
@@ -66,7 +66,7 @@ export const metadata: Metadata = {
     creator: '@Bredora',
     title: 'Bredora - Apartment Finder & Lease Cosigner Service',
     description: 'Apartment Finder and lease cosigner service. Get approved in 24-48 hours.',
-    images: ['https://credorainc.com/twitter-image.jpg'],
+    images: ['https://bredora.com/twitter-image.jpg'],
   },
   verification: {
     google: 'your-google-verification-code',
@@ -74,7 +74,7 @@ export const metadata: Metadata = {
     yahoo: 'your-yahoo-verification-code',
   },
   alternates: {
-    canonical: 'https://credorainc.com',
+    canonical: 'https://bredora.com',
   },
   category: 'Real Estate Services',
 };
@@ -89,13 +89,13 @@ export default function RootLayout({
     "@graph": [
       {
         "@type": "Organization",
-        "@id": "https://credorainc.com/#organization",
+        "@id": "https://bredora.com/#organization",
         "name": "Bredora",
         "legalName": "Bredora",
-        "url": "https://credorainc.com",
+        "url": "https://bredora.com",
         "logo": {
           "@type": "ImageObject",
-          "url": "https://credorainc.com/logo.png",
+          "url": "https://bredora.com/logo.png",
           "width": 300,
           "height": 100
         },
@@ -107,7 +107,7 @@ export default function RootLayout({
             "@type": "ContactPoint",
             "telephone": "+1-800-273-3672",
             "contactType": "customer service",
-            "email": "support@credorainc.com",
+            "email": "support@bredora.com",
             "availableLanguage": "English",
             "areaServed": "US"
           }
@@ -132,19 +132,19 @@ export default function RootLayout({
       },
       {
         "@type": "WebSite",
-        "@id": "https://credorainc.com/#website",
-        "url": "https://credorainc.com",
+        "@id": "https://bredora.com/#website",
+        "url": "https://bredora.com",
         "name": "Bredora",
         "description": "Professional apartment lease cosigning services with guaranteed approval",
         "publisher": {
-          "@id": "https://credorainc.com/#organization"
+          "@id": "https://bredora.com/#organization"
         },
         "potentialAction": [
           {
             "@type": "SearchAction",
             "target": {
               "@type": "EntryPoint",
-              "urlTemplate": "https://credorainc.com/apartments?search={search_term_string}"
+              "urlTemplate": "https://bredora.com/apartments?search={search_term_string}"
             },
             "query-input": "required name=search_term_string"
           }
@@ -152,11 +152,11 @@ export default function RootLayout({
       },
       {
         "@type": "Service",
-        "@id": "https://credorainc.com/#service",
+        "@id": "https://bredora.com/#service",
         "name": "Professional Apartment Cosigning Service",
         "description": "Guaranteed apartment lease approval through professional cosigning services",
         "provider": {
-          "@id": "https://credorainc.com/#organization"
+          "@id": "https://bredora.com/#organization"
         },
         "serviceType": "Lease Cosigning",
         "areaServed": {
@@ -192,12 +192,12 @@ export default function RootLayout({
       },
       {
         "@type": "LocalBusiness",
-        "@id": "https://credorainc.com/#localbusiness",
+        "@id": "https://bredora.com/#localbusiness",
         "name": "Bredora",
         "description": "Professional apartment lease cosigning services with guaranteed approval",
-        "url": "https://credorainc.com",
+        "url": "https://bredora.com",
         "telephone": "+1-800-273-3672",
-        "email": "support@credorainc.com",
+        "email": "support@bredora.com",
         "address": {
           "@type": "PostalAddress",
           "streetAddress": "50 California Street, Suite 1500",
@@ -244,7 +244,7 @@ export default function RootLayout({
         />
         <meta name="google-site-verification" content="your-google-verification-code" />
         <meta name="msvalidate.01" content="your-bing-verification-code" />
-        <link rel="canonical" href="https://credorainc.com" />
+        <link rel="canonical" href="https://bredora.com" />
         
         {/* Favicon and App Icons */}
         <link rel="icon" href="/favicon.ico" sizes="any" />

@@ -226,8 +226,8 @@ export default function ContactPageClient() {
                   <div>
                     <h3 className="font-semibold text-slate-900 mb-1">Email Support</h3>
                     <p className="text-slate-600 mb-2">Response within 24 hours</p>
-                    <a href="mailto:support@credorainc.com" className="text-slate-700 hover:text-slate-900 font-medium">
-                      support@credorainc.com
+                    <a href="mailto:support@bredora.com" className="text-slate-700 hover:text-slate-900 font-medium">
+                      support@bredora.com
                     </a>
                   </div>
                 </div>

@@ -31,13 +31,13 @@ This guide will help you get your business to appear in search results exactly a
 Business Name: Credora LLC
 Category: Financial Service / Real Estate Service
 Description: Professional apartment lease cosigning services with guaranteed approval. Serving all 50 states.
-Website: https://credora.com
+Website: https://bredora.com
 Phone: 855-997-6615
 Address: 50 California Street, Suite 1500, San Francisco, CA 94111
 ```
 
 ### 2. **Submit to Search Engines**
-- **Google Search Console**: Submit your sitemap at https://credora.com/sitemap.xml
+- **Google Search Console**: Submit your sitemap at https://bredora.com/sitemap.xml
 - **Bing Webmaster Tools**: Submit your site for indexing
 - **Yahoo**: Submit through Bing (they share the same index)
 
@@ -180,7 +180,7 @@ You'll know it's working when:
 
 ### Domain Setup
 Make sure your domain is configured properly:
-- **Primary domain**: https://credora.com
+- **Primary domain**: https://bredora.com
 - **SSL certificate**: Installed and working
 - **301 redirects**: From www to non-www (or vice versa)
 - **Fast loading**: Optimize images and code

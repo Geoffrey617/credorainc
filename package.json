@@ -73,7 +73,7 @@
     "type": "git",
     "url": "https://github.com/credora/credora-platform.git"
   },
-  "homepage": "https://credora.com",
+  "homepage": "https://bredora.com",
   "engines": {
     "node": ">=18.0.0",
     "npm": ">=8.0.0"

@@ -20,8 +20,8 @@ export const metadata: Metadata = createMetadata({
 
 export default function CookiePolicyPage() {
   const breadcrumbSchema = createBreadcrumbSchema([
-    { name: "Home", url: "https://credorainc.com" },
-    { name: "Cookie Policy", url: "https://credorainc.com/cookies" }
+    { name: "Home", url: "https://bredora.com" },
+    { name: "Cookie Policy", url: "https://bredora.com/cookies" }
   ]);
   return (
     <>
@@ -218,7 +218,7 @@ export default function CookiePolicyPage() {
             </p>
             
             <div className="bg-gray-50 p-6 rounded-lg mb-6">
-              <p className="text-gray-700 mb-2"><strong>Email:</strong> privacy@credora.com</p>
+              <p className="text-gray-700 mb-2"><strong>Email:</strong> privacy@bredora.com</p>
               <p className="text-gray-700 mb-2"><strong>Phone:</strong> 1-800-CREDORA (1-800-273-3672)</p>
             </div>
 

@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
 
     // Use the real Apple Pay merchant certificate
     const merchantId = process.env.APPLE_PAY_MERCHANT_ID || 'merchant.com.credorainc.payments';
-    const domainToVerify = process.env.APPLE_PAY_DOMAIN || 'credorainc.com';
+    const domainToVerify = process.env.APPLE_PAY_DOMAIN || 'bredora.com';
 
     console.log('🍎 Using real merchant ID:', merchantId);
     console.log('🍎 Validating domain:', domainToVerify);

@@ -215,7 +215,7 @@ export default function DashboardPage() {
                   </div>
                   <div>
                     <h5 className="font-semibold text-slate-800 text-sm mb-1">Email Support</h5>
-                    <p className="text-slate-600 text-xs">Send us an email at support@credorainc.com for detailed assistance.</p>
+                    <p className="text-slate-600 text-xs">Send us an email at support@bredora.com for detailed assistance.</p>
                   </div>
                   <div>
                     <h5 className="font-semibold text-slate-800 text-sm mb-1">Phone Support</h5>
