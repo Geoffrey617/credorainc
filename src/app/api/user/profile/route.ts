@@ -13,6 +13,7 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const email = searchParams.get('email');
+    const provider = searchParams.get('provider') || 'email'; // Default to email for backward compatibility
 
     if (!email) {
       return NextResponse.json(
@@ -21,9 +22,48 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    console.log('🔍 Fetching profile for:', email);
+    console.log('🔍 Fetching profile for:', email, 'Provider:', provider);
 
-    // Get user from database
+    // Handle Google users (Firebase) - they might not be in database
+    if (provider === 'google' || provider === 'firebase') {
+      console.log('🔍 Google user detected - checking database first');
+      
+      // First check if Google user exists in database
+      const { data: googleUser, error: googleError } = await supabase
+        .from('users')
+        .select('*')
+        .eq('email', email)
+        .single();
+
+      if (googleUser && !googleError) {
+        console.log('✅ Google user found in database:', email);
+        const { password_hash, ...profileData } = googleUser;
+        return NextResponse.json({
+          success: true,
+          profile: profileData,
+          source: 'database'
+        });
+      } else {
+        console.log('ℹ️ Google user not in database, returning minimal profile');
+        // Return minimal profile for Google users not in database
+        return NextResponse.json({
+          success: true,
+          profile: {
+            email: email,
+            provider: 'google',
+            email_verified: true,
+            first_name: '',
+            last_name: '',
+            phone: '',
+            created_at: new Date().toISOString(),
+            user_type: 'tenant'
+          },
+          source: 'auth_session'
+        });
+      }
+    }
+
+    // Handle email/password users (Supabase database)
     const { data: user, error } = await supabase
       .from('users')
       .select('*')
@@ -32,21 +72,22 @@ export async function GET(request: NextRequest) {
       .single();
 
     if (error || !user) {
-      console.log('❌ User not found:', email);
+      console.log('❌ Email user not found in database:', email);
       return NextResponse.json(
         { error: 'User not found' },
         { status: 404 }
       );
     }
 
-    console.log('✅ Profile loaded for:', email);
+    console.log('✅ Email user profile loaded from database:', email);
 
     // Return user profile (exclude sensitive data)
     const { password_hash, ...profileData } = user;
     
     return NextResponse.json({
       success: true,
-      profile: profileData
+      profile: profileData,
+      source: 'database'
     });
 
   } catch (error) {
@@ -61,7 +102,7 @@ export async function GET(request: NextRequest) {
 // PUT - Update user profile
 export async function PUT(request: NextRequest) {
   try {
-    const { email, firstName, lastName, phone } = await request.json();
+    const { email, firstName, lastName, phone, provider = 'email' } = await request.json();
 
     if (!email) {
       return NextResponse.json(
@@ -70,9 +111,97 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    console.log('🔄 Updating profile for:', email);
+    console.log('🔄 Updating profile for:', email, 'Provider:', provider);
 
-    // Prepare update data
+    // Handle Google users
+    if (provider === 'google' || provider === 'firebase') {
+      console.log('🔍 Google user update - checking if exists in database');
+      
+      // Check if Google user exists in database
+      const { data: existingUser } = await supabase
+        .from('users')
+        .select('*')
+        .eq('email', email)
+        .single();
+
+      if (existingUser) {
+        // Update existing Google user in database
+        const updateData: any = {};
+        if (firstName !== undefined) updateData.first_name = firstName;
+        if (lastName !== undefined) updateData.last_name = lastName;
+        if (phone !== undefined) updateData.phone = phone;
+        
+        const { data: updatedUser, error } = await supabase
+          .from('users')
+          .update(updateData)
+          .eq('email', email)
+          .select()
+          .single();
+
+        if (error) {
+          console.error('❌ Google user update error:', error);
+          return NextResponse.json(
+            { error: 'Failed to update profile' },
+            { status: 500 }
+          );
+        }
+
+        console.log('✅ Google user profile updated in database:', email);
+        const { password_hash, ...profileData } = updatedUser;
+        
+        return NextResponse.json({
+          success: true,
+          profile: profileData,
+          message: 'Profile updated successfully',
+          source: 'database'
+        });
+      } else {
+        // Create new database record for Google user
+        const { data: newUser, error } = await supabase
+          .from('users')
+          .insert([{
+            email,
+            first_name: firstName || '',
+            last_name: lastName || '',
+            phone: phone || '',
+            provider: 'google',
+            user_type: 'tenant',
+            email_verified: true
+          }])
+          .select()
+          .single();
+
+        if (error) {
+          console.error('❌ Failed to create Google user in database:', error);
+          // Return success anyway - Google users can work without database
+          return NextResponse.json({
+            success: true,
+            profile: {
+              email,
+              first_name: firstName || '',
+              last_name: lastName || '',
+              phone: phone || '',
+              provider: 'google',
+              email_verified: true,
+              user_type: 'tenant',
+              created_at: new Date().toISOString()
+            },
+            message: 'Profile updated (session only)',
+            source: 'auth_session'
+          });
+        }
+
+        console.log('✅ Google user created in database:', email);
+        return NextResponse.json({
+          success: true,
+          profile: newUser,
+          message: 'Profile created and updated successfully',
+          source: 'database'
+        });
+      }
+    }
+
+    // Handle email/password users (existing logic)
     const updateData: any = {};
     if (firstName !== undefined) updateData.first_name = firstName;
     if (lastName !== undefined) updateData.last_name = lastName;
@@ -88,7 +217,7 @@ export async function PUT(request: NextRequest) {
       .single();
 
     if (error) {
-      console.error('❌ Profile update error:', error);
+      console.error('❌ Email user update error:', error);
       return NextResponse.json(
         { error: 'Failed to update profile' },
         { status: 500 }
@@ -102,7 +231,7 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    console.log('✅ Profile updated for:', email);
+    console.log('✅ Email user profile updated:', email);
 
     // Return updated profile (exclude sensitive data)
     const { password_hash, ...profileData } = updatedUser;
@@ -110,7 +239,8 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({
       success: true,
       profile: profileData,
-      message: 'Profile updated successfully'
+      message: 'Profile updated successfully',
+      source: 'database'
     });
 
   } catch (error) {

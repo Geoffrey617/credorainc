@@ -32,8 +32,13 @@ export default function SettingsPage() {
 
   const loadUserProfile = async (userEmail: string) => {
     try {
-      // Fetch real user data from database
-      const response = await fetch(`/api/user/profile?email=${encodeURIComponent(userEmail)}`, {
+      // Detect provider type from auth user data
+      const provider = (authUser as any)?.provider || 'email';
+      
+      console.log('🔍 Loading profile for:', userEmail, 'Provider:', provider);
+      
+      // Fetch user data with provider information
+      const response = await fetch(`/api/user/profile?email=${encodeURIComponent(userEmail)}&provider=${provider}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -42,7 +47,7 @@ export default function SettingsPage() {
 
       if (response.ok) {
         const result = await response.json();
-        console.log('✅ User profile loaded:', result.profile.email);
+        console.log('✅ User profile loaded from database:', result.profile.email);
         setUser(result.profile);
         setFormData({
           firstName: result.profile.first_name || '',
@@ -51,9 +56,8 @@ export default function SettingsPage() {
           phone: result.profile.phone || ''
         });
       } else {
-        console.error('❌ Failed to load profile:', response.status);
-        setError('Failed to load your profile');
-        // Fallback to auth user data
+        console.log('ℹ️ Database profile not found, using auth user data');
+        // Use auth user data directly (no error message)
         setUser(authUser);
         setFormData({
           firstName: (authUser as any)?.firstName || (authUser as any)?.first_name || '',
@@ -63,9 +67,8 @@ export default function SettingsPage() {
         });
       }
     } catch (err) {
-      console.error('❌ Error loading profile:', err);
-      setError('Error loading your profile');
-      // Fallback to auth user data
+      console.log('ℹ️ Using auth user data as fallback');
+      // Use auth user data as fallback (no error message)
       setUser(authUser);
       setFormData({
         firstName: (authUser as any)?.firstName || (authUser as any)?.first_name || '',
@@ -108,6 +111,11 @@ export default function SettingsPage() {
     setError('');
 
     try {
+      // Detect provider type
+      const provider = (authUser as any)?.provider || user?.provider || 'email';
+      
+      console.log('💾 Saving profile for:', user?.email, 'Provider:', provider);
+      
       // Update user profile via API
       const response = await fetch('/api/user/profile', {
         method: 'PUT',
@@ -118,7 +126,8 @@ export default function SettingsPage() {
           email: user?.email,
           firstName: formData.firstName,
           lastName: formData.lastName,
-          phone: formData.phone
+          phone: formData.phone,
+          provider: provider
         })
       });
 
@@ -132,6 +141,7 @@ export default function SettingsPage() {
 
         // Update localStorage with new data
         const updatedLocalUser = {
+          ...authUser,
           ...user,
           firstName: result.profile.first_name,
           lastName: result.profile.last_name,
@@ -139,9 +149,20 @@ export default function SettingsPage() {
           last_name: result.profile.last_name,
           phone: result.profile.phone,
           name: `${result.profile.first_name} ${result.profile.last_name}`,
+          displayName: `${result.profile.first_name} ${result.profile.last_name}`,
           updatedAt: new Date().toISOString()
         };
+        
+        // Update both localStorage and sessionStorage for compatibility
         localStorage.setItem('credora_user', JSON.stringify(updatedLocalUser));
+        
+        // Also update session storage if it exists (for Google users)
+        const sessionData = sessionStorage.getItem('credora_session_temp');
+        if (sessionData) {
+          const session = JSON.parse(sessionData);
+          session.user = { ...session.user, ...updatedLocalUser };
+          sessionStorage.setItem('credora_session_temp', JSON.stringify(session));
+        }
 
         // Clear success message after 3 seconds
         setTimeout(() => setSaveStatus('idle'), 3000);
