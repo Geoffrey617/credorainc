@@ -266,9 +266,6 @@ function ApartmentFinderPaymentContent() {
           ← Back to form
         </Link>
       </div>
-      </div>
-      </div>
-      </div>
     </div>
   );
 }
