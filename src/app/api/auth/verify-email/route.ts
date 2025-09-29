@@ -67,8 +67,7 @@ export async function POST(request: NextRequest) {
       .update({ 
         email_verified: true,
         verification_token: null,
-        verification_expires: null,
-        verified_at: new Date().toISOString()
+        verification_expires: null
       })
       .eq('email', email)
       .eq('verification_token', token)
