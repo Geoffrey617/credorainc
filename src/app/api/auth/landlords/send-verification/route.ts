@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
       })
     ).toString('base64url');
 
-    const verificationUrl = `http://localhost:3000/auth/landlords/verify?token=${verificationToken}`;
+    const verificationUrl = `${process.env.NEXTAUTH_URL || 'https://bredora.com'}/auth/landlords/verify?token=${verificationToken}`;
 
     // HTML Email Template for Landlords
     const htmlContent = `

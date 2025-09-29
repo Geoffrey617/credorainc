@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
     const verificationToken = Buffer.from(JSON.stringify(tokenData)).toString('base64url');
     
     // Create verification URL
-    const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
+    const baseUrl = process.env.NEXTAUTH_URL || 'https://bredora.com';
     const verificationUrl = `${baseUrl}/auth/verify?token=${verificationToken}&email=${encodeURIComponent(email)}`;
 
     // Send verification email

@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
     })).toString('base64url');
 
     // Create reset URL
-    const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
+    const baseUrl = process.env.NEXTAUTH_URL || 'https://bredora.com';
     const resetUrl = `${baseUrl}/auth/reset-password?token=${resetToken}&email=${encodeURIComponent(email)}`;
 
     // Send password reset email
