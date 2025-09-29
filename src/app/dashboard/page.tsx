@@ -39,9 +39,9 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 w-full" style={{backgroundColor: '#f8fafc'}}>
       {/* Dashboard Content - Add top padding for the fixed navigation */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-16">
         {/* Welcome Section */}
         <div className="bg-gradient-to-r from-slate-700 to-slate-800 rounded-xl p-8 text-white mb-8">
           <h2 className="text-2xl font-bold mb-2">
