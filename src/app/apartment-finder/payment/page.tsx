@@ -173,8 +173,6 @@ function ApartmentFinderPaymentContent() {
             <div className="bg-white rounded-xl shadow-lg p-8 h-full lg:pb-12">
               {/* Payment Form Container */}
               <div className="flex-1 min-h-0 h-full">
-                <h3 className="text-lg font-semibold text-slate-800 mb-6">Payment Information</h3>
-                
                 {/* Stripe Payment Element */}
                 <StripePaymentElement
                   amount={25000} // $250.00 in cents
@@ -228,15 +226,7 @@ function ApartmentFinderPaymentContent() {
         </div>
       </div>
 
-      {/* Back Link */}
-      <div className="text-center mt-8">
-        <Link
-          href="/apartment-finder"
-          className="text-slate-600 hover:text-slate-800 text-sm font-medium"
-        >
-          ← Back to form
-        </Link>
-      </div>
+      {/* Removed back link as requested */}
     </div>
   );
 }
